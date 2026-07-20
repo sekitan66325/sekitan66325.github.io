@@ -8,6 +8,7 @@
 </head>
 <body>
 
+  <!-- 背景色が完全に本体と同化した、すっきりとしたヘッダー -->
   <header class="site-header">
     <div class="header-inner">
       <h1 class="logo">真岡鐵道 運用調査資料ライブラリ</h1>
@@ -16,6 +17,7 @@
 
   <main class="container">
     
+    <!-- 注意書きセクション -->
     <section class="notice-section">
       <strong>【閲覧にあたっての注意事項】</strong>
       <p>本情報は有志の目撃情報および調査を基に作成した非公式データです。真岡鐵道株式会社様への問い合わせはおやめください。</p>
@@ -24,83 +26,150 @@
     <!-- 現行ダイヤ・車両別運用セクション -->
     <section class="content-section">
       <h2 class="section-title">現行ダイヤ 車両運用（箱ダイヤ）</h2>
-      <div class="grid-container">
+      
+      <ul class="list-container">
         
         <!-- モオカ14 平日 -->
-        <div class="card">
-          <span class="card-tag">定期列車 / 平日ダイヤ</span>
-          <div class="card-img-wrapper">
-            <img src="assets/moka14.png" alt="モオカ14" class="train-icon">
-          </div>
-          <h3>モオカ14【平日】</h3>
-          <p class="file-info">普通列車 運用箱ダイヤ</p>
-          <a href="path/to/moka14_heijitsu.pdf" class="btn-link" target="_blank">PDFを開く</a>
-        </div>
+        <li class="list-item">
+          <a href="path/to/moka14_heijitsu.pdf" class="btn-link" target="_blank">
+            <div class="item-left-block">
+              <div class="card-img-wrapper">
+                <img src="assets/moka14.png" alt="モオカ14" class="train-icon">
+              </div>
+              <div class="item-text-meta">
+                <span class="item-label">モオカ14【平日】<span class="size-badge">[PDF/32.4KB]</span></span>
+                <span class="card-tag">定期列車 / 平日ダイヤ · 普通列車 運用箱ダイヤ</span>
+              </div>
+            </div>
+            <div class="item-right-block">
+              <span class="chevron-right"></span>
+            </div>
+          </a>
+        </li>
 
         <!-- モオカ14 休日 -->
-        <div class="card">
-          <span class="card-tag">定期列車 / 土休日ダイヤ</span>
-          <div class="card-img-wrapper">
-            <img src="assets/moka14b.png" alt="モオカ14" class="train-icon">
-          </div>
-          <h3>モオカ14【休日】</h3>
-          <p class="file-info">普通列車 運用箱ダイヤ</p>
-          <a href="path/to/moka14_kyujitsu.pdf" class="btn-link" target="_blank">PDFを開く</a>
-        </div>
+        <li class="list-item">
+          <a href="path/to/moka14_kyujitsu.pdf" class="btn-link" target="_blank">
+            <div class="item-left-block">
+              <div class="card-img-wrapper">
+                <img src="assets/moka14b.png" alt="モオカ14" class="train-icon">
+              </div>
+              <div class="item-text-meta">
+                <span class="item-label">モオカ14【休日】<span class="size-badge">[PDF/31.8KB]</span></span>
+                <span class="card-tag">定期列車 / 土休日ダイヤ · 普通列車 運用箱ダイヤ</span>
+              </div>
+            </div>
+            <div class="item-right-block">
+              <span class="chevron-right"></span>
+            </div>
+          </a>
+        </li>
 
         <!-- SLもおか（3種連結） -->
-        <div class="card">
-          <span class="card-tag">特定日運行 / SLもおか</span>
-          <div class="card-img-wrapper sl-composition">
-            <img src="assets/c12mk.png" alt="C12 66" class="train-icon loco-sl">
-            <img src="assets/moka50.png" alt="50系客車" class="train-icon coach">
-          </div>
-          <h3>C12 66・50系</h3>
-          <p class="file-info">SL・客車 運用箱ダイヤ</p>
-          <a href="path/to/c12_50kei.pdf" class="btn-link" target="_blank">PDFを開く</a>
-        </div>
+        <li class="list-item">
+          <a href="path/to/c12_50kei.pdf" class="btn-link" target="_blank">
+            <div class="item-left-block">
+              <div class="card-img-wrapper sl-composition">
+                <img src="assets/c12mk.png" alt="C12 66" class="train-icon loco-sl">
+                <img src="assets/moka50.png" alt="50系客車" class="train-icon coach">
+              </div>
+              <div class="item-text-meta">
+                <span class="item-label">C12 66・50系<span class="size-badge">[PDF/45.2KB]</span></span>
+                <span class="card-tag">特定日運行 / SLもおか · SL・客車 運用箱ダイヤ</span>
+              </div>
+            </div>
+            <div class="item-right-block">
+              <span class="chevron-right"></span>
+            </div>
+          </a>
+        </li>
 
         <!-- DE10 -->
-        <div class="card">
-          <span class="card-tag">特定日運行 / DL・回送</span>
-          <div class="card-img-wrapper">
-            <img src="assets/de10j1.png" alt="DE10 1535" class="train-icon loco-dl">
-          </div>
-          <h3>DE10 1535</h3>
-          <p class="file-info">DL 運用箱ダイヤ</p>
-          <a href="path/to/de10_1535.pdf" class="btn-link" target="_blank">PDFを開く</a>
-        </div>
+        <li class="list-item">
+          <a href="path/to/de10_1535.pdf" class="btn-link" target="_blank">
+            <div class="item-left-block">
+              <div class="card-img-wrapper">
+                <img src="assets/de10j1.png" alt="DE10 1535" class="train-icon loco-dl">
+              </div>
+              <div class="item-text-meta">
+                <span class="item-label">DE10 1535<span class="size-badge">[PDF/28.7KB]</span></span>
+                <span class="card-tag">特定日運行 / DL・回送 · DL 運用箱ダイヤ</span>
+              </div>
+            </div>
+            <div class="item-right-block">
+              <span class="chevron-right"></span>
+            </div>
+          </a>
+        </li>
         
-      </div>
+      </ul>
     </section>
 
     <!-- 月別 運用調査報告セクション -->
     <section class="content-section">
       <h2 class="section-title">月別 運用報告</h2>
-      <!-- 追加：更新タイミングを説明するテキスト -->
       <p class="section-desc">当月分の報告書は、毎日3:40頃に前日までの記録を記入して更新します。</p>
       
-      <div class="monthly-report-list">
-        <a href="path/to/mooka_report_202607.pdf" class="report-btn" target="_blank">
-          2026年7月分 運用報告書 (PDF)<span>[記入中]</span>
-        </a>
-        <a href="path/to/mooka_report_202606.pdf" class="report-btn" target="_blank">2026年6月分 運用報告書 (PDF)</a>
-        <a href="path/to/mooka_report_202605.pdf" class="report-btn" target="_blank">2026年5月分 運用報告書 (PDF)</a>
-      </div>
+      <ul class="list-container">
+        
+        <!-- 7月分（記入中） -->
+        <li class="list-item">
+          <a href="path/to/mooka_report_202607.pdf" class="report-btn" target="_blank">
+            <div class="item-left-block">
+              <div class="item-text-meta">
+                <span class="item-label">2026年7月分 運用報告書<span class="size-badge">[PDF/12.5KB]</span></span>
+              </div>
+            </div>
+            <div class="item-right-block">
+              <span class="status-badge">記入中</span>
+              <span class="chevron-right"></span>
+            </div>
+          </a>
+        </li>
+
+        <!-- 6月分 -->
+        <li class="list-item">
+          <a href="path/to/mooka_report_202606.pdf" class="report-btn" target="_blank">
+            <div class="item-left-block">
+              <div class="item-text-meta">
+                <span class="item-label">2026年6月分 運用報告書<span class="size-badge">[PDF/30.8KB]</span></span>
+              </div>
+            </div>
+            <div class="item-right-block">
+              <span class="chevron-right"></span>
+            </div>
+          </a>
+        </li>
+
+        <!-- 5月分 -->
+        <li class="list-item">
+          <a href="path/to/mooka_report_202605.pdf" class="report-btn" target="_blank">
+            <div class="item-left-block">
+              <div class="item-text-meta">
+                <span class="item-label">2026年5月分 運用報告書<span class="size-badge">[PDF/29.4KB]</span></span>
+              </div>
+            </div>
+            <div class="item-right-block">
+              <span class="chevron-right"></span>
+            </div>
+          </a>
+        </li>
+
+      </ul>
     </section>
 
   </main>
 
-<footer class="site-footer">
+  <!-- 境界線がなくなり、黒背景の上に自然に配置されたフッター -->
+  <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-title">せきたん</div>
       
-      <!-- 追加：連絡先・外部リンクエリア -->
-      <div class="footer-links">
-        <a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X (Twitter)</a>
-        <a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank" rel="noopener noreferrer">BOOTH</a>
-        <a href="mailto:sekitan.info@gmail.com" class="footer-link">メールでお問い合わせ</a>
-      </div>
+      <ul class="footer-links">
+        <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X (Twitter)</a></li>
+        <li><a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank" rel="noopener noreferrer">BOOTH</a></li>
+        <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">メールでお問い合わせ</a></li>
+      </ul>
 
       <p class="copyright">©せきたん All Rights Reserved 2026</p>
     </div>

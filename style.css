@@ -1,356 +1,294 @@
 /* ==========================================================================
-   1. 配色システム & タイポグラフィ (Rules 2 & 6)
+   1. 基本配色 & タイポグラフィ（シームレス・ダークUI仕様）
    ========================================================================== */
 :root {
-  font: 100%/1.625 system-ui, -apple-system, sans-serif; /* 本文 leading-relaxed (1.625) */
+  font: 100%/1.625 system-ui, -apple-system, sans-serif;
   
-  /* Learning Next グレースケール & システムカラー */
-  --bg-main: #FFFFFF;                                  /* 基本背景は完全な白 */
-  --bg-section: #F9FAFB;                               /* セクション背景 (gray-50) */
-  --text-main: #111827;                                /* 主要テキスト (gray-900) */
-  --text-sub: #374151;                                 /* 補助テキスト (gray-700) */
-  --text-caption: #4B5563;                             /* 注釈・説明 (gray-600) */
-  --border-normal: #D1D5DB;                            /* 境界線 (gray-300) */
-  --border-light: #E5E7EB;                             /* 薄境界線 (gray-200) */
+  /* 画面全体で完全に地続きの漆黒背景 */
+  --bg-system: #000000;
+  --bg-secondary: #1c1c1e;
+  --border-separator: #2c2c2e;
   
-  /* ブランド・システムカラー（WCAG適合 7:1以上確保） */
-  --blue-primary: #3B82F6;                             /* 主要アクション (blue-500) */
-  --blue-hover: #2563EB;                               /* ホバー状態 (blue-600) */
-  --blue-text: #1D4ED8;                                /* 白背景でのテキスト用 (blue-700) */
-  --blue-text-aaa: #1E40AF;                            /* 白背景AAA対応 (blue-800) */
+  /* 文字色はメイン・ヘッダー・フッターで完全共通化 */
+  --text-primary: #ffffff;           /* メインの白色テキスト */
+  --text-secondary: #a2a2a7;         /* 読みやすい明るさのグレー補助テキスト */
   
-  --color-success: #059669;                            /* 成功 (green-600) */
-  --color-warning: #D97706;                            /* 警告 (amber-600) */
-  --color-error: #DC2626;                              /* エラー (red-600) */
+  --text-link: #0a84ff;              /* アクセントブルー */
+  --color-error: #ff453a;            /* アラートレッド（記入中） */
+  --color-warning: #ff9f0a;          /* 注意オレンジ */
 }
 
-/* ダークモード時もコントラストルールを厳格に維持 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-main: #111827;
-    --bg-section: #1F2937;
-    --text-main: #F9FAFB;
-    --text-sub: #E5E7EB;
-    --text-caption: #9CA3AF;
-    --border-normal: #4B5563;
-    --border-light: #374151;
-    
-    --blue-primary: #3B82F6;
-    --blue-hover: #60A5FA;
-    --blue-text: #93C5FD;
-    --blue-text-aaa: #BFDBFE;
-    
-    --color-warning: #F59E0B;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  background-color: var(--bg-main);
-  color: var(--text-sub);
+  background-color: var(--bg-system);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  padding-bottom: 64px;
 }
 
-/* 階層に応じたサイズ、ウエイト、行間の厳格化 */
-.logo {
-  font-size: 1.25rem;                                  /* text-xl (20px) 相当 */
-  font-weight: 600;                                    /* font-semibold */
-  line-height: 1.25;                                   /* leading-tight */
-  color: var(--blue-text-aaa);                         /* 白背景で最も映える高コントラストブルー */
-  margin: 0;
-}
-
-.section-title {
-  font-size: 1.25rem;                                  /* text-xl */
-  font-weight: 600;                                    /* font-semibold */
-  line-height: 1.25;                                   /* leading-tight */
-  color: var(--text-main);
-  margin-top: 0;
-  margin-bottom: 8px;                                  /* space-y-2 */
-  border-left: none;                                   /* 不要な装飾の制限 */
-  padding-left: 0;
-}
-
-.section-desc {
-  font-size: 0.875rem;                                 /* text-sm */
-  color: var(--text-caption);                          /* gray-600 */
-  margin-top: 0;
-  margin-bottom: 24px;                                 /* space-y-6 */
+/* センターコンテナ（最大幅を共通化） */
+.header-inner, .container, .footer-inner {
+  width: 100%;
+  max-width: 56rem; /* 896px仕様 */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 /* ==========================================================================
-   2. レイアウト & カード・セクション構造 (Rules 3, 4, 5, 8)
+   2. ヘッダーデザイン（背景色・境界線を完全に排除）
    ========================================================================== */
 .site-header {
-  background-color: var(--bg-main);
-  border-bottom: 1px solid var(--border-light);
-  padding: 16px 0;                                     /* 標準余白 16px */
+  background-color: var(--bg-system); /* 背景を完全に同化 */
+  padding: 32px 0 16px 0;             /* 余白のバランス調整 */
 }
 
-.header-inner, .container {
-  width: 100%;
-  max-width: 56rem;                                    /* max-w-4xl (896px) に準拠調整 */
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 24px;                                  /* px-6 */
-  padding-right: 24px;
-  box-sizing: border-box;
+.logo {
+  font-size: 1.5rem;                  /* 少し存在感を持たせた大見出し */
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
 }
 
+/* ==========================================================================
+   3. メインコンテンツエリア & テキストサイズ
+   ========================================================================== */
 .container {
-  margin-top: 32px;                                    /* py-8 / space-y-8 */
+  margin-top: 16px;
   margin-bottom: 32px;
 }
 
-/* セクション背景を必要な場所（コンテンツエリア）に適用 */
-.content-section {
-  background: var(--bg-section);
-  border: 1px solid var(--border-normal);             /* border-gray-300 */
-  border-radius: 16px;                                 /* rounded-2xl */
-  padding: 24px;                                       /* 大カード内余白 p-6 */
-  margin-bottom: 32px;                                 /* セクション間隔 space-y-8 */
-}
-
-/* 4カラムグリッドシステム */
-.grid-container {
-  display: grid;
-  grid-template-columns: grid-cols-1;
-  gap: 24px;                                           /* gap-6 */
-}
-@media (min-width: 640px) { .grid-container { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .grid-container { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-
-/* 車両カード設計 */
-.card {
-  border: 1px solid var(--border-normal);             /* border-gray-300 */
-  border-radius: 16px;                                 /* rounded-2xl */
-  padding: 20px;                                       /* 標準カード内余白 p-5 */
-  background-color: var(--bg-main);
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);           /* shadow-sm (非インタラクティブ) */
-}
-
-.card-tag {
-  font-size: 0.75rem;                                  /* text-xs */
-  color: var(--text-caption);
-  margin-bottom: 4px;
-}
-
-.card h3 {
-  font-size: 1.125rem;                                 /* text-lg */
+.section-title {
+  font-size: 1.25rem; 
   font-weight: 600;
-  margin: 0 0 8px 0;
-  color: var(--text-main);
+  color: var(--text-primary);
+  margin-top: 32px;
+  margin-bottom: 12px;
 }
 
-.file-info {
-  font-size: 0.875rem;                                 /* text-sm */
-  color: var(--text-caption);
-  margin: 0 0 16px 0;
-  margin-top: auto;
+.section-desc {
+  font-size: 0.95rem; 
+  color: var(--text-secondary);
+  margin-top: -4px;
+  margin-bottom: 16px;
+}
+
+/* 注意書き */
+.notice-section {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.notice-section strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--color-warning);
+  margin-bottom: 8px;
+}
+
+.notice-section p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   4. UI領域全体をボタン化するリスト構造（領域バグ修正済み）
+   ========================================================================== */
+.content-section {
+  margin-bottom: 32px;
+}
+
+.list-container {
+  background-color: var(--bg-secondary);
+  border-radius: 14px;
+  overflow: hidden;
+  list-style: none;
+}
+
+.list-item {
+  position: relative;
+}
+
+.list-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  right: 0;
+  height: 0.5px;
+  background-color: var(--border-separator);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* リンク自体をコンテナ全域まで広げる（完全ボタン化） */
+.btn-link, .report-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 56px; 
+  padding: 16px 24px;
+  text-decoration: none;
+  color: var(--text-primary);
+  background-color: transparent;
+  transition: background-color 150ms ease;
+  user-select: none; 
+}
+
+.btn-link:hover, .report-btn:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.btn-link:active, .report-btn:active {
+  background-color: #2c2c2e !important;
+}
+
+/* 内部レイアウト */
+.item-left-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .card-img-wrapper {
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-end; 
-  height: 72px;          
-  margin: 8px 0 16px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-light); 
+  width: 56px;
+  height: 38px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .train-icon {
-  height: 56px;                                        /* 56px一律固定仕様 */
-  width: auto;           
-  image-rendering: pixelated; 
+  height: 32px;
+  width: auto;
+  image-rendering: pixelated;
 }
 
 .sl-composition {
-  display: flex;
-  align-items: flex-end;
   gap: 4px;
 }
-
-/* ==========================================================================
-   3. インタラクション & ボタン設計 (Rules 5, 7, 9 厳格適応版)
-   ========================================================================== */
-.btn-link, .report-btn {
-  display: block;
-  font-weight: 600;                                    /* font-semibold (視認性重視) */
-  box-sizing: border-box;
-  
-  /* 標準トランジション（200ms ease-in-out） */
-  transition: all 200ms ease-in-out;
+.sl-composition .train-icon {
+  height: 26px;
 }
 
-/* プライマリボタン（PDFを開く） */
-.btn-link {
-  text-align: center;
-  background-color: var(--blue-primary);               /* bg-blue-500 */
-  color: #FFFFFF;                                      /* 青背景には常に白 */
-  text-decoration: none;
-  padding: 12px 24px;                                  /* 標準ボタン px-6 py-3 (48px高確保) */
-  border-radius: 12px;                                 /* rounded-xl */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);           /* shadow-sm */
-}
-
-.btn-link:hover {
-  background-color: var(--blue-hover);                 /* bg-blue-600 */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);           /* shadow-md */
-  transform: scale(1.02);                              /* 動きを少しマイルドに調整 */
-}
-
-/* --- 月別報告書リスト（デザインルール厳格修正） --- */
-.monthly-report-list {
+.item-text-meta {
   display: flex;
   flex-direction: column;
-  gap: 12px;                                           /* コンポーネント間 space-y-4 (16px) に近い間隔へ微調整 */
+  gap: 2px;
 }
 
-.report-btn {
+.item-label {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.card-tag, .file-info {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* 容量表示バッジ */
+.size-badge {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  margin-left: 6px;
+}
+
+/* 右側アクションブロック */
+.item-right-block {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px 24px;                                  /* タッチターゲット 44px 以上を確実に確保 */
-  border: 2px solid var(--blue-text);                  /* border-2 border-blue-700 */
-  background-color: var(--bg-main);                    /* bg-white */
-  color: var(--blue-text);                             /* text-blue-700 */
-  text-decoration: none;
-  border-radius: 12px;                                 /* rounded-xl */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);           /* カード・ボタン標準影 shadow-sm */
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-/* ホバー効果の適正化：視認性最優先・過度な拡大の禁止 */
-.report-btn:hover {
-  background-color: var(--blue-hover);                 /* ホバー時はしっかりとした青 (bg-blue-600) へ */
-  border-color: var(--blue-hover);
-  color: #FFFFFF;                                      /* 青背景のテキスト色は常に白色（コントラスト比最高値へ） */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);           /* 影を一段階強化してフィードバックを提供 (shadow-md) */
-  transform: none;                                     /* 縦並びリストの連続的なブレを防ぐため、拡大モーションを排除 */
-}
-
-/* アクティブ状態：手触りを感じる最小限のフィードバック */
-.btn-link:active, .report-btn:active {
-  transform: scale(0.98) !important;                  /* 過度な縮小を抑え、自然な沈み込み(scale-98)に抑制 */
-}
-
-/* 右側のステータスバッジ */
-.report-btn span {
-  font-size: 0.75rem;                                  /* text-xs */
+.status-badge {
+  font-size: 0.9rem;
+  color: var(--color-error);
   font-weight: 600;
-  color: var(--color-error);                           /* エラー・警告色に準拠 */
-  background-color: rgba(220, 38, 38, 0.1);
-  padding: 2px 8px;
-  border-radius: 4px;
-  transition: all 200ms ease-in-out;
 }
 
-/* ホバー時にバッジの文字が背景の青に埋もれないよう、コントラストを自動反転 */
-.report-btn:hover span {
-  color: #FFFFFF;
-  background-color: rgba(255, 255, 255, 0.25);
+.chevron-right::after {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid #545456;
+  border-right: 2px solid #545456;
+  transform: rotate(45deg);
 }
 
 /* ==========================================================================
-   4. 注意書き & フッター (Rules 2, 10, 14)
+   5. フッターデザイン（背景色・境界線を完全に排除して地続き化）
    ========================================================================== */
-/* 注意書き：システムカラー警告（amber-600ベース、コントラスト比7:1確保） */
-.notice-section {
-  background-color: var(--notice-bg);
-  border: 1px solid var(--notice-border);
-  color: var(--notice-text);
-  border-radius: 12px;                                 /* rounded-xl */
-  padding: 16px 20px;
-  margin-bottom: 32px;                                 /* space-y-8 */
-  font-size: 0.875rem;                                 /* text-sm */
-}
-.notice-section p {
-  margin: 8px 0 0 0;
-}
-
-/* フッターデザイン */
 .site-footer {
-  background-color: var(--bg-section);
-  border-top: 1px solid var(--border-light);
-  padding: 48px 0;                                     /* 特大垂直余白 py-12 */
-  margin-top: 64px;                                    /* 最大余白 64px */
+  background-color: var(--bg-system);  /* 背景を完全に同化 */
+  padding: 64px 0 40px 0;             /* 上部に適度な空間を作る */
   text-align: center;
 }
 
 .footer-title {
-  font-size: 1.125rem;                                 /* text-lg */
-  font-weight: 600;                                    /* font-semibold */
-  color: var(--text-main);
-  margin-bottom: 8px;
-}
-
-.copyright {
-  font-size: 0.75rem;                                  /* text-xs */
-  color: var(--text-caption);
-  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
 }
 
 /* ==========================================================================
-   フッターリンク（Learning Next ルール適用）
+   修正: フッターリンクのホバー挙動をApple流に最適化
    ========================================================================== */
 .footer-links {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 24px;               /* space-x-6 / 間隔をしっかり空ける */
-  margin-top: 16px;        /* コンポーネント間 space-y-4 */
-  margin-bottom: 24px;     /* セクション内 space-y-6 */
+  gap: 8px; /* 少し間隔を調整 */
+  margin-bottom: 24px;
+  list-style: none;
 }
 
 .footer-link {
-  font-size: 0.875rem;     /* text-sm */
-  color: var(--text-caption); /* gray-600 ベースの落ち着いた色 */
+  font-size: 0.9rem;
+  color: var(--text-link); /* 最初から青（デフォルト） */
   text-decoration: none;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
-  min-height: 44px;        /* 最小タッチターゲット 44px を確保 */
-  padding: 0 4px;
-  transition: color 150ms ease-in-out; /* 色のみの標準トランジション */
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 8px; /* 角丸でタップ領域を明確化 */
+  transition: background-color 150ms ease;
 }
 
-/* ホバー効果：色の変化 + underline */
+/* ホバー時は背景をわずかに光らせる（色変えなし） */
 .footer-link:hover {
-  color: var(--blue-text); /* ホバー時は blue-700 に変化して視認性確保 */
-  text-decoration: underline;
+  background-color: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
 }
 
-/* フォーカス状態（アクセシビリティ重要） */
-.footer-link:focus-visible {
-  outline: none;
-  border-radius: 4px;
-  box-shadow: 0 0 0 2px var(--blue-primary); /* ring-2 ring-blue-500 */
+/* タップ（アクティブ）時はさらにハイライト */
+.footer-link:active {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* 著作権表記のマージン調整 */
 .copyright {
-  font-size: 0.75rem;      /* text-xs */
-  color: var(--text-caption);
-  margin: 0;
-  opacity: 0.8;
-}
-
-/* ==========================================================================
-   5. モーション配慮（アクセシビリティ対応）(Rule 10)
-   ========================================================================== */
-@media (prefers-reduced-motion: reduce) {
-  *, .btn-link, .report-btn {
-    transition: none !important;
-    animation: none !important;
-  }
-  .btn-link:hover, .report-btn:hover {
-    transform: none !important;
-  }
-  .btn-link:active, .report-btn:active {
-    transform: none !important;
-    opacity: 0.5;                                      /* 縮小の代わりに不透明度で応答 */
-  }
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
 }
