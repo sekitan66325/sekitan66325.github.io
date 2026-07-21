@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>真岡鐵道 車両運用資料ライブラリ</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 </head>
-
-<link rel="icon" href="assets/favicon.png" type="image/png">
-
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 
 <body>
 
@@ -21,6 +19,7 @@
 
   <div class="app-view-slider" id="app-slider">
 
+    <!-- 運用資料 タブ -->
     <section class="view-panel" id="view-library">
       <main class="container">
         
@@ -189,34 +188,65 @@
       </main>
     </section>
 
+    <!-- 目撃掲示板 タブ -->
     <section class="view-panel" id="view-board">
       <main class="container">
         
         <div class="board-form-card">
           <h2 class="section-title" style="margin-top:0;">目撃情報を投稿</h2>
+          
+          <!-- 入力レギュレーション（常時表示） -->
+          <div class="rule-box">
+            <strong class="rule-title">【記入ルール】</strong>
+            <p class="rule-text">
+              ・基本的に「年月日」「列車番号」「車両番号」を記入してください。<br>
+              ・時刻表記、運用番号表記は任意です。<br>
+              ・必要に応じて「備考 / 」を使用してください。
+            </p>
+            <div class="rule-example">2026/07/21 21:59
+145レ 14-2+14-6(A31+A6)
+備考 / 真岡駅で目撃。14-6を連結。</div>
+          </div>
+
           <form id="board-form" onsubmit="handlePostSubmit(event)">
             <div class="form-group">
               <label class="form-label">投稿者名</label>
-              <input type="text" id="board-name" class="form-input" placeholder="例：真岡太郎" required>
+              <input type="text" id="board-name" class="form-input" placeholder="ポッポちゃん" required>
             </div>
             <div class="form-group">
               <label class="form-label">目撃情報・本文</label>
-              <textarea id="board-message" class="form-textarea" rows="3" placeholder="例：本日モオカ14形 基本運用111レで確認" required></textarea>
+              <textarea id="board-message" class="form-textarea" rows="4" placeholder="年月日、列車番号、車両番号を規則に従って入力" required></textarea>
             </div>
             <div class="form-group">
-              <label class="form-label">削除・編集用暗証番号（数字4桁）</label>
-              <input type="password" id="board-password" class="form-input" maxlength="4" placeholder="1234" required>
+              <label class="form-label">削除・編集用暗証番号（半角英数字4桁以上）</label>
+              <input type="password" id="board-password" class="form-input" minlength="4" placeholder="任意の文字列" required>
             </div>
             <button type="submit" id="submit-btn" class="form-submit-btn">投稿する</button>
           </form>
         </div>
 
+        <!-- 投稿一覧 -->
         <section class="content-section">
           <h2 class="section-title">最新の目撃情報</h2>
           <ul id="board-list" class="list-container">
-            <li class="list-item" style="padding: 20px; text-align: center; color: var(--text-secondary);">
+            <li style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.875rem; list-style: none;">
               目撃情報を読み込んでいます...
             </li>
+          </ul>
+          <!-- ページネーションコントロール -->
+          <div id="pagination" class="pagination-container"></div>
+        </section>
+
+        <!-- 掲示板利用上の注意（画面最下部常時表示） -->
+        <section class="notice-section board-rules-notice">
+          <strong>掲示板利用にあたっての注意事項</strong>
+          <ul class="board-rules-list">
+            <li>自分で目撃した編成のみ書き込んでください。他人からの情報、ライブカメラの映像、独自のルートで集めた情報をまとめて書き込むなど、自分で見ていないものは絶対に書き込まないでください。</li>
+            <li>自分の書き込みを修正したり削除したい場合、該当投稿の「編集」または「削除」ボタンを押し、設定した暗証番号を入力して作業を行ってください。</li>
+            <li>誤った投稿を削除せず「下は間違いです」などと続けて投稿があった場合、管理人権限で投稿を削除します。記入ミスは投稿者本人が編集・削除に努めますようお願いします。</li>
+            <li>幾度も上記を守っていただけなかったり、目撃情報を転載してトラブルを持ち込むなどした場合は、アクセス禁止の処置を施します。</li>
+            <li>投稿いただいた全ての情報が運用調査報告に反映されるとは限りません。予めご了承ください。</li>
+            <li>掲示板がメンテナンス等で利用できない場合は書き込みできません。</li>
           </ul>
         </section>
 
@@ -250,7 +280,7 @@
     </div>
   </footer>
 
-  <!-- 編集用モーダル（すりガラス風UI） -->
+  <!-- 編集用モーダル -->
   <div id="edit-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
       <h3 style="margin-top:0; font-size: 1.1rem; color: var(--text-primary);">投稿を編集</h3>
@@ -258,8 +288,8 @@
       <input type="hidden" id="edit-post-id">
       
       <div class="form-group" style="margin-bottom: 12px;">
-        <label class="form-label" style="font-size: 0.8rem;">暗証番号（4桁）</label>
-        <input type="password" id="edit-password" class="form-input" maxlength="4" placeholder="1234">
+        <label class="form-label" style="font-size: 0.8rem;">暗証番号（半角英数字4桁以上）</label>
+        <input type="password" id="edit-password" class="form-input" minlength="4" placeholder="設定した暗証番号">
       </div>
       
       <div class="form-group" style="margin-bottom: 16px;">

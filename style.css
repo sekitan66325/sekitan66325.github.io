@@ -1,22 +1,17 @@
 /* ==========================================================================
-   1. 基本配色 & タイポグラフィ（シームレス・ダークUI仕様）
+   1. 基本配色 & タイポグラフィ（Apple HIG 準拠・完全地続きダークUI）
    ========================================================================== */
 :root {
-  font: 100%/1.6 system-ui, -apple-system, sans-serif;
-  
-  /* 画面全体で完全に地続きの漆黒背景 */
   --bg-system: #000000;
   --bg-secondary: #1c1c1e;
   
-  /* iOS純正スタイルの明るめのセパレーターカラー */
-  --border-separator: #38383a; 
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-separator: #2c2c2e;
   
-  /* 文字色はメイン・ヘッダー・フッターで完全共通化 */
-  --text-primary: #ffffff;           /* メインの白色テキスト */
-  --text-secondary: #a2a2a7;         /* 読みやすい明るさのグレー補助テキスト */
-  
-  --text-link: #0a84ff;              /* アクセントブルー */
-  --color-error: #ff453a;            /* アラートレッド（記入中） */
+  --text-primary: #f5f5f7;
+  --text-secondary: #86868b;
+  --text-link: #2997ff;       /* Apple System Blue */
+  --color-error: #ff453a;      /* Apple System Red */
 }
 
 * {
@@ -28,14 +23,15 @@
 body {
   background-color: var(--bg-system);
   color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   padding-bottom: 48px;
 }
 
-/* センターコンテナ（最大幅を 720px にキュッと集約） */
 .header-inner, .container, .footer-inner {
   width: 100%;
-  max-width: 45rem; /* 720px仕様：1画面での収まりと密度感を最優先 */
+  max-width: 45rem; /* 720px */
   margin-left: auto;
   margin-right: auto;
   padding-left: 20px;
@@ -43,22 +39,22 @@ body {
 }
 
 /* ==========================================================================
-   2. ヘッダーデザイン（背景色・境界線を完全に排除）
+   2. ヘッダー
    ========================================================================== */
 .site-header {
-  background-color: var(--bg-system); /* 背景を完全に同化 */
-  padding: 24px 0 12px 0;             /* 上下余白をコンパクト化 */
+  background-color: var(--bg-system);
+  padding: 28px 0 16px 0;
 }
 
 .logo {
-  font-size: 1.35rem;                 /* ほどよいサイズ感の大見出し */
+  font-size: 1.35rem;
   font-weight: 700;
-  line-height: 1.25;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 /* ==========================================================================
-   3. メインコンテンツエリア & テキストサイズ
+   3. メインコンテンツ & フォーム
    ========================================================================== */
 .container {
   margin-top: 12px;
@@ -66,62 +62,299 @@ body {
 }
 
 .section-title {
-  font-size: 1.15rem; 
+  font-size: 1.15rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-top: 24px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
 }
 
 .section-desc {
-  font-size: 0.875rem; 
+  font-size: 0.85rem;
   color: var(--text-secondary);
-  margin-top: -2px;
+  margin-top: -4px;
   margin-bottom: 12px;
 }
 
-/* 注意書き & お知らせ共通スタイル */
+/* 注意書き（汎用） */
 .notice-section {
   background-color: var(--bg-secondary);
   border-radius: 12px;
   padding: 16px 20px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-subtle);
 }
 
 .notice-section strong {
   display: block;
-  font-size: 0.975rem;
-  font-weight: 700;
-  color: var(--text-primary); /* 完全な白で強調 */
-  margin-bottom: 4px;
-  letter-spacing: 0.02em;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
 }
 
 .notice-section p {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
   line-height: 1.5;
 }
 
+/* 掲示板最下部 注意事項リスト */
+.board-rules-notice {
+  margin-top: 32px;
+  margin-bottom: 24px;
+}
+
+.board-rules-list {
+  padding-left: 18px;
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.board-rules-list li {
+  margin-bottom: 8px;
+}
+
+.board-rules-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* 入力レギュレーションボックス */
+.rule-box {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.rule-title {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.rule-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.rule-example {
+  font-size: 0.8rem;
+  font-family: monospace;
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+/* フォームカード */
+.board-form-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.form-input:focus, .form-textarea:focus {
+  border-color: var(--text-link);
+  background-color: rgba(255, 255, 255, 0.09);
+}
+
+.form-submit-btn {
+  width: 100%;
+  background-color: var(--text-link);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  margin-top: 6px;
+}
+
+.form-submit-btn:active {
+  opacity: 0.75;
+}
+
 /* ==========================================================================
-   4. UI領域全体をボタン化するリスト構造（コンパクトiOS仕様）
+   4. 投稿一覧リスト & カードデザイン
    ========================================================================== */
 .content-section {
   margin-bottom: 24px;
 }
 
-.list-container {
+#board-list {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  list-style: none !important;
+}
+
+.board-post-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 12px;
+  list-style: none;
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  border-bottom: 0.5px solid var(--border-separator);
+  padding-bottom: 6px;
+}
+
+.post-author {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.post-time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.post-body {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.post-btn-edit {
+  background: none;
+  border: none;
+  color: var(--text-link);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.9;
+  transition: opacity 150ms ease;
+}
+
+.post-btn-delete {
+  background: none;
+  border: none;
+  color: var(--color-error);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.9;
+  transition: opacity 150ms ease;
+}
+
+.post-btn-edit:hover, .post-btn-delete:hover {
+  opacity: 1;
+}
+
+/* ページネーション（10件切り替えコントロール） */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+
+.page-btn {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   5. 資料ライブラリ用リスト
+   ========================================================================== */
+.list-container:not(#board-list) {
   background-color: var(--bg-secondary);
   border-radius: 12px;
   overflow: hidden;
   list-style: none;
+  border: 1px solid var(--border-subtle);
 }
 
 .list-item {
   position: relative;
 }
 
-/* 基本の区切り線設定（右端も20px空ける） */
 .list-item:not(:last-child)::after {
   content: "";
   position: absolute;
@@ -133,307 +366,57 @@ body {
   pointer-events: none;
 }
 
-/* 【iOS仕様】アイコン付きリスト：左88px 〜 右20px */
-.list-item:has(.card-img-wrapper):not(:last-child)::after {
-  left: 88px; 
-}
+.list-item:has(.card-img-wrapper):not(:last-child)::after { left: 88px; }
+.list-item:has(.report-btn):not(:last-child)::after { left: 20px; }
 
-/* 【iOS仕様】アイコンなしリスト（運用報告など）：左20px 〜 右20px */
-.list-item:has(.report-btn):not(:last-child)::after {
-  left: 20px;
-}
-
-/* リンク自体をコンテナ全域まで広げる（完全ボタン化・高さをコンパクト化） */
 .btn-link, .report-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 48px; 
+  min-height: 48px;
   padding: 12px 20px;
   text-decoration: none;
   color: var(--text-primary);
   background-color: transparent;
   transition: background-color 150ms ease;
-  user-select: none; 
+  user-select: none;
 }
 
-.btn-link:hover, .report-btn:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-}
+.btn-link:hover, .report-btn:hover { background-color: rgba(255, 255, 255, 0.04); }
+.btn-link:active, .report-btn:active { background-color: #2c2c2e !important; }
 
-.btn-link:active, .report-btn:active {
-  background-color: #2c2c2e !important;
-}
-
-/* 内部レイアウト */
-.item-left-block {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
+.item-left-block { display: flex; align-items: center; gap: 14px; }
 .card-img-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  width: 52px; height: 36px;
   background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  overflow: hidden;
-  flex-shrink: 0;
+  border-radius: 6px; overflow: hidden; flex-shrink: 0;
 }
-
-.train-icon {
-  height: 28px;
-  width: auto;
-  image-rendering: pixelated;
-}
-
-.sl-composition {
-  gap: 4px;
-}
-.sl-composition .train-icon {
-  height: 24px;
-}
-
-.item-text-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.item-label {
-  font-size: 0.975rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.card-tag, .file-info {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-/* 容量表示バッジ */
-.size-badge {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
-  margin-left: 4px;
-}
-
-/* 右側アクションブロック */
-.item-right-block {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.status-badge {
-  font-size: 0.85rem;
-  color: var(--color-error);
-  font-weight: 600;
-}
-
+.train-icon { height: 28px; width: auto; image-rendering: pixelated; }
+.sl-composition { gap: 4px; }
+.sl-composition .train-icon { height: 24px; }
+.item-text-meta { display: flex; flex-direction: column; gap: 2px; }
+.item-label { font-size: 0.95rem; font-weight: 500; color: var(--text-primary); }
+.card-tag, .file-info { font-size: 0.8rem; color: var(--text-secondary); }
+.size-badge { font-size: 0.8rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; margin-left: 4px; }
+.item-right-block { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.status-badge { font-size: 0.85rem; color: var(--color-error); font-weight: 600; }
 .chevron-right::after {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-top: 2px solid #545456;
-  border-right: 2px solid #545456;
+  content: ""; display: inline-block; width: 8px; height: 8px;
+  border-top: 2px solid #545456; border-right: 2px solid #545456;
   transform: rotate(45deg);
 }
 
 /* ==========================================================================
-   5. フッターデザイン（背景色・境界線を完全に排除して地続き化）
+   6. スライド＆リキッドグラスバー
    ========================================================================== */
-.site-footer {
-  background-color: var(--bg-system);  /* 背景を完全に同化 */
-  padding: 48px 0 32px 0;             /* 上部に適度な空間を作る */
-  text-align: center;
-}
-
-.footer-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-}
-
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  list-style: none;
-}
-
-.footer-link {
-  font-size: 0.875rem;
-  color: var(--text-link); /* 最初から青（デフォルト） */
-  text-decoration: none;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 0 10px;
-  border-radius: 8px;
-  transition: background-color 150ms ease;
-}
-
-/* ホバー時は背景をわずかに光らせる */
-.footer-link:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  text-decoration: none;
-}
-
-/* タップ（アクティブ）時はさらにハイライト */
-.footer-link:active {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.copyright {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  opacity: 0.7;
-}
-
-/* ==========================================================================
-   6. ビュー切り替え & フローティング・リキッドグラスバー
-   ========================================================================== */
-
-/* タブの表示・非表示切替 */
-.tab-content {
-  display: none;
-}
-.tab-content.active {
-  display: block;
-  animation: fadeIn 200ms ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* 画面下部に浮遊するリキッドグラスバー */
-.floating-tab-bar {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  
-  /* リキッドグラス（すりガラス）質感 */
-  background: rgba(30, 30, 32, 0.65);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  
-  border: 0.5px solid rgba(255, 255, 255, 0.15);
-  border-radius: 32px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
-}
-
-/* タブボタン */
-.tab-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  padding: 8px 18px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* アクティブなタブ（iOSの選択状態） */
-.tab-btn.active {
-  background: rgba(255, 255, 255, 0.18);
-  color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.tab-btn:active {
-  transform: scale(0.96);
-}
-
-/* 投稿フォームエリア（掲示板タブ用） */
-.board-form-card {
-  background-color: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
-}
-
-.form-group {
-  margin-bottom: 12px;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-
-.form-input, .form-textarea {
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-separator);
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  outline: none;
-}
-
-.form-input:focus, .form-textarea:focus {
-  border-color: var(--text-link);
-}
-
-.form-submit-btn {
-  width: 100%;
-  background-color: var(--text-link);
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-}
-
-.form-submit-btn:active {
-  opacity: 0.8;
-}
-
-/* ==========================================================================
-   6. スライド＆リキッドグラスバー（つまみ完全一体化版）
-   ========================================================================== */
-
-/* 全体の横溢れを完全にブロック */
 html, body {
   overflow-x: hidden;
   width: 100%;
   position: relative;
 }
 
-/* スライドコンテナ */
 .app-view-slider {
   display: flex;
   width: 100%;
@@ -441,15 +424,10 @@ html, body {
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  
   scrollbar-width: none;
-  -ms-overflow-style: none;
 }
-.app-view-slider::-webkit-scrollbar {
-  display: none;
-}
+.app-view-slider::-webkit-scrollbar { display: none; }
 
-/* 各ビューパネル */
 .view-panel {
   flex: 0 0 100%;
   width: 100%;
@@ -459,61 +437,44 @@ html, body {
   padding-bottom: 110px;
 }
 
-/* --------------------------------------------------------------------------
-   フローティング・リキッドグラスバー
-   -------------------------------------------------------------------------- */
 .floating-tab-bar {
   position: fixed;
   bottom: calc(24px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  
   display: flex;
   align-items: center;
   padding: 4px;
   width: max-content;
-  
-  /* すりガラス（リキッドグラス）土台 */
   background: rgba(25, 25, 28, 0.75);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  
-  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border: 0.5px solid rgba(255, 255, 255, 0.18);
   border-radius: 32px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
   user-select: none;
   touch-action: none;
 }
 
-/* ヌルヌル移動するハイライトつまみ（これだけが背景として動く） */
 .tab-glider {
   position: absolute;
   top: 4px;
   left: 4px;
   height: calc(100% - 8px);
   width: 100px;
-  background: rgba(255, 255, 255, 0.22);
-  border: 0.5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  border: 0.5px solid rgba(255, 255, 255, 0.25);
   border-radius: 24px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1), width 250ms ease;
   pointer-events: none;
   z-index: 1;
 }
 
-/* ドラッグ中の演出 */
-.tab-glider.dragging {
-  transition: none;
-  background: rgba(255, 255, 255, 0.35);
-}
-
-/* タブボタン（背景は透明で固定） */
 .tab-btn {
   position: relative;
   z-index: 2;
-  background: transparent !important; /* ボタン自身の背景を完全に消去 */
-  box-shadow: none !important;        /* ボタン自身の影も完全消去 */
+  background: transparent !important;
   border: none;
   color: var(--text-secondary);
   padding: 8px 18px;
@@ -529,88 +490,35 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 選択中のボタンは文字色だけ白にする */
-.tab-btn.active {
-  color: var(--text-primary);
-  background: transparent !important;
-}
+.tab-btn.active { color: var(--text-primary); }
 
-/* 掲示板フォーム */
-.board-form-card {
-  background-color: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
-}
-
-.form-group {
-  margin-bottom: 12px;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-
-.form-input, .form-textarea {
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-separator);
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  outline: none;
-  font-family: inherit;
-}
-
-.form-input:focus, .form-textarea:focus {
-  border-color: var(--text-link);
-}
-
-.form-submit-btn {
-  width: 100%;
-  background-color: var(--text-link);
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-  margin-top: 4px;
-}
-
-.form-submit-btn:active {
-  opacity: 0.8;
-}
-
-/* 編集モーダルのスタイル */
+/* モーダル */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 9999; padding: 16px;
 }
 
 .modal-content {
-  background: var(--bg-secondary, #1c1c1e);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   border-radius: 16px;
-  width: 100%;
-  max-width: 420px;
+  width: 100%; max-width: 420px;
   padding: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
+
+/* フッター */
+.site-footer {
+  background-color: var(--bg-system);
+  padding: 48px 0 32px 0;
+  text-align: center;
+}
+.footer-title { font-size: 1.05rem; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
+.footer-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-bottom: 20px; list-style: none; }
+.footer-link { font-size: 0.875rem; color: var(--text-link); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 40px; padding: 0 10px; border-radius: 8px; }
+.copyright { font-size: 0.75rem; color: var(--text-secondary); opacity: 0.7; }

@@ -30,9 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/**
- * バイト数を KB や MB 単位に整形する関数
- */
 function formatBytes(bytes, decimals = 1) {
   if (bytes === 0) return '0KB';
   const k = 1024;
@@ -45,7 +42,7 @@ function formatBytes(bytes, decimals = 1) {
 
 
 /* ==========================================================================
-   2. スライド＆リキッドグラスバー（割り込み追従完全制御版）
+   2. スライド＆リキッドグラスバー
    ========================================================================== */
 const slider = document.getElementById('app-slider');
 const tabBar = document.getElementById('tab-bar');
@@ -58,9 +55,6 @@ let isAnimating = false;
 let startX = 0;
 let currentX = 0;
 
-/**
- * ハイライトつまみの位置と幅を対象ボタンに合わせる関数
- */
 function updateGliderPosition(index) {
   const targetBtn = index === 0 ? btn0 : btn1;
   if (!targetBtn || !glider || !tabBar) return;
@@ -76,9 +70,6 @@ function updateGliderPosition(index) {
   if (btn1) btn1.classList.toggle('active', index === 1);
 }
 
-/**
- * ボタンタップ等で該当画面へスムーズスライド
- */
 function scrollToView(index) {
   if (!slider) return;
   
@@ -100,7 +91,6 @@ function scrollToView(index) {
   }, 350);
 }
 
-// 画面直接スワイプ時の下部タブ位置連動
 if (slider) {
   slider.addEventListener('scroll', () => {
     if (isDragging || isAnimating) return;
@@ -112,9 +102,6 @@ if (slider) {
   });
 }
 
-/* --------------------------------------------------------------------------
-   ドラッグ・フリック操作
-   -------------------------------------------------------------------------- */
 if (tabBar) {
   let dragStartTime = 0;
 
@@ -187,11 +174,11 @@ if (tabBar) {
   window.addEventListener('touchcancel', endDrag);
 }
 
-// 初期化
 window.addEventListener('load', () => {
   updateGliderPosition(0);
   fetchBoardData();
 });
+
 window.addEventListener('resize', () => {
   if (!slider || isDragging || isAnimating) return;
   const index = slider.scrollLeft > slider.clientWidth * 0.5 ? 1 : 0;
@@ -200,13 +187,14 @@ window.addEventListener('resize', () => {
 
 
 /* ==========================================================================
-   3. 掲示板API通信 ＆ UI描画処理 (GAS連携・完全版)
+   3. 掲示板API通信 ＆ UI描画処理 (ページネーション対応)
    ========================================================================== */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyA_836JV_xFiWXXaVqbifUDkjIxxvY6Bv-CdunB8Jsj3kcMzmBbJIRuKtMJiYEPIrz/exec';
 
-/**
- * タイムスタンプの整形（秒単位保持）
- */
+let allPosts = [];       // 全投稿データ保持用
+let currentPage = 1;     // 現在のページ番号
+const ITEMS_PER_PAGE = 10; // 1ページあたりの表示件数
+
 function formatTimestamp(timestampStr) {
   if (!timestampStr) return '';
   if (timestampStr.includes('/')) return timestampStr;
@@ -224,9 +212,6 @@ function formatTimestamp(timestampStr) {
   return `${yyyy}/${mm}/${dd} ${hh}:${min}:${ss}`;
 }
 
-/**
- * XSS対策用エスケープ関数
- */
 function escapeHTML(str) {
   if (!str) return '';
   return String(str).replace(/[&<>'"]/g, 
@@ -235,7 +220,7 @@ function escapeHTML(str) {
 }
 
 /**
- * 投稿データを取得して画面に表示する
+ * 投稿データを取得
  */
 async function fetchBoardData() {
   const boardList = document.getElementById('board-list');
@@ -243,60 +228,81 @@ async function fetchBoardData() {
 
   try {
     const response = await fetch(GAS_URL);
-    const posts = await response.json();
+    allPosts = await response.json();
     
-    renderBoardPosts(posts);
+    renderBoardPosts();
   } catch (error) {
     console.error('データ取得エラー:', error);
-    boardList.innerHTML = `<li style="padding: 20px; text-align: center; color: #ff5252; list-style: none;">データの取得に失敗しました。</li>`;
+    boardList.innerHTML = `<li style="padding: 24px; text-align: center; color: var(--color-error); font-size: 0.85rem;">データの取得に失敗しました。</li>`;
   }
 }
 
 /**
- * 取得した投稿データをカードとして独立生成・挿入する
+ * 現在のページの投稿10件分を表示・ページネーション描画
  */
-function renderBoardPosts(posts) {
+function renderBoardPosts() {
   const boardList = document.getElementById('board-list');
+  const paginationContainer = document.getElementById('pagination');
   if (!boardList) return;
 
-  if (!posts || posts.length === 0) {
-    boardList.innerHTML = `<li style="padding: 20px; text-align: center; color: var(--text-secondary); list-style: none;">目撃情報はまだありません。</li>`;
+  if (!allPosts || allPosts.length === 0) {
+    boardList.innerHTML = `<li style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.875rem; list-style: none;">目撃情報はまだありません。</li>`;
+    if (paginationContainer) paginationContainer.innerHTML = '';
     return;
   }
 
-  boardList.style.listStyle = 'none';
-  boardList.style.padding = '0';
-  boardList.style.margin = '0';
+  // 10件区切りスライス計算
+  const totalPages = Math.ceil(allPosts.length / ITEMS_PER_PAGE);
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
 
-  boardList.innerHTML = posts.map(post => `
-    <li class="board-post-card" style="
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      list-style: none;
-    ">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 8px;">
-        <span style="font-weight: bold; font-size: 0.95rem; color: var(--text-primary);">${escapeHTML(post.name)}</span>
-        <span style="font-size: 0.75rem; color: var(--text-secondary); font-family: monospace;">${formatTimestamp(post.timestamp)}</span>
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentPosts = allPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  // カード描画
+  boardList.innerHTML = currentPosts.map(post => `
+    <li class="board-post-card">
+      <div class="post-header">
+        <span class="post-author">${escapeHTML(post.name)}</span>
+        <span class="post-time">${formatTimestamp(post.timestamp)}</span>
       </div>
-
-      <div style="font-size: 0.9rem; color: var(--text-primary); white-space: pre-wrap; word-break: break-all; line-height: 1.5; margin-bottom: 12px;">${escapeHTML(post.message)}</div>
-
-      <div style="text-align: right; display: flex; justify-content: flex-end; gap: 12px;">
-        <button onclick="handlePostEdit('${post.id}', '${escapeHTML(post.message)}')" style="background: transparent; border: none; color: #4fc3f7; font-size: 0.75rem; cursor: pointer; padding: 2px 6px;">編集</button>
-        <button onclick="handlePostDelete('${post.id}')" style="background: transparent; border: none; color: #ff5252; font-size: 0.75rem; cursor: pointer; padding: 2px 6px;">削除</button>
+      <div class="post-body">${escapeHTML(post.message)}</div>
+      <div class="post-actions">
+        <button class="post-btn-edit" onclick="handlePostEdit('${post.id}', '${escapeHTML(post.message)}')">編集</button>
+        <button class="post-btn-delete" onclick="handlePostDelete('${post.id}')">削除</button>
       </div>
     </li>
   `).join('');
+
+  // ページネーションボタン描画（11件以上ある場合のみ）
+  if (paginationContainer) {
+    if (totalPages > 1) {
+      paginationContainer.innerHTML = `
+        <button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← 前へ</button>
+        <span class="page-info">${currentPage} / ${totalPages}</span>
+        <button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>次へ →</button>
+      `;
+    } else {
+      paginationContainer.innerHTML = '';
+    }
+  }
 }
 
 /**
- * フォーム送信ハンドラー
+ * ページ移動処理
+ */
+function changePage(newPage) {
+  currentPage = newPage;
+  renderBoardPosts();
+  // リストの先頭へスクロール
+  const boardSection = document.getElementById('board-list');
+  if (boardSection) {
+    boardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+/**
+ * 投稿送信ハンドラー
  */
 async function handlePostSubmit(event) {
   event.preventDefault();
@@ -309,6 +315,13 @@ async function handlePostSubmit(event) {
   const name = nameInput ? nameInput.value.trim() : '';
   const message = messageInput ? messageInput.value.trim() : '';
   const password = passwordInput ? passwordInput.value.trim() : '';
+
+  // 半角英数字4桁以上バリデーション
+  const passRegex = /^[a-zA-Z0-9]{4,}$/;
+  if (!passRegex.test(password)) {
+    alert('暗証番号は半角英数字4桁以上で入力してください。');
+    return;
+  }
 
   if (!message) {
     alert('目撃情報・本文を入力してください。');
@@ -342,6 +355,7 @@ async function handlePostSubmit(event) {
       alert('投稿が完了しました！');
       if (messageInput) messageInput.value = '';
       if (passwordInput) passwordInput.value = '';
+      currentPage = 1; // 最新投稿を見せるため1ページ目へ
       fetchBoardData();
     } else {
       alert('送信エラー: ' + (result.message || '投稿に失敗しました'));
@@ -358,7 +372,7 @@ async function handlePostSubmit(event) {
 }
 
 /**
- * 編集ボタン押下時：モーダル表示
+ * 編集モーダル表示
  */
 function handlePostEdit(id, currentMessage) {
   const modal = document.getElementById('edit-modal');
@@ -369,7 +383,6 @@ function handlePostEdit(id, currentMessage) {
   if (!modal) return;
 
   idInput.value = id;
-  // エスケープ文字の復元
   messageInput.value = currentMessage
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
@@ -381,24 +394,22 @@ function handlePostEdit(id, currentMessage) {
   modal.style.display = 'flex';
 }
 
-/**
- * モーダルを閉じる
- */
 function closeEditModal() {
   const modal = document.getElementById('edit-modal');
   if (modal) modal.style.display = 'none';
 }
 
 /**
- * 編集データの送信処理
+ * 編集データの送信
  */
 async function submitPostEdit() {
   const id = document.getElementById('edit-post-id').value;
   const message = document.getElementById('edit-message').value.trim();
   const password = document.getElementById('edit-password').value.trim();
 
-  if (!password) {
-    alert('暗証番号を入力してください。');
+  const passRegex = /^[a-zA-Z0-9]{4,}$/;
+  if (!passRegex.test(password)) {
+    alert('暗証番号は半角英数字4桁以上で入力してください。');
     return;
   }
 
@@ -439,10 +450,10 @@ async function submitPostEdit() {
 }
 
 /**
- * 投稿の削除処理
+ * 削除処理
  */
 async function handlePostDelete(id) {
-  const password = prompt('投稿時に設定した4桁の暗証番号を入力してください:');
+  const password = prompt('投稿時に設定した半角英数字4桁以上の暗証番号を入力してください:');
   if (!password) return;
 
   const payload = {
