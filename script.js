@@ -41,3 +41,53 @@ function formatBytes(bytes, decimals = 1) {
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
 }
+
+function switchTab(tabName) {
+    // 全タブコンテンツを非表示
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    // 全ボタンのアクティブ解除
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+    if (tabName === 'library') {
+    document.getElementById('tab-library').classList.add('active');
+    event.currentTarget.classList.add('active');
+    } else if (tabName === 'board') {
+    document.getElementById('tab-board').classList.add('active');
+    event.currentTarget.classList.add('active');
+    // 掲示板を開いた時に最新データをGASから取得する処理を発火
+    fetchBoardData();
+    }
+}
+
+/**
+ * タブ切り替え・スライド連動制御
+ */
+const slider = document.getElementById('app-slider');
+const btnLibrary = document.getElementById('btn-tab-library');
+const btnBoard = document.getElementById('btn-tab-board');
+
+// ボタンを押して画面をスライド移動させる
+function scrollToView(index) {
+  const width = window.innerWidth;
+  slider.scrollTo({
+    left: width * index,
+    behavior: 'smooth'
+  });
+}
+
+// 横スクロールを検知して下部タブのアクティブ状態を追従させる
+if (slider) {
+  slider.addEventListener('scroll', () => {
+    const scrollLeft = slider.scrollLeft;
+    const width = window.innerWidth;
+    
+    // スクロール位置が画面半分の50%を超えたら切り替え
+    if (scrollLeft > width * 0.5) {
+      btnLibrary.classList.remove('active');
+      btnBoard.classList.add('active');
+    } else {
+      btnLibrary.classList.add('active');
+      btnBoard.classList.remove('active');
+    }
+  });
+}

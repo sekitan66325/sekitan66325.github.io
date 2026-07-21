@@ -302,3 +302,284 @@ body {
   color: var(--text-secondary);
   opacity: 0.7;
 }
+
+/* ==========================================================================
+   6. ビュー切り替え & フローティング・リキッドグラスバー
+   ========================================================================== */
+
+/* タブの表示・非表示切替 */
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+  animation: fadeIn 200ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 画面下部に浮遊するリキッドグラスバー */
+.floating-tab-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  
+  /* リキッドグラス（すりガラス）質感 */
+  background: rgba(30, 30, 32, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 32px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* タブボタン */
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 8px 18px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* アクティブなタブ（iOSの選択状態） */
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tab-btn:active {
+  transform: scale(0.96);
+}
+
+/* 投稿フォームエリア（掲示板タブ用） */
+.board-form-card {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-separator);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.form-input:focus, .form-textarea:focus {
+  border-color: var(--text-link);
+}
+
+.form-submit-btn {
+  width: 100%;
+  background-color: var(--text-link);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.form-submit-btn:active {
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   6. スライド＆リキッドグラスバー（ドラッグ追従・スクロールバー消去版）
+   ========================================================================== */
+
+/* 全体の横溢れを完全にブロック */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* スライドコンテナ：100vwではなく100%にして横スクロールバーを完全に消去 */
+.app-view-slider {
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  
+  /* スクロールバー消去（全ブラウザ対応） */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / Edge */
+}
+.app-view-slider::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
+/* パネル幅を100%（親要素にぴったりフィット）に設定 */
+.view-panel {
+  flex: 0 0 100%;
+  width: 100%;
+  max-width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  padding-bottom: 90px;
+}
+
+/* --------------------------------------------------------------------------
+   フローティング・リキッドグラスバー（つまみ追従・ドラッグ対応）
+   -------------------------------------------------------------------------- */
+.floating-tab-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  
+  /* リキッドグラス質感 */
+  background: rgba(25, 25, 28, 0.68);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  
+  border: 0.5px solid rgba(255, 255, 255, 0.16);
+  border-radius: 32px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  touch-action: none; /* ドラッグ操作の誤作動防止 */
+}
+
+/* ぬるぬる移動するハイライトつまみ（ニュイニュイ動く部分） */
+.tab-glider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  height: calc(100% - 8px);
+  width: 110px; /* JSで自動計算・調整されます */
+  background: rgba(255, 255, 255, 0.22);
+  border: 0.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1), width 250ms ease;
+  pointer-events: none; /* クリックを透過 */
+  z-index: 1;
+}
+
+/* ドラッグ中のぬめらか感アップ */
+.tab-glider.dragging {
+  transition: none; /* ドラッグ中は遅延なしで指に追従 */
+  background: rgba(255, 255, 255, 0.32);
+}
+
+/* タブボタン */
+.tab-btn {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: color 200ms ease;
+}
+
+.tab-btn.active {
+  color: var(--text-primary);
+}
+
+/* 掲示板フォーム */
+.board-form-card {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-separator);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.form-input:focus, .form-textarea:focus {
+  border-color: var(--text-link);
+}
+
+.form-submit-btn {
+  width: 100%;
+  background-color: var(--text-link);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+  margin-top: 4px;
+}
+
+.form-submit-btn:active {
+  opacity: 0.8;
+}

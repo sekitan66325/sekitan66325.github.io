@@ -2,206 +2,238 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>真岡鐵道 車両運用資料ライブラリ</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
-<!-- 通常のファビコン -->
 <link rel="icon" href="assets/favicon.png" type="image/png">
 
-<!-- Apple用アイコン -->
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 
 <body>
 
-  <!-- 背景色が完全に本体と同化した、すっきりとしたヘッダー -->
   <header class="site-header">
     <div class="header-inner">
-      <h1 class="logo">真岡鐵道 車両運用資料ライブラリ</h1>
+      <h1 class="logo">真岡鐵道 車両運用情報</h1>
     </div>
   </header>
 
-  <main class="container">
-    
-    <!-- 注意書きセクション -->
-    <section class="notice-section">
-      <strong>閲覧にあたっての注意事項</strong>
-      <p>本情報は有志の目撃情報および調査を基に作成した非公式データです。真岡鐵道株式会社様への問い合わせはおやめください。</p>
-    </section>
+  <div class="app-view-slider" id="app-slider">
 
-    <!-- 現行ダイヤ・車両別運用セクション -->
-    <section class="content-section">
-      <h2 class="section-title">現行ダイヤ 車両運用（箱ダイヤ）</h2>
-      
-      <ul class="list-container">
+    <section class="view-panel" id="view-library">
+      <main class="container">
         
-        <!-- モオカ14 基本運用 平日 -->
-        <li class="list-item">
-          <a href="unyou/202303/moka14-kihon.pdf" class="btn-link" target="_blank">
-            <div class="item-left-block">
-              <div class="card-img-wrapper">
-                <img src="assets/moka14.png" alt="モオカ14" class="train-icon">
-              </div>
-              <div class="item-text-meta">
-                <span class="item-label">モオカ14形 基本運用<span class="size-badge" data-file-size="unyou/202303/moka14-kihon.pdf">[PDF/--KB]</span></span>
-                <span class="card-tag">定期列車 / 普通列車 基本運用箱ダイヤ</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
+        <section class="notice-section">
+          <strong>閲覧にあたっての注意事項</strong>
+          <p>本情報は有志の目撃情報および調査を基に作成した非公式データです。真岡鐵道株式会社様への問い合わせはおやめください。</p>
+        </section>
 
-        <!-- モオカ14 付属運用 -->
-        <li class="list-item">
-          <a href="unyou/202303/moka14-fuzoku.pdf" class="btn-link" target="_blank">
-            <div class="item-left-block">
-              <div class="card-img-wrapper">
-                <img src="assets/moka14b.png" alt="モオカ14" class="train-icon">
-              </div>
-              <div class="item-text-meta">
-                <span class="item-label">モオカ14形 付属運用<span class="size-badge" data-file-size="unyou/202303/moka14-fuzoku.pdf">[PDF/--KB]</span></span>
-                <span class="card-tag">定期列車 / 普通列車 付属運用箱ダイヤ</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
+        <section class="content-section">
+          <h2 class="section-title">現行ダイヤ 車両運用（箱ダイヤ）</h2>
+          
+          <ul class="list-container">
+            
+            <li class="list-item">
+              <a href="unyou/202303/moka14-kihon.pdf" class="btn-link" target="_blank">
+                <div class="item-left-block">
+                  <div class="card-img-wrapper">
+                    <img src="assets/moka14.png" alt="モオカ14" class="train-icon">
+                  </div>
+                  <div class="item-text-meta">
+                    <span class="item-label">モオカ14形 基本運用<span class="size-badge" data-file-size="unyou/202303/moka14-kihon.pdf">[PDF/--KB]</span></span>
+                    <span class="card-tag">定期列車 / 普通列車 基本運用箱ダイヤ</span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
 
-        <!-- SL/PC -->
-        <li class="list-item">
-          <a href="unyou/202303/sl-pc.pdf" class="btn-link" target="_blank">
-            <div class="item-left-block">
-              <div class="card-img-wrapper sl-composition">
-                <img src="assets/c12mk.png" alt="C12 66" class="train-icon loco-sl">
-                <img src="assets/moka50.png" alt="50系客車" class="train-icon coach">
-              </div>
-              <div class="item-text-meta">
-                <span class="item-label">C12 66・50系<span class="size-badge" data-file-size="unyou/202303/sl-pc.pdf">[PDF/--KB]</span></span>
-                <span class="card-tag">特定日運行 / SLもおか · SL・客車 運用箱ダイヤ</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
+            <li class="list-item">
+              <a href="unyou/202303/moka14-fuzoku.pdf" class="btn-link" target="_blank">
+                <div class="item-left-block">
+                  <div class="card-img-wrapper">
+                    <img src="assets/moka14b.png" alt="モオカ14" class="train-icon">
+                  </div>
+                  <div class="item-text-meta">
+                    <span class="item-label">モオカ14形 付属運用<span class="size-badge" data-file-size="unyou/202303/moka14-fuzoku.pdf">[PDF/--KB]</span></span>
+                    <span class="card-tag">定期列車 / 普通列車 付属運用箱ダイヤ</span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
 
-        <!-- DE10 -->
-        <li class="list-item">
-          <a href="unyou/202303/dl.pdf" class="btn-link" target="_blank">
-            <div class="item-left-block">
-              <div class="card-img-wrapper">
-                <img src="assets/de10j1.png" alt="DE10 1535" class="train-icon loco-dl">
-              </div>
-              <div class="item-text-meta">
-                <span class="item-label">DE10 1535<span class="size-badge" data-file-size="unyou/202303/dl.pdf">[PDF/--KB]</span></span>
-                <span class="card-tag">特定日運行 / 回送・補機 · DL 運用箱ダイヤ</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
+            <li class="list-item">
+              <a href="unyou/202303/sl-pc.pdf" class="btn-link" target="_blank">
+                <div class="item-left-block">
+                  <div class="card-img-wrapper sl-composition">
+                    <img src="assets/c12mk.png" alt="C12 66" class="train-icon loco-sl">
+                    <img src="assets/moka50.png" alt="50系客車" class="train-icon coach">
+                  </div>
+                  <div class="item-text-meta">
+                    <span class="item-label">C12 66・50系<span class="size-badge" data-file-size="unyou/202303/sl-pc.pdf">[PDF/--KB]</span></span>
+                    <span class="card-tag">特定日運行 / SLもおか · SL・客車 運用箱ダイヤ</span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202303/dl.pdf" class="btn-link" target="_blank">
+                <div class="item-left-block">
+                  <div class="card-img-wrapper">
+                    <img src="assets/de10j1.png" alt="DE10 1535" class="train-icon loco-dl">
+                  </div>
+                  <div class="item-text-meta">
+                    <span class="item-label">DE10 1535<span class="size-badge" data-file-size="unyou/202303/dl.pdf">[PDF/--KB]</span></span>
+                    <span class="card-tag">特定日運行 / 回送・補機 · DL 運用箱ダイヤ</span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+            
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2 class="section-title">月別 運用報告</h2>
+          <p class="section-desc">当月分の報告書は、毎日3:40頃に前日までの記録を記入して更新します。</p>
+          
+          <ul class="list-container">
+            
+            <li class="list-item">
+              <a href="unyou/202607.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年7月分 運用報告書<span class="size-badge" data-file-size="unyou/202607.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="status-badge">記入中</span>
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202606.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年6月分 運用報告書<span class="size-badge" data-file-size="unyou/202606.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202605.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年5月分 運用報告書<span class="size-badge" data-file-size="unyou/202605.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202604.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年4月分 運用報告書<span class="size-badge" data-file-size="unyou/202604.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202603.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年3月分 運用報告書<span class="size-badge" data-file-size="unyou/202603.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+          </ul>
+        </section>
+
+        <section class="notice-section acknowledgement-section">
+          <strong>運用情報の収集と御礼</strong>
+          <p>Xでも「真岡鐵道」、「真岡線」、「真岡線運用」、「モオカ14」等で検索を行い、情報を運用調査に反映させていただいております。<br>個別に情報を提供していただいている方を含め、厚く御礼申し上げます。</p>
+        </section>
+
+      </main>
+    </section>
+
+    <section class="view-panel" id="view-board">
+      <main class="container">
         
-      </ul>
+        <div class="board-form-card">
+          <h2 class="section-title" style="margin-top:0;">目撃情報を投稿</h2>
+          <form id="bbs-form" onsubmit="handlePostSubmit(event)">
+            <div class="form-group">
+              <label class="form-label">投稿者名</label>
+              <input type="text" id="input-name" class="form-input" placeholder="例：真岡太郎" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">目撃情報・本文</label>
+              <textarea id="input-msg" class="form-textarea" rows="3" placeholder="例：本日モオカ14形 基本運用111レで確認" required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">削除・編集用暗証番号（数字4桁）</label>
+              <input type="password" id="input-pass" class="form-input" maxlength="4" placeholder="1234" required>
+            </div>
+            <button type="submit" id="submit-btn" class="form-submit-btn">投稿する</button>
+          </form>
+        </div>
+
+        <section class="content-section">
+          <h2 class="section-title">最新の目撃情報</h2>
+          <ul id="board-list" class="list-container">
+            <li class="list-item" style="padding: 20px; text-align: center; color: var(--text-secondary);">
+              目撃情報を読み込んでいます...
+            </li>
+          </ul>
+        </section>
+
+      </main>
     </section>
 
-    <!-- 月別 運用調査報告セクション -->
-    <section class="content-section">
-      <h2 class="section-title">月別 運用報告</h2>
-      <p class="section-desc">当月分の報告書は、毎日3:40頃に前日までの記録を記入して更新します。</p>
-      
-      <ul class="list-container">
-        
-        <!-- 2026年7月分 -->
-        <li class="list-item">
-          <a href="unyou/202607.pdf" class="report-btn" target="_blank">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label">2026年7月分 運用報告書<span class="size-badge" data-file-size="unyou/202607.pdf">[PDF/--KB]</span></span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="status-badge">記入中</span>
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
+  </div>
 
-        <!-- 2026年6月分 -->
-        <li class="list-item">
-          <a href="unyou/202606.pdf" class="report-btn" target="_blank">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label">2026年6月分 運用報告書<span class="size-badge" data-file-size="unyou/202606.pdf">[PDF/--KB]</span></span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
+  <nav class="floating-tab-bar">
+    <button class="tab-btn active" id="btn-tab-library" onclick="scrollToView(0)">
+      📄 運用資料
+    </button>
+    <button class="tab-btn" id="btn-tab-board" onclick="scrollToView(1)">
+      💬 目撃掲示板
+    </button>
+  </nav>
 
-        <!-- 2026年5月分 -->
-        <li class="list-item">
-          <a href="unyou/202605.pdf" class="report-btn" target="_blank">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label">2026年5月分 運用報告書<span class="size-badge" data-file-size="unyou/202605.pdf">[PDF/--KB]</span></span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
-
-        <!-- 2026年4月分 -->
-        <li class="list-item">
-          <a href="unyou/202604.pdf" class="report-btn" target="_blank">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label">2026年4月分 運用報告書<span class="size-badge" data-file-size="unyou/202604.pdf">[PDF/--KB]</span></span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
-
-        <!-- 2026年3月分 -->
-        <li class="list-item">
-          <a href="unyou/202603.pdf" class="report-btn" target="_blank">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label">2026年3月分 運用報告書<span class="size-badge" data-file-size="unyou/202603.pdf">[PDF/--KB]</span></span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
-
-      </ul>
-    </section>
-
-    <!-- お知らせ・御礼セクション -->
-    <section class="notice-section acknowledgement-section">
-      <strong>運用情報の収集と御礼</strong>
-      <p>Xでも「真岡鐵道」、「真岡線」、「真岡線運用」、「モオカ14」等で検索を行い、情報を運用調査に反映させていただいております。<br>個別に情報を提供していただいている方を含め、厚く御礼申し上げます。</p>
-    </section>
-
-  </main>
-
-  <!-- 境界線がなくなり、黒背景の上に自然に配置されたフッター -->
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-title">せきたん</div>
@@ -217,6 +249,5 @@
   </footer>
 
   <script src="script.js"></script>
-
 </body>
 </html>
