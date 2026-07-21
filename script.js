@@ -391,22 +391,55 @@ function renderBoardPosts(posts) {
 }
 
 /**
- * 編集ボタンが押された時のハンドラー
+ * 編集ボタンを押したとき：モーダルを開く
  */
-async function handlePostEdit(id, currentMessage) {
-  const password = prompt('投稿時に設定した4桁の暗証番号を入力してください:');
-  if (!password) return;
+function handlePostEdit(id, currentMessage) {
+  const modal = document.getElementById('edit-modal');
+  const idInput = document.getElementById('edit-post-id');
+  const messageInput = document.getElementById('edit-message');
+  const passwordInput = document.getElementById('edit-password');
 
-  const newMessage = prompt('新しい本文を入力してください:', currentMessage);
-  if (!newMessage || newMessage.trim() === '') {
-    alert('本文が入力されていません。');
+  if (!modal) return;
+
+  // 既存の値をセット
+  idInput.value = id;
+  // &amp; 等のエスケープを元に戻してセット
+  messageInput.value = currentMessage.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+  passwordInput.value = '';
+
+  modal.style.display = 'flex';
+}
+
+/**
+ * モーダルを閉じる
+ */
+function closeEditModal() {
+  const modal = document.getElementById('edit-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+/**
+ * モーダル内「更新する」ボタン押下時の送信処理
+ */
+async function submitPostEdit() {
+  const id = document.getElementById('edit-post-id').value;
+  const message = document.getElementById('edit-message').value.trim();
+  const password = document.getElementById('edit-password').value.trim();
+
+  if (!password) {
+    alert('暗証番号を入力してください。');
+    return;
+  }
+
+  if (!message) {
+    alert('本文を入力してください。');
     return;
   }
 
   const payload = {
     action: 'edit',
     id: id,
-    message: newMessage.trim(),
+    message: message,
     password: password
   };
 
@@ -423,7 +456,8 @@ async function handlePostEdit(id, currentMessage) {
 
     if (result.status === 'success') {
       alert('投稿を更新しました！');
-      fetchBoardData(); // 画面を再読み込み
+      closeEditModal();
+      fetchBoardData(); // 画面再読み込み
     } else {
       alert('編集失敗: ' + (result.message || '暗証番号が間違っています。'));
     }
