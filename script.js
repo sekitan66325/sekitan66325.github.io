@@ -105,7 +105,6 @@ function scrollToView(index) {
 // 画面直接スワイプ時の下部タブ位置連動
 if (slider) {
   slider.addEventListener('scroll', () => {
-    // ドラッグ中または離した直後のアニメーション移動中はスクロール割り込みを完全に無視
     if (isDragging || isAnimating) return;
     
     const scrollLeft = slider.scrollLeft;
@@ -136,7 +135,6 @@ if (tabBar) {
     const barRect = tabBar.getBoundingClientRect();
     let offsetX = currentX - barRect.left - (glider.clientWidth / 2);
 
-    // バーからはみ出さない制御
     const maxOffset = barRect.width - glider.clientWidth - 8;
     offsetX = Math.max(0, Math.min(offsetX, maxOffset));
 
@@ -147,7 +145,7 @@ if (tabBar) {
     if (!isDragging) return;
     
     isDragging = false;
-    isAnimating = true; // 離した瞬間のスライド中も割り込みをブロック
+    isAnimating = true;
     glider.classList.remove('dragging');
 
     const dragDuration = Date.now() - dragStartTime;
@@ -159,19 +157,14 @@ if (tabBar) {
 
     let targetIndex = 0;
 
-    // 1. フリック判定（短時間のスワイプ操作）
     if (dragDuration < 250 && Math.abs(deltaX) > 20) {
       targetIndex = deltaX > 0 ? 1 : 0;
-    } 
-    // 2. 最寄り吸着判定（ドラッグを離した位置）
-    else {
+    } else {
       targetIndex = gliderCenter > midPoint ? 1 : 0;
     }
 
-    // 離したその場所から目的地のボタンへスムーズ直行
     updateGliderPosition(targetIndex);
 
-    // 画面本体のスライド
     if (slider) {
       const width = slider.clientWidth;
       slider.scrollTo({
@@ -180,13 +173,11 @@ if (tabBar) {
       });
     }
 
-    // アニメーション完了後に割り込みブロック解除
     setTimeout(() => {
       isAnimating = false;
     }, 350);
   };
 
-  // イベント登録
   tabBar.addEventListener('mousedown', startDrag);
   tabBar.addEventListener('touchstart', startDrag, { passive: true });
 
@@ -201,6 +192,8 @@ if (tabBar) {
 // 初期化
 window.addEventListener('load', () => {
   updateGliderPosition(0);
+  // 初回読み込み時にデータ取得
+  fetchBoardData();
 });
 window.addEventListener('resize', () => {
   if (!slider || isDragging || isAnimating) return;
@@ -208,34 +201,91 @@ window.addEventListener('resize', () => {
   updateGliderPosition(index);
 });
 
+
 /* ==========================================================================
-   3. 掲示板API通信処理 (GAS連携)
+   3. 掲示板API通信 ＆ UI描画処理 (GAS連携・確定版)
    ========================================================================== */
-// ★デプロイして発行されたウェブアプリURLをここに貼り付けます
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyA_836JV_xFiWXXaVqbifUDkjIxxvY6Bv-CdunB8Jsj3kcMzmBbJIRuKtMJiYEPIrz/exec';
 
 /**
- * 投稿データの取得・画面更新
+ * 投稿データを取得して画面に表示する
  */
 async function fetchBoardData() {
+  const boardList = document.getElementById('board-list');
+  if (!boardList) return;
+
   try {
     const response = await fetch(GAS_URL);
     const posts = await response.json();
     
-    // TODO: ここでDOM操作をして投稿一覧（posts）を画面に描画します
-    console.log('取得した投稿:', posts);
+    renderBoardPosts(posts);
   } catch (error) {
     console.error('データ取得エラー:', error);
+    boardList.innerHTML = `<li class="list-item" style="padding: 20px; text-align: center; color: #ff5252;">データの取得に失敗しました。</li>`;
   }
 }
 
 /**
- * 新規投稿の送信
+ * 取得した投稿データをHTML要素として生成・挿入する
  */
-async function submitPost(name, message, password) {
-  if (password && password.length < 8) {
-    alert('パスワードは8文字以上で入力してください');
+function renderBoardPosts(posts) {
+  const boardList = document.getElementById('board-list');
+  if (!boardList) return;
+
+  if (!posts || posts.length === 0) {
+    boardList.innerHTML = `<li class="list-item" style="padding: 20px; text-align: center; color: var(--text-secondary);">目撃情報はまだありません。</li>`;
     return;
+  }
+
+  boardList.innerHTML = posts.map(post => `
+    <li class="list-item" style="padding: 14px 16px; display: block;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-weight: bold; font-size: 0.9rem; color: var(--text-primary);">${escapeHTML(post.name)}</span>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">${post.timestamp}</span>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--text-primary); white-space: pre-wrap; word-break: break-all; margin-bottom: 8px;">${escapeHTML(post.message)}</div>
+      <div style="text-align: right;">
+        <button onclick="handlePostDelete('${post.id}')" style="background: transparent; border: none; color: #ff5252; font-size: 0.75rem; cursor: pointer; padding: 2px 6px;">削除</button>
+      </div>
+    </li>
+  `).join('');
+}
+
+/**
+ * XSS対策用エスケープ関数
+ */
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>'"]/g, 
+    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+  );
+}
+
+/**
+ * フォーム送信時のハンドラー（HTMLの onsubmit="handlePostSubmit(event)" から呼ばれる）
+ */
+async function handlePostSubmit(event) {
+  event.preventDefault(); // ページリロードを防止
+
+  const submitBtn = document.getElementById('submit-btn');
+  const nameInput = document.getElementById('board-name');
+  // HTML側で board-meaage となっていたタイポに対応
+  const messageInput = document.getElementById('board-meaage') || document.getElementById('board-message');
+  const passwordInput = document.getElementById('board-password');
+
+  const name = nameInput ? nameInput.value.trim() : '';
+  const message = messageInput ? messageInput.value.trim() : '';
+  const password = passwordInput ? passwordInput.value.trim() : '';
+
+  if (!message) {
+    alert('目撃情報・本文を入力してください。');
+    return;
+  }
+
+  // ボタンを無効化して連打を防止
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送信中...';
   }
 
   const payload = {
@@ -246,20 +296,44 @@ async function submitPost(name, message, password) {
   };
 
   try {
-    await fetch(GAS_URL, {
+    const response = await fetch(GAS_URL, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
       body: JSON.stringify(payload)
     });
-    fetchBoardData(); // 送信後に一覧を更新
+
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      alert('投稿が完了しました！');
+      // フォームをクリア
+      if (messageInput) messageInput.value = '';
+      if (passwordInput) passwordInput.value = '';
+      // 一覧を再取得
+      fetchBoardData();
+    } else {
+      alert('送信エラー: ' + (result.message || '投稿に失敗しました'));
+    }
   } catch (error) {
     console.error('投稿エラー:', error);
+    alert('通信エラーが発生しました。');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '投稿する';
+    }
   }
 }
 
 /**
- * 投稿の削除
+ * 削除ボタンが押された時のハンドラー
  */
-async function deletePost(id, password) {
+async function handlePostDelete(id) {
+  const password = prompt('投稿時に設定した4桁の暗証番号を入力してください:');
+  if (!password) return;
+
   const payload = {
     action: 'delete',
     id: id,
@@ -269,17 +343,22 @@ async function deletePost(id, password) {
   try {
     const response = await fetch(GAS_URL, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
       body: JSON.stringify(payload)
     });
+
     const result = await response.json();
 
     if (result.status === 'success') {
-      alert('削除しました');
+      alert('投稿を削除しました。');
       fetchBoardData();
     } else {
-      alert(result.message);
+      alert('削除失敗: ' + (result.message || '暗証番号が間違っています。'));
     }
   } catch (error) {
     console.error('削除エラー:', error);
+    alert('通信エラーが発生しました。');
   }
 }
