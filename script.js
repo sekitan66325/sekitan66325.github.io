@@ -362,3 +362,73 @@ async function handlePostDelete(id) {
     alert('通信エラーが発生しました。');
   }
 }
+
+/**
+ * 取得した投稿データをHTML要素として生成・挿入する（編集ボタン追加版）
+ */
+function renderBoardPosts(posts) {
+  const boardList = document.getElementById('board-list');
+  if (!boardList) return;
+
+  if (!posts || posts.length === 0) {
+    boardList.innerHTML = `<li class="list-item" style="padding: 20px; text-align: center; color: var(--text-secondary);">目撃情報はまだありません。</li>`;
+    return;
+  }
+
+  boardList.innerHTML = posts.map(post => `
+    <li class="list-item" style="padding: 14px 16px; display: block;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-weight: bold; font-size: 0.9rem; color: var(--text-primary);">${escapeHTML(post.name)}</span>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">${post.timestamp}</span>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--text-primary); white-space: pre-wrap; word-break: break-all; margin-bottom: 8px;">${escapeHTML(post.message)}</div>
+      <div style="text-align: right; display: flex; justify-content: flex-end; gap: 12px;">
+        <button onclick="handlePostEdit('${post.id}', '${escapeHTML(post.message)}')" style="background: transparent; border: none; color: #4fc3f7; font-size: 0.75rem; cursor: pointer; padding: 2px 6px;">編集</button>
+        <button onclick="handlePostDelete('${post.id}')" style="background: transparent; border: none; color: #ff5252; font-size: 0.75rem; cursor: pointer; padding: 2px 6px;">削除</button>
+      </div>
+    </li>
+  `).join('');
+}
+
+/**
+ * 編集ボタンが押された時のハンドラー
+ */
+async function handlePostEdit(id, currentMessage) {
+  const password = prompt('投稿時に設定した4桁の暗証番号を入力してください:');
+  if (!password) return;
+
+  const newMessage = prompt('新しい本文を入力してください:', currentMessage);
+  if (!newMessage || newMessage.trim() === '') {
+    alert('本文が入力されていません。');
+    return;
+  }
+
+  const payload = {
+    action: 'edit',
+    id: id,
+    message: newMessage.trim(),
+    password: password
+  };
+
+  try {
+    const response = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      alert('投稿を更新しました！');
+      fetchBoardData(); // 画面を再読み込み
+    } else {
+      alert('編集失敗: ' + (result.message || '暗証番号が間違っています。'));
+    }
+  } catch (error) {
+    console.error('編集エラー:', error);
+    alert('通信エラーが発生しました。');
+  }
+}
