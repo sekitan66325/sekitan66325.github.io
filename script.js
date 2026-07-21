@@ -54,7 +54,7 @@ const btn0 = document.getElementById('btn-tab-0');
 const btn1 = document.getElementById('btn-tab-1');
 
 let isDragging = false;
-let isAnimating = false; // アニメーション中のスクロール割り込みブロック用フラグ
+let isAnimating = false;
 let startX = 0;
 let currentX = 0;
 
@@ -68,11 +68,10 @@ function updateGliderPosition(index) {
   const rect = targetBtn.getBoundingClientRect();
   const barRect = tabBar.getBoundingClientRect();
 
-  const leftOffset = rect.left - barRect.left - 4; // padding補正
+  const leftOffset = rect.left - barRect.left - 4;
   glider.style.width = `${rect.width}px`;
   glider.style.transform = `translateX(${leftOffset}px)`;
 
-  // アクティブ表示の切替
   if (btn0) btn0.classList.toggle('active', index === 0);
   if (btn1) btn1.classList.toggle('active', index === 1);
 }
@@ -83,7 +82,7 @@ function updateGliderPosition(index) {
 function scrollToView(index) {
   if (!slider) return;
   
-  isAnimating = true; // スライド完了まで連動スクロールをブロック
+  isAnimating = true;
   
   const width = slider.clientWidth;
   slider.scrollTo({
@@ -92,7 +91,6 @@ function scrollToView(index) {
   });
   updateGliderPosition(index);
 
-  // 掲示板（index 1）を開いた時にGASからデータを自動読み込み
   if (index === 1 && typeof fetchBoardData === 'function') {
     fetchBoardData();
   }
@@ -115,7 +113,7 @@ if (slider) {
 }
 
 /* --------------------------------------------------------------------------
-   ドラッグ・フリック操作（ダイレクト吸着・巻き戻り防止）
+   ドラッグ・フリック操作
    -------------------------------------------------------------------------- */
 if (tabBar) {
   let dragStartTime = 0;
@@ -192,7 +190,6 @@ if (tabBar) {
 // 初期化
 window.addEventListener('load', () => {
   updateGliderPosition(0);
-  // 初回読み込み時にデータ取得
   fetchBoardData();
 });
 window.addEventListener('resize', () => {
@@ -203,9 +200,39 @@ window.addEventListener('resize', () => {
 
 
 /* ==========================================================================
-   3. 掲示板API通信 ＆ UI描画処理 (GAS連携・確定版)
+   3. 掲示板API通信 ＆ UI描画処理 (GAS連携・完全版)
    ========================================================================== */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyA_836JV_xFiWXXaVqbifUDkjIxxvY6Bv-CdunB8Jsj3kcMzmBbJIRuKtMJiYEPIrz/exec';
+
+/**
+ * タイムスタンプの整形（秒単位保持）
+ */
+function formatTimestamp(timestampStr) {
+  if (!timestampStr) return '';
+  if (timestampStr.includes('/')) return timestampStr;
+  
+  const d = new Date(timestampStr);
+  if (isNaN(d.getTime())) return timestampStr;
+
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  const ss = String(d.getSeconds()).padStart(2, '0');
+
+  return `${yyyy}/${mm}/${dd} ${hh}:${min}:${ss}`;
+}
+
+/**
+ * XSS対策用エスケープ関数
+ */
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>'"]/g, 
+    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+  );
+}
 
 /**
  * 投稿データを取得して画面に表示する
@@ -221,30 +248,47 @@ async function fetchBoardData() {
     renderBoardPosts(posts);
   } catch (error) {
     console.error('データ取得エラー:', error);
-    boardList.innerHTML = `<li class="list-item" style="padding: 20px; text-align: center; color: #ff5252;">データの取得に失敗しました。</li>`;
+    boardList.innerHTML = `<li style="padding: 20px; text-align: center; color: #ff5252; list-style: none;">データの取得に失敗しました。</li>`;
   }
 }
 
 /**
- * 取得した投稿データをHTML要素として生成・挿入する
+ * 取得した投稿データをカードとして独立生成・挿入する
  */
 function renderBoardPosts(posts) {
   const boardList = document.getElementById('board-list');
   if (!boardList) return;
 
   if (!posts || posts.length === 0) {
-    boardList.innerHTML = `<li class="list-item" style="padding: 20px; text-align: center; color: var(--text-secondary);">目撃情報はまだありません。</li>`;
+    boardList.innerHTML = `<li style="padding: 20px; text-align: center; color: var(--text-secondary); list-style: none;">目撃情報はまだありません。</li>`;
     return;
   }
 
+  boardList.style.listStyle = 'none';
+  boardList.style.padding = '0';
+  boardList.style.margin = '0';
+
   boardList.innerHTML = posts.map(post => `
-    <li class="list-item" style="padding: 14px 16px; display: block;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <span style="font-weight: bold; font-size: 0.9rem; color: var(--text-primary);">${escapeHTML(post.name)}</span>
-        <span style="font-size: 0.75rem; color: var(--text-secondary);">${post.timestamp}</span>
+    <li class="board-post-card" style="
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      list-style: none;
+    ">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 8px;">
+        <span style="font-weight: bold; font-size: 0.95rem; color: var(--text-primary);">${escapeHTML(post.name)}</span>
+        <span style="font-size: 0.75rem; color: var(--text-secondary); font-family: monospace;">${formatTimestamp(post.timestamp)}</span>
       </div>
-      <div style="font-size: 0.85rem; color: var(--text-primary); white-space: pre-wrap; word-break: break-all; margin-bottom: 8px;">${escapeHTML(post.message)}</div>
-      <div style="text-align: right;">
+
+      <div style="font-size: 0.9rem; color: var(--text-primary); white-space: pre-wrap; word-break: break-all; line-height: 1.5; margin-bottom: 12px;">${escapeHTML(post.message)}</div>
+
+      <div style="text-align: right; display: flex; justify-content: flex-end; gap: 12px;">
+        <button onclick="handlePostEdit('${post.id}', '${escapeHTML(post.message)}')" style="background: transparent; border: none; color: #4fc3f7; font-size: 0.75rem; cursor: pointer; padding: 2px 6px;">編集</button>
         <button onclick="handlePostDelete('${post.id}')" style="background: transparent; border: none; color: #ff5252; font-size: 0.75rem; cursor: pointer; padding: 2px 6px;">削除</button>
       </div>
     </li>
@@ -252,25 +296,14 @@ function renderBoardPosts(posts) {
 }
 
 /**
- * XSS対策用エスケープ関数
- */
-function escapeHTML(str) {
-  if (!str) return '';
-  return String(str).replace(/[&<>'"]/g, 
-    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-  );
-}
-
-/**
- * フォーム送信時のハンドラー（HTMLの onsubmit="handlePostSubmit(event)" から呼ばれる）
+ * フォーム送信ハンドラー
  */
 async function handlePostSubmit(event) {
-  event.preventDefault(); // ページリロードを防止
+  event.preventDefault();
 
   const submitBtn = document.getElementById('submit-btn');
   const nameInput = document.getElementById('board-name');
-  // HTML側で board-meaage となっていたタイポに対応
-  const messageInput = document.getElementById('board-meaage') || document.getElementById('board-message');
+  const messageInput = document.getElementById('board-message') || document.getElementById('board-meaage');
   const passwordInput = document.getElementById('board-password');
 
   const name = nameInput ? nameInput.value.trim() : '';
@@ -282,7 +315,6 @@ async function handlePostSubmit(event) {
     return;
   }
 
-  // ボタンを無効化して連打を防止
   if (submitBtn) {
     submitBtn.disabled = true;
     submitBtn.textContent = '送信中...';
@@ -308,10 +340,8 @@ async function handlePostSubmit(event) {
 
     if (result.status === 'success') {
       alert('投稿が完了しました！');
-      // フォームをクリア
       if (messageInput) messageInput.value = '';
       if (passwordInput) passwordInput.value = '';
-      // 一覧を再取得
       fetchBoardData();
     } else {
       alert('送信エラー: ' + (result.message || '投稿に失敗しました'));
@@ -328,70 +358,7 @@ async function handlePostSubmit(event) {
 }
 
 /**
- * 削除ボタンが押された時のハンドラー
- */
-async function handlePostDelete(id) {
-  const password = prompt('投稿時に設定した4桁の暗証番号を入力してください:');
-  if (!password) return;
-
-  const payload = {
-    action: 'delete',
-    id: id,
-    password: password
-  };
-
-  try {
-    const response = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-
-    if (result.status === 'success') {
-      alert('投稿を削除しました。');
-      fetchBoardData();
-    } else {
-      alert('削除失敗: ' + (result.message || '暗証番号が間違っています。'));
-    }
-  } catch (error) {
-    console.error('削除エラー:', error);
-    alert('通信エラーが発生しました。');
-  }
-}
-
-/**
- * 取得した投稿データをHTML要素として生成・挿入する（編集ボタン追加版）
- */
-function renderBoardPosts(posts) {
-  const boardList = document.getElementById('board-list');
-  if (!boardList) return;
-
-  if (!posts || posts.length === 0) {
-    boardList.innerHTML = `<li class="list-item" style="padding: 20px; text-align: center; color: var(--text-secondary);">目撃情報はまだありません。</li>`;
-    return;
-  }
-
-  boardList.innerHTML = posts.map(post => `
-    <li class="list-item" style="padding: 14px 16px; display: block;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <span style="font-weight: bold; font-size: 0.9rem; color: var(--text-primary);">${escapeHTML(post.name)}</span>
-        <span style="font-size: 0.75rem; color: var(--text-secondary);">${post.timestamp}</span>
-      </div>
-      <div style="font-size: 0.85rem; color: var(--text-primary); white-space: pre-wrap; word-break: break-all; margin-bottom: 8px;">${escapeHTML(post.message)}</div>
-      <div style="text-align: right; display: flex; justify-content: flex-end; gap: 12px;">
-        <button onclick="handlePostEdit('${post.id}', '${escapeHTML(post.message)}')" style="background: transparent; border: none; color: #4fc3f7; font-size: 0.75rem; cursor: pointer; padding: 2px 6px;">編集</button>
-        <button onclick="handlePostDelete('${post.id}')" style="background: transparent; border: none; color: #ff5252; font-size: 0.75rem; cursor: pointer; padding: 2px 6px;">削除</button>
-      </div>
-    </li>
-  `).join('');
-}
-
-/**
- * 編集ボタンを押したとき：モーダルを開く
+ * 編集ボタン押下時：モーダル表示
  */
 function handlePostEdit(id, currentMessage) {
   const modal = document.getElementById('edit-modal');
@@ -401,10 +368,14 @@ function handlePostEdit(id, currentMessage) {
 
   if (!modal) return;
 
-  // 既存の値をセット
   idInput.value = id;
-  // &amp; 等のエスケープを元に戻してセット
-  messageInput.value = currentMessage.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+  // エスケープ文字の復元
+  messageInput.value = currentMessage
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"');
   passwordInput.value = '';
 
   modal.style.display = 'flex';
@@ -419,7 +390,7 @@ function closeEditModal() {
 }
 
 /**
- * モーダル内「更新する」ボタン押下時の送信処理
+ * 編集データの送信処理
  */
 async function submitPostEdit() {
   const id = document.getElementById('edit-post-id').value;
@@ -457,12 +428,48 @@ async function submitPostEdit() {
     if (result.status === 'success') {
       alert('投稿を更新しました！');
       closeEditModal();
-      fetchBoardData(); // 画面再読み込み
+      fetchBoardData();
     } else {
       alert('編集失敗: ' + (result.message || '暗証番号が間違っています。'));
     }
   } catch (error) {
     console.error('編集エラー:', error);
+    alert('通信エラーが発生しました。');
+  }
+}
+
+/**
+ * 投稿の削除処理
+ */
+async function handlePostDelete(id) {
+  const password = prompt('投稿時に設定した4桁の暗証番号を入力してください:');
+  if (!password) return;
+
+  const payload = {
+    action: 'delete',
+    id: id,
+    password: password
+  };
+
+  try {
+    const response = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      alert('投稿を削除しました。');
+      fetchBoardData();
+    } else {
+      alert('削除失敗: ' + (result.message || '暗証番号が間違っています。'));
+    }
+  } catch (error) {
+    console.error('削除エラー:', error);
     alert('通信エラーが発生しました。');
   }
 }
