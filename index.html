@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
@@ -29,7 +30,7 @@
         </section>
 
         <section class="content-section">
-          <h2 class="section-title">現行ダイヤ 車両運用（箱ダイヤ）</h2>
+          <h2 class="section-title">現行ダイヤ 2023年3月18日～</h2>
           
           <ul class="list-container">
             
@@ -41,7 +42,7 @@
                   </div>
                   <div class="item-text-meta">
                     <span class="item-label">モオカ14形 基本運用<span class="size-badge" data-file-size="unyou/202303/moka14-kihon.pdf">[PDF/--KB]</span></span>
-                    <span class="card-tag">定期列車 / 普通列車 基本運用箱ダイヤ</span>
+                    <span class="card-tag">定期列車 / 普通列車 基本運用</span>
                   </div>
                 </div>
                 <div class="item-right-block">
@@ -58,7 +59,7 @@
                   </div>
                   <div class="item-text-meta">
                     <span class="item-label">モオカ14形 付属運用<span class="size-badge" data-file-size="unyou/202303/moka14-fuzoku.pdf">[PDF/--KB]</span></span>
-                    <span class="card-tag">定期列車 / 普通列車 付属運用箱ダイヤ</span>
+                    <span class="card-tag">定期列車 / 普通列車 付属運用</span>
                   </div>
                 </div>
                 <div class="item-right-block">
@@ -76,7 +77,7 @@
                   </div>
                   <div class="item-text-meta">
                     <span class="item-label">C12 66・50系<span class="size-badge" data-file-size="unyou/202303/sl-pc.pdf">[PDF/--KB]</span></span>
-                    <span class="card-tag">特定日運行 / SLもおか · SL・客車 運用箱ダイヤ</span>
+                    <span class="card-tag">特定日運行 / SLもおか</span>
                   </div>
                 </div>
                 <div class="item-right-block">
@@ -93,7 +94,7 @@
                   </div>
                   <div class="item-text-meta">
                     <span class="item-label">DE10 1535<span class="size-badge" data-file-size="unyou/202303/dl.pdf">[PDF/--KB]</span></span>
-                    <span class="card-tag">特定日運行 / 回送・補機 · DL 運用箱ダイヤ</span>
+                    <span class="card-tag">特定日運行 / 回送・補機</span>
                   </div>
                 </div>
                 <div class="item-right-block">
@@ -213,7 +214,7 @@
           <div class="board-form-card">
             <!-- 入力レギュレーション -->
             <div class="rule-box">
-              <strong class="rule-title">【記入ルール】</strong>
+              <strong class="rule-title">記入ルール</strong>
               <p class="rule-text">
                 ・基本的に「年月日」「列車番号」「車両番号」を記入してください。<br>
                 ・時刻表記、運用番号表記は任意です。<br>
@@ -227,15 +228,15 @@
             <form id="board-form" onsubmit="handlePostSubmit(event)">
               <div class="form-group">
                 <label class="form-label">投稿者名</label>
-                <input type="text" id="board-name" class="form-input" placeholder="例：真岡太郎" required>
+                <input type="text" id="board-name" class="form-input" placeholder="" required>
               </div>
               <div class="form-group">
                 <label class="form-label">目撃情報・本文</label>
-                <textarea id="board-message" class="form-textarea" rows="3" placeholder="2026/07/21 22:06&#10;145レ 14-2+14-6(A31+A6)&#10;備考 / 西田井駅で目撃" required></textarea>
+                <textarea id="board-message" class="form-textarea" rows="3" placeholder="" required></textarea>
               </div>
               <div class="form-group">
                 <label class="form-label">削除・編集用暗証番号（半角英数字4桁以上）</label>
-                <input type="password" id="board-password" class="form-input" minlength="4" placeholder="半角英数字4桁以上（例: pass123）" required>
+                <input type="password" id="board-password" class="form-input" minlength="4" placeholder="" required>
               </div>
               <button type="submit" id="submit-btn" class="form-submit-btn">投稿する</button>
             </form>

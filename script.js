@@ -1,3 +1,12 @@
+// Service Workerの登録（PWA化対応）
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
+      console.error('ServiceWorker registration failed: ', err);
+    });
+  });
+}
+
 /* ==========================================================================
    1. PDFファイルサイズの自動動的取得 (HEADリクエスト)
    ========================================================================== */
