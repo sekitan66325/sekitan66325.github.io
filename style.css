@@ -423,7 +423,7 @@ body {
 }
 
 /* ==========================================================================
-   6. スライド＆リキッドグラスバー（ドラッグ追従・スクロールバー消去版）
+   6. スライド＆リキッドグラスバー（つまみ完全一体化版）
    ========================================================================== */
 
 /* 全体の横溢れを完全にブロック */
@@ -433,7 +433,7 @@ html, body {
   position: relative;
 }
 
-/* スライドコンテナ：100vwではなく100%にして横スクロールバーを完全に消去 */
+/* スライドコンテナ */
 .app-view-slider {
   display: flex;
   width: 100%;
@@ -442,77 +442,78 @@ html, body {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   
-  /* スクロールバー消去（全ブラウザ対応） */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE / Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .app-view-slider::-webkit-scrollbar {
-  display: none; /* Chrome / Safari */
+  display: none;
 }
 
-/* パネル幅を100%（親要素にぴったりフィット）に設定 */
+/* 各ビューパネル */
 .view-panel {
   flex: 0 0 100%;
   width: 100%;
   max-width: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  padding-bottom: 90px;
+  padding-bottom: 110px;
 }
 
 /* --------------------------------------------------------------------------
-   フローティング・リキッドグラスバー（つまみ追従・ドラッグ対応）
+   フローティング・リキッドグラスバー
    -------------------------------------------------------------------------- */
 .floating-tab-bar {
   position: fixed;
-  bottom: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: 9999;
   
   display: flex;
   align-items: center;
   padding: 4px;
+  width: max-content;
   
-  /* リキッドグラス質感 */
-  background: rgba(25, 25, 28, 0.68);
+  /* すりガラス（リキッドグラス）土台 */
+  background: rgba(25, 25, 28, 0.75);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   
-  border: 0.5px solid rgba(255, 255, 255, 0.16);
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
   border-radius: 32px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
   user-select: none;
-  touch-action: none; /* ドラッグ操作の誤作動防止 */
+  touch-action: none;
 }
 
-/* ぬるぬる移動するハイライトつまみ（ニュイニュイ動く部分） */
+/* ヌルヌル移動するハイライトつまみ（これだけが背景として動く） */
 .tab-glider {
   position: absolute;
   top: 4px;
   left: 4px;
   height: calc(100% - 8px);
-  width: 110px; /* JSで自動計算・調整されます */
+  width: 100px;
   background: rgba(255, 255, 255, 0.22);
   border: 0.5px solid rgba(255, 255, 255, 0.3);
   border-radius: 24px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1), width 250ms ease;
-  pointer-events: none; /* クリックを透過 */
+  pointer-events: none;
   z-index: 1;
 }
 
-/* ドラッグ中のぬめらか感アップ */
+/* ドラッグ中の演出 */
 .tab-glider.dragging {
-  transition: none; /* ドラッグ中は遅延なしで指に追従 */
-  background: rgba(255, 255, 255, 0.32);
+  transition: none;
+  background: rgba(255, 255, 255, 0.35);
 }
 
-/* タブボタン */
+/* タブボタン（背景は透明で固定） */
 .tab-btn {
   position: relative;
   z-index: 2;
-  background: transparent;
+  background: transparent !important; /* ボタン自身の背景を完全に消去 */
+  box-shadow: none !important;        /* ボタン自身の影も完全消去 */
   border: none;
   color: var(--text-secondary);
   padding: 8px 18px;
@@ -525,10 +526,13 @@ html, body {
   gap: 6px;
   white-space: nowrap;
   transition: color 200ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* 選択中のボタンは文字色だけ白にする */
 .tab-btn.active {
   color: var(--text-primary);
+  background: transparent !important;
 }
 
 /* 掲示板フォーム */
