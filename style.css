@@ -121,60 +121,95 @@ body {
   margin-bottom: 0;
 }
 
+/* アコーディオン型 投稿フォーム */
+.board-form-accordion {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.form-accordion-summary {
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-link);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.form-accordion-summary::after {
+  content: "＋";
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.board-form-accordion[open] .form-accordion-summary::after {
+  content: "－";
+}
+
+.board-form-card {
+  padding: 0 16px 16px 16px;
+  border-top: 0.5px solid var(--border-separator);
+  margin-top: 4px;
+  padding-top: 14px;
+}
+
 /* 入力レギュレーションボックス */
 .rule-box {
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 16px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
 }
 
 .rule-title {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 4px;
 }
 
 .rule-text {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: 8px;
+  line-height: 1.4;
+  margin-bottom: 6px;
 }
 
 .rule-example {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-family: monospace;
   color: var(--text-primary);
   background: rgba(0, 0, 0, 0.4);
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid var(--border-subtle);
   white-space: pre-wrap;
-  line-height: 1.4;
-}
-
-/* フォームカード */
-.board-form-card {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 20px;
-  margin-bottom: 32px;
+  line-height: 1.35;
 }
 
 .form-group {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .form-label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   font-weight: 500;
 }
 
@@ -183,9 +218,9 @@ body {
   background-color: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-family: inherit;
   outline: none;
   transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -202,9 +237,9 @@ body {
   color: #ffffff;
   border: none;
   border-radius: 10px;
-  padding: 12px;
+  padding: 11px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: opacity 0.15s ease;
   margin-top: 6px;
@@ -425,6 +460,7 @@ html, body {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  align-items: flex-start; /* 余白解消用 */
 }
 .app-view-slider::-webkit-scrollbar { display: none; }
 

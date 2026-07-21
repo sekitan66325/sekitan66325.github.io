@@ -311,6 +311,7 @@ async function handlePostSubmit(event) {
   const nameInput = document.getElementById('board-name');
   const messageInput = document.getElementById('board-message') || document.getElementById('board-meaage');
   const passwordInput = document.getElementById('board-password');
+  const formAccordion = document.querySelector('.board-form-accordion');
 
   const name = nameInput ? nameInput.value.trim() : '';
   const message = messageInput ? messageInput.value.trim() : '';
@@ -355,6 +356,7 @@ async function handlePostSubmit(event) {
       alert('投稿が完了しました！');
       if (messageInput) messageInput.value = '';
       if (passwordInput) passwordInput.value = '';
+      if (formAccordion) formAccordion.removeAttribute('open'); // 投稿完了後にアコーディオンを閉じる
       currentPage = 1; // 最新投稿を見せるため1ページ目へ
       fetchBoardData();
     } else {
@@ -400,12 +402,13 @@ function closeEditModal() {
 }
 
 /**
- * 編集データの送信
+ * 編集データの送信（連打・二重送信防止対応）
  */
 async function submitPostEdit() {
   const id = document.getElementById('edit-post-id').value;
   const message = document.getElementById('edit-message').value.trim();
   const password = document.getElementById('edit-password').value.trim();
+  const editSubmitBtn = document.querySelector('#edit-modal button[onclick="submitPostEdit()"]');
 
   const passRegex = /^[a-zA-Z0-9]{4,}$/;
   if (!passRegex.test(password)) {
@@ -416,6 +419,12 @@ async function submitPostEdit() {
   if (!message) {
     alert('本文を入力してください。');
     return;
+  }
+
+  // 二重送信防止
+  if (editSubmitBtn) {
+    editSubmitBtn.disabled = true;
+    editSubmitBtn.textContent = '更新中...';
   }
 
   const payload = {
@@ -446,6 +455,11 @@ async function submitPostEdit() {
   } catch (error) {
     console.error('編集エラー:', error);
     alert('通信エラーが発生しました。');
+  } finally {
+    if (editSubmitBtn) {
+      editSubmitBtn.disabled = false;
+      editSubmitBtn.textContent = '更新する';
+    }
   }
 }
 
