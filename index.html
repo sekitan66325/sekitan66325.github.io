@@ -194,18 +194,18 @@
         
         <div class="board-form-card">
           <h2 class="section-title" style="margin-top:0;">目撃情報を投稿</h2>
-          <form id="bbs-form" onsubmit="handlePostSubmit(event)">
+          <form id="board-form" onsubmit="handlePostSubmit(event)">
             <div class="form-group">
               <label class="form-label">投稿者名</label>
-              <input type="text" id="input-name" class="form-input" placeholder="例：真岡太郎" required>
+              <input type="text" id="board-name" class="form-input" placeholder="例：真岡太郎" required>
             </div>
             <div class="form-group">
               <label class="form-label">目撃情報・本文</label>
-              <textarea id="input-msg" class="form-textarea" rows="3" placeholder="例：本日モオカ14形 基本運用111レで確認" required></textarea>
+              <textarea id="board-meaage" class="form-textarea" rows="3" placeholder="例：本日モオカ14形 基本運用111レで確認" required></textarea>
             </div>
             <div class="form-group">
               <label class="form-label">削除・編集用暗証番号（数字4桁）</label>
-              <input type="password" id="input-pass" class="form-input" maxlength="4" placeholder="1234" required>
+              <input type="password" id="board-password" class="form-input" maxlength="4" placeholder="1234" required>
             </div>
             <button type="submit" id="submit-btn" class="form-submit-btn">投稿する</button>
           </form>
