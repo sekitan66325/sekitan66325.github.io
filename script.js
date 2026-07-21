@@ -1,3 +1,6 @@
+/* ==========================================================================
+   1. PDFファイルサイズの自動動的取得 (HEADリクエスト)
+   ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
   const sizeBadges = document.querySelectorAll('[data-file-size]');
 
@@ -6,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!fileUrl) return;
 
     try {
-      // HEADリクエストを送信
       const response = await fetch(fileUrl, { method: 'HEAD' });
 
       if (!response.ok) {
@@ -18,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (contentLength) {
         const bytes = parseInt(contentLength, 10);
         const formattedSize = formatBytes(bytes);
-        // [PDF/12.5KB] の形式で書き換え
         badge.textContent = `[PDF/${formattedSize}]`;
       } else {
         console.warn(`[Content-Length ヘッダーなし] ${fileUrl}`);
@@ -42,52 +43,125 @@ function formatBytes(bytes, decimals = 1) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
 }
 
-function switchTab(tabName) {
-    // 全タブコンテンツを非表示
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    // 全ボタンのアクティブ解除
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-    if (tabName === 'library') {
-    document.getElementById('tab-library').classList.add('active');
-    event.currentTarget.classList.add('active');
-    } else if (tabName === 'board') {
-    document.getElementById('tab-board').classList.add('active');
-    event.currentTarget.classList.add('active');
-    // 掲示板を開いた時に最新データをGASから取得する処理を発火
-    fetchBoardData();
-    }
+/* ==========================================================================
+   2. スライド＆リキッドグラスバー（ドラッグ追従・ニュイニュイ移動）制御
+   ========================================================================== */
+const slider = document.getElementById('app-slider');
+const tabBar = document.getElementById('tab-bar');
+const glider = document.getElementById('tab-glider');
+const btn0 = document.getElementById('btn-tab-0');
+const btn1 = document.getElementById('btn-tab-1');
+
+let isDragging = false;
+let startX = 0;
+let currentX = 0;
+
+/**
+ * ハイライトつまみの位置と幅を対象ボタンに合わせる関数
+ */
+function updateGliderPosition(index) {
+  const targetBtn = index === 0 ? btn0 : btn1;
+  if (!targetBtn || !glider || !tabBar) return;
+
+  const rect = targetBtn.getBoundingClientRect();
+  const barRect = tabBar.getBoundingClientRect();
+
+  const leftOffset = rect.left - barRect.left - 4; // padding補正
+  glider.style.width = `${rect.width}px`;
+  glider.style.transform = `translateX(${leftOffset}px)`;
+
+  // アクティブ表示の切替
+  if (btn0) btn0.classList.toggle('active', index === 0);
+  if (btn1) btn1.classList.toggle('active', index === 1);
 }
 
 /**
- * タブ切り替え・スライド連動制御
+ * ボタンタップで該当画面へスムーズスライド
  */
-const slider = document.getElementById('app-slider');
-const btnLibrary = document.getElementById('btn-tab-library');
-const btnBoard = document.getElementById('btn-tab-board');
-
-// ボタンを押して画面をスライド移動させる
 function scrollToView(index) {
-  const width = window.innerWidth;
+  if (!slider) return;
+  const width = slider.clientWidth;
   slider.scrollTo({
     left: width * index,
     behavior: 'smooth'
   });
+  updateGliderPosition(index);
+  
+  // 掲示板（index 1）を開いた時にGASからデータを自動読み込み（後ほど接続）
+  if (index === 1 && typeof fetchBoardData === 'function') {
+    fetchBoardData();
+  }
 }
 
-// 横スクロールを検知して下部タブのアクティブ状態を追従させる
+// 画面直接スワイプ時の下部タブ位置連動
 if (slider) {
   slider.addEventListener('scroll', () => {
+    if (isDragging) return; // ドラッグ中は連動を一時停止
     const scrollLeft = slider.scrollLeft;
-    const width = window.innerWidth;
-    
-    // スクロール位置が画面半分の50%を超えたら切り替え
-    if (scrollLeft > width * 0.5) {
-      btnLibrary.classList.remove('active');
-      btnBoard.classList.add('active');
-    } else {
-      btnLibrary.classList.add('active');
-      btnBoard.classList.remove('active');
-    }
+    const width = slider.clientWidth;
+    const index = scrollLeft > width * 0.5 ? 1 : 0;
+    updateGliderPosition(index);
   });
 }
+
+/* --------------------------------------------------------------------------
+   ドラッグ・タッチ操作（つまみを掴んで左右にぬるぬる動かす）
+   -------------------------------------------------------------------------- */
+if (tabBar) {
+  const startDrag = (e) => {
+    isDragging = true;
+    glider.classList.add('dragging');
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+  };
+
+  const moveDrag = (e) => {
+    if (!isDragging) return;
+    currentX = e.touches ? e.touches[0].clientX : e.clientX;
+    const barRect = tabBar.getBoundingClientRect();
+    let offsetX = currentX - barRect.left - (glider.clientWidth / 2);
+
+    // 移動範囲の制御
+    const maxOffset = barRect.width - glider.clientWidth - 8;
+    offsetX = Math.max(0, Math.min(offsetX, maxOffset));
+
+    glider.style.transform = `translateX(${offsetX}px)`;
+  };
+
+  const endDrag = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    glider.classList.remove('dragging');
+
+    const barRect = tabBar.getBoundingClientRect();
+    const midPoint = barRect.width / 2;
+    const gliderCenter = (currentX || startX) - barRect.left;
+
+    // 放した位置が半分より右なら掲示板へ、左なら運用資料へ
+    if (gliderCenter > midPoint) {
+      scrollToView(1);
+    } else {
+      scrollToView(0);
+    }
+  };
+
+  // マウスイベント
+  tabBar.addEventListener('mousedown', startDrag);
+  window.addEventListener('mousemove', moveDrag);
+  window.addEventListener('mouseup', endDrag);
+
+  // タッチイベント（スマホ用）
+  tabBar.addEventListener('touchstart', startDrag, { passive: true });
+  window.addEventListener('touchmove', moveDrag, { passive: true });
+  window.addEventListener('touchend', endDrag);
+}
+
+// 初期化（読み込み時・リサイズ時の位置合わせ）
+window.addEventListener('load', () => {
+  updateGliderPosition(0);
+});
+window.addEventListener('resize', () => {
+  if (!slider) return;
+  const index = slider.scrollLeft > slider.clientWidth * 0.5 ? 1 : 0;
+  updateGliderPosition(index);
+});
