@@ -7,7 +7,9 @@
   /* 画面全体で完全に地続きの漆黒背景 */
   --bg-system: #000000;
   --bg-secondary: #1c1c1e;
-  --border-separator: #2c2c2e;
+  
+  /* iOS純正スタイルの明るめのセパレーターカラー */
+  --border-separator: #38383a; 
   
   /* 文字色はメイン・ヘッダー・フッターで完全共通化 */
   --text-primary: #ffffff;           /* メインの白色テキスト */
@@ -15,7 +17,6 @@
   
   --text-link: #0a84ff;              /* アクセントブルー */
   --color-error: #ff453a;            /* アラートレッド（記入中） */
-  --color-warning: #ff9f0a;          /* 注意オレンジ */
 }
 
 * {
@@ -79,19 +80,21 @@ body {
   margin-bottom: 16px;
 }
 
-/* 注意書き */
+/* 注意書き & お知らせ共通スタイル */
 .notice-section {
   background-color: var(--bg-secondary);
   border-radius: 12px;
   padding: 20px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .notice-section strong {
   display: block;
-  font-size: 1.1rem;
-  color: var(--color-warning);
-  margin-bottom: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary); /* 完全な白で強調 */
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
 }
 
 .notice-section p {
@@ -101,7 +104,7 @@ body {
 }
 
 /* ==========================================================================
-   4. UI領域全体をボタン化するリスト構造（領域バグ修正済み）
+   4. UI領域全体をボタン化するリスト構造（iOS準拠セパレーター仕様）
    ========================================================================== */
 .content-section {
   margin-bottom: 32px;
@@ -118,16 +121,26 @@ body {
   position: relative;
 }
 
+/* 基本の区切り線設定（右端も24px空ける） */
 .list-item:not(:last-child)::after {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 24px;
-  right: 0;
+  right: 24px; /* 右端にくっつかないよう24pxの余白 */
   height: 0.5px;
   background-color: var(--border-separator);
   z-index: 2;
   pointer-events: none;
+}
+
+/* 【iOS仕様】アイコン付きリスト：左96px 〜 右24px */
+.list-item:has(.card-img-wrapper):not(:last-child)::after {
+  left: 96px; 
+}
+
+/* 【iOS仕様】アイコンなしリスト（運用報告など）：左24px 〜 右24px */
+.list-item:has(.report-btn):not(:last-child)::after {
+  left: 24px;
 }
 
 /* リンク自体をコンテナ全域まで広げる（完全ボタン化） */
@@ -250,15 +263,12 @@ body {
   margin-bottom: 16px;
 }
 
-/* ==========================================================================
-   修正: フッターリンクのホバー挙動をApple流に最適化
-   ========================================================================== */
 .footer-links {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 8px; /* 少し間隔を調整 */
+  gap: 8px; /* 間隔を微調整 */
   margin-bottom: 24px;
   list-style: none;
 }
