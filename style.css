@@ -132,32 +132,35 @@ body {
   overflow: hidden;
 }
 
-/* アコーディオンのヘッダーボタン */
+/* アコーディオンヘッダー（通常時） */
 .form-accordion-summary {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: var(--card-bg, #1c1c1e); /* またはカード背景色 */
+  background: var(--card-bg, #1c1c1e); /* ベースのカード背景色 */
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  
-  /* 👇 ここを追加：文字色を白（基本テキスト色）に固定 */
   color: var(--text-primary, #ffffff);
   font-size: 1rem;
   font-weight: 600;
-  text-decoration: none; /* 下線を防ぐ */
-  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.2s ease, border-radius 0.2s ease;
 }
 
-/* ボタン内の span にも明示的に色を継承させる */
-.form-accordion-summary span {
-  color: inherit;
+/* 展開時 (.open)：ヘッダーの背景色をフォーム領域と完全に一致させる */
+.board-form-accordion.open .form-accordion-summary {
+  background: transparent; /* 親カードと同じ背景色に透かす */
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
-.form-accordion-summary:hover {
-  background-color: rgba(255, 255, 255, 0.04);
+
+/* アコーディオン全体の外枠（展開時に一体化させる場合） */
+.board-form-accordion {
+  background: var(--card-bg, #1c1c1e);
+  border-radius: 12px;
+  overflow: hidden; /* 中身のはみ出しを防ぎ角丸を統一 */
 }
 
 /* アコーディオンアイコン（SVGシェブロン） */
