@@ -121,13 +121,16 @@ body {
   margin-bottom: 0;
 }
 
-/* アコーディオン型 投稿フォーム */
+/* アコーディオン型 投稿フォーム (Liquid Glass風) */
 .board-form-accordion {
-  background-color: var(--bg-secondary);
+  background: rgba(28, 28, 30, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--border-subtle);
   border-radius: 14px;
   margin-bottom: 24px;
   overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .form-accordion-summary {
@@ -141,6 +144,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: background-color 0.2s ease;
+}
+
+.form-accordion-summary:hover {
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
 .form-accordion-summary::-webkit-details-marker {
@@ -152,6 +160,7 @@ body {
   font-size: 0.9rem;
   color: var(--text-secondary);
   font-weight: 400;
+  transition: transform 0.3s ease;
 }
 
 .board-form-accordion[open] .form-accordion-summary::after {
@@ -163,6 +172,55 @@ body {
   border-top: 0.5px solid var(--border-separator);
   margin-top: 4px;
   padding-top: 14px;
+  animation: accordionSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes accordionSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 掲示板ヘッダー & 検索バー */
+.board-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.board-header-row .section-title {
+  margin: 0;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 280px;
+}
+
+.search-input {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: var(--text-primary);
+  font-size: 0.825rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--text-link);
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 /* 入力レギュレーションボックス */

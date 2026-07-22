@@ -196,11 +196,12 @@ window.addEventListener('resize', () => {
 
 
 /* ==========================================================================
-   3. 掲示板API通信 ＆ UI描画処理 (ページネーション対応)
+   3. 掲示板API通信 ＆ UI描画処理 (検索・ページネーション対応)
    ========================================================================== */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyA_836JV_xFiWXXaVqbifUDkjIxxvY6Bv-CdunB8Jsj3kcMzmBbJIRuKtMJiYEPIrz/exec';
 
 let allPosts = [];       // 全投稿データ保持用
+let filteredPosts = [];  // 検索絞り込み後のデータ保持用
 let currentPage = 1;     // 現在のページ番号
 const ITEMS_PER_PAGE = 10; // 1ページあたりの表示件数
 
@@ -238,12 +239,35 @@ async function fetchBoardData() {
   try {
     const response = await fetch(GAS_URL);
     allPosts = await response.json();
+    filteredPosts = [...allPosts]; // 初期データ設定
     
     renderBoardPosts();
   } catch (error) {
     console.error('データ取得エラー:', error);
     boardList.innerHTML = `<li style="padding: 24px; text-align: center; color: var(--color-error); font-size: 0.85rem;">データの取得に失敗しました。</li>`;
   }
+}
+
+/**
+ * リアルタイム検索ハンドラー
+ */
+function handleSearchInput() {
+  const searchInput = document.getElementById('board-search');
+  const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+  if (!query) {
+    filteredPosts = [...allPosts];
+  } else {
+    filteredPosts = allPosts.filter(post => {
+      const nameMatch = post.name ? post.name.toLowerCase().includes(query) : false;
+      const messageMatch = post.message ? post.message.toLowerCase().includes(query) : false;
+      const timeMatch = post.timestamp ? post.timestamp.toLowerCase().includes(query) : false;
+      return nameMatch || messageMatch || timeMatch;
+    });
+  }
+
+  currentPage = 1; // 検索時は1ページ目に戻す
+  renderBoardPosts();
 }
 
 /**
@@ -254,19 +278,19 @@ function renderBoardPosts() {
   const paginationContainer = document.getElementById('pagination');
   if (!boardList) return;
 
-  if (!allPosts || allPosts.length === 0) {
-    boardList.innerHTML = `<li style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.875rem; list-style: none;">目撃情報はまだありません。</li>`;
+  if (!filteredPosts || filteredPosts.length === 0) {
+    boardList.innerHTML = `<li style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.875rem; list-style: none;">該当する目撃情報は見つかりませんでした。</li>`;
     if (paginationContainer) paginationContainer.innerHTML = '';
     return;
   }
 
   // 10件区切りスライス計算
-  const totalPages = Math.ceil(allPosts.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredPosts.length / ITEMS_PER_PAGE);
   if (currentPage > totalPages) currentPage = totalPages;
   if (currentPage < 1) currentPage = 1;
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentPosts = allPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const currentPosts = filteredPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   // カード描画
   boardList.innerHTML = currentPosts.map(post => `

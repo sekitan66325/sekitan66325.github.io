@@ -245,7 +245,14 @@
 
         <!-- 投稿一覧 -->
         <section class="content-section">
-          <h2 class="section-title">最新の目撃情報</h2>
+          <div class="board-header-row">
+            <h2 class="section-title">最新の目撃情報</h2>
+            <!-- リアルタイム検索バー -->
+            <div class="search-box">
+              <input type="text" id="board-search" class="search-input" placeholder="🔍 日付・列車番号・車両で検索..." oninput="handleSearchInput()">
+            </div>
+          </div>
+
           <ul id="board-list" class="list-container">
             <li style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.875rem; list-style: none;">
               目撃情報を読み込んでいます...
