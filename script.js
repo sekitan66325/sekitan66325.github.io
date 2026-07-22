@@ -207,10 +207,11 @@ const ITEMS_PER_PAGE = 10; // 1ページあたりの表示件数
 
 function formatTimestamp(timestampStr) {
   if (!timestampStr) return '';
-  if (timestampStr.includes('/')) return timestampStr;
+  const str = String(timestampStr);
+  if (str.includes('/') || str.includes('-')) return str;
   
-  const d = new Date(timestampStr);
-  if (isNaN(d.getTime())) return timestampStr;
+  const d = new Date(str);
+  if (isNaN(d.getTime())) return str;
 
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -239,7 +240,7 @@ async function fetchBoardData() {
   try {
     const response = await fetch(GAS_URL);
     allPosts = await response.json();
-    filteredPosts = [...allPosts]; // 初期データ設定
+    filteredPosts = [...allPosts];
     
     renderBoardPosts();
   } catch (error) {
@@ -249,7 +250,7 @@ async function fetchBoardData() {
 }
 
 /**
- * リアルタイム検索ハンドラー
+ * リアルタイム検索ハンドラー（型安全版）
  */
 function handleSearchInput() {
   const searchInput = document.getElementById('board-search');
@@ -259,14 +260,15 @@ function handleSearchInput() {
     filteredPosts = [...allPosts];
   } else {
     filteredPosts = allPosts.filter(post => {
-      const nameMatch = post.name ? post.name.toLowerCase().includes(query) : false;
-      const messageMatch = post.message ? post.message.toLowerCase().includes(query) : false;
-      const timeMatch = post.timestamp ? post.timestamp.toLowerCase().includes(query) : false;
-      return nameMatch || messageMatch || timeMatch;
+      const nameStr = post.name !== undefined && post.name !== null ? String(post.name).toLowerCase() : '';
+      const messageStr = post.message !== undefined && post.message !== null ? String(post.message).toLowerCase() : '';
+      const timeStr = post.timestamp !== undefined && post.timestamp !== null ? String(post.timestamp).toLowerCase() : '';
+
+      return nameStr.includes(query) || messageStr.includes(query) || timeStr.includes(query);
     });
   }
 
-  currentPage = 1; // 検索時は1ページ目に戻す
+  currentPage = 1;
   renderBoardPosts();
 }
 
@@ -284,7 +286,6 @@ function renderBoardPosts() {
     return;
   }
 
-  // 10件区切りスライス計算
   const totalPages = Math.ceil(filteredPosts.length / ITEMS_PER_PAGE);
   if (currentPage > totalPages) currentPage = totalPages;
   if (currentPage < 1) currentPage = 1;
@@ -292,7 +293,6 @@ function renderBoardPosts() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentPosts = filteredPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  // カード描画
   boardList.innerHTML = currentPosts.map(post => `
     <li class="board-post-card">
       <div class="post-header">
@@ -307,7 +307,6 @@ function renderBoardPosts() {
     </li>
   `).join('');
 
-  // ページネーションボタン描画（11件以上ある場合のみ）
   if (paginationContainer) {
     if (totalPages > 1) {
       paginationContainer.innerHTML = `
@@ -327,7 +326,6 @@ function renderBoardPosts() {
 function changePage(newPage) {
   currentPage = newPage;
   renderBoardPosts();
-  // リストの先頭へスクロール
   const boardSection = document.getElementById('board-list');
   if (boardSection) {
     boardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -344,13 +342,11 @@ async function handlePostSubmit(event) {
   const nameInput = document.getElementById('board-name');
   const messageInput = document.getElementById('board-message') || document.getElementById('board-meaage');
   const passwordInput = document.getElementById('board-password');
-  const formAccordion = document.querySelector('.board-form-accordion');
 
   const name = nameInput ? nameInput.value.trim() : '';
   const message = messageInput ? messageInput.value.trim() : '';
   const password = passwordInput ? passwordInput.value.trim() : '';
 
-  // 半角英数字4桁以上バリデーション
   const passRegex = /^[a-zA-Z0-9]{4,}$/;
   if (!passRegex.test(password)) {
     alert('暗証番号は半角英数字4桁以上で入力してください。');
@@ -389,8 +385,14 @@ async function handlePostSubmit(event) {
       alert('投稿が完了しました！');
       if (messageInput) messageInput.value = '';
       if (passwordInput) passwordInput.value = '';
-      if (formAccordion) formAccordion.removeAttribute('open'); // 投稿完了後にアコーディオンを閉じる
-      currentPage = 1; // 最新投稿を見せるため1ページ目へ
+      
+      // 投稿完了後にアコーディオンを自動で閉じる
+      const accordion = document.getElementById('form-accordion');
+      if (accordion && accordion.classList.contains('open')) {
+        toggleFormAccordion();
+      }
+      
+      currentPage = 1;
       fetchBoardData();
     } else {
       alert('送信エラー: ' + (result.message || '投稿に失敗しました'));
@@ -435,7 +437,7 @@ function closeEditModal() {
 }
 
 /**
- * 編集データの送信（連打・二重送信防止対応）
+ * 編集データの送信
  */
 async function submitPostEdit() {
   const id = document.getElementById('edit-post-id').value;
@@ -454,7 +456,6 @@ async function submitPostEdit() {
     return;
   }
 
-  // 二重送信防止
   if (editSubmitBtn) {
     editSubmitBtn.disabled = true;
     editSubmitBtn.textContent = '更新中...';
@@ -530,4 +531,14 @@ async function handlePostDelete(id) {
     console.error('削除エラー:', error);
     alert('通信エラーが発生しました。');
   }
+}
+
+/**
+ * 投稿フォームのアコーディオン開閉制御
+ */
+function toggleFormAccordion() {
+  const accordion = document.getElementById('form-accordion');
+  if (!accordion) return;
+
+  accordion.classList.toggle('open');
 }

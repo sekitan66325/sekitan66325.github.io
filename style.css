@@ -121,156 +121,132 @@ body {
   margin-bottom: 0;
 }
 
-/* アコーディオン型 投稿フォーム (Liquid Glass風) */
+/* アコーディオン型 投稿フォーム (Liquid Glass & スムース伸縮) */
 .board-form-accordion {
   background: rgba(28, 28, 30, 0.65);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px;
+  border-radius: 16px;
   margin-bottom: 24px;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .form-accordion-summary {
-  padding: 14px 18px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 16px 20px;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-link);
   cursor: pointer;
   user-select: none;
-  list-style: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   transition: background-color 0.2s ease;
+  text-align: left;
 }
 
 .form-accordion-summary:hover {
   background-color: rgba(255, 255, 255, 0.04);
 }
 
-.form-accordion-summary::-webkit-details-marker {
-  display: none;
-}
-
-.form-accordion-summary::after {
-  content: "＋";
-  font-size: 0.9rem;
+/* アコーディオンアイコン（SVGシェブロン） */
+.accordion-icon {
   color: var(--text-secondary);
-  font-weight: 400;
-  transition: transform 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
 }
 
-.board-form-accordion[open] .form-accordion-summary::after {
-  content: "－";
+/* 開いたときにくるっと下向き→上向きへ回転 */
+.board-form-accordion.open .accordion-icon {
+  transform: rotate(180deg);
+}
+
+/* 開閉アニメーションのGrid伸縮構造 */
+.accordion-content-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.board-form-accordion.open .accordion-content-wrapper {
+  grid-template-rows: 1fr;
+}
+
+.accordion-content-inner {
+  overflow: hidden;
 }
 
 .board-form-card {
-  padding: 0 16px 16px 16px;
-  border-top: 0.5px solid var(--border-separator);
-  margin-top: 4px;
-  padding-top: 14px;
-  animation: accordionSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes accordionSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 掲示板ヘッダー & 検索バー */
-.board-header-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 24px;
-  margin-bottom: 12px;
-}
-
-.board-header-row .section-title {
-  margin: 0;
-}
-
-.search-box {
-  flex: 1;
-  max-width: 280px;
-}
-
-.search-input {
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.07);
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
-  padding: 6px 14px;
-  color: var(--text-primary);
-  font-size: 0.825rem;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.search-input:focus {
-  border-color: var(--text-link);
-  background-color: rgba(255, 255, 255, 0.12);
+  padding: 0 20px 20px 20px;
+  border-top: none;
 }
 
 /* 入力レギュレーションボックス */
 .rule-box {
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 12px;
+  background-color: transparent;
+  padding: 0;
+  margin-bottom: 16px;
+  border: none;
 }
 
 .rule-title {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.rule-text {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
   margin-bottom: 6px;
 }
 
+.rule-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+/* 記入例エリア全体のコンテナ */
+.rule-example-container {
+  margin-top: 10px;
+  background-color: rgba(255, 255, 255, 0.025); /* 入力欄より暗く馴染むトーン */
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+/* 「記入例」の小ラベル */
+.rule-example-label {
+  display: block;
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+/* 記入例の本文 */
 .rule-example {
-  font-size: 0.75rem;
-  font-family: monospace;
-  color: var(--text-primary);
-  background: rgba(0, 0, 0, 0.4);
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-subtle);
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: #8e8e93; /* 入力欄（明るい白）と分けて控えめなグレーに */
   white-space: pre-wrap;
-  line-height: 1.35;
+  line-height: 1.5;
+  border: none; /* 枠線を撤去 */
 }
 
 .form-group {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .form-label {
   display: block;
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--text-primary); /* グレーから白（#f5f5f7）へ変更 */
   margin-bottom: 4px;
   font-weight: 500;
 }
-
 .form-input, .form-textarea {
   width: 100%;
   background-color: rgba(255, 255, 255, 0.06);
@@ -305,6 +281,53 @@ body {
 
 .form-submit-btn:active {
   opacity: 0.75;
+}
+
+/* 掲示板ヘッダー & 検索バー */
+.board-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.board-header-row .section-title {
+  margin: 0;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 280px;
+}
+
+.search-input {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: var(--text-primary);
+  font-size: 0.825rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'><path d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/></svg>") no-repeat center;
+  background-size: 10px;
+  cursor: pointer;
+}
+
+.search-input:focus {
+  border-color: var(--text-link);
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ==========================================================================
@@ -518,7 +541,7 @@ html, body {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  align-items: flex-start; /* 余白解消用 */
+  align-items: flex-start;
 }
 .app-view-slider::-webkit-scrollbar { display: none; }
 
