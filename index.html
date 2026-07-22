@@ -195,6 +195,7 @@
             <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X (Twitter)</a></li>
             <li><a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank" rel="noopener noreferrer">BOOTH</a></li>
             <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">メールでお問い合わせ</a></li>
+            <li><a href="admin.html" class="footer-link" target="_blank">管理画面</a></li>
           </ul>
           <p class="copyright">©せきたん All Rights Reserved 2026</p>
         </div>
@@ -340,7 +341,7 @@
     </div>
   </div>
 
-  <!-- 👇 ここから追加：削除用モーダル -->
+  <!-- 削除用モーダル -->
   <div id="delete-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
       <h3 style="margin-top:0; font-size: 1.1rem; color: var(--text-primary);">投稿の削除</h3>
@@ -350,7 +351,6 @@
       <input type="hidden" id="delete-post-id">
       <div class="form-group" style="margin-bottom: 16px;">
         <label class="form-label" style="font-size: 0.8rem;">暗証番号</label>
-        <!-- type="password" で「●●●●」と隠す -->
         <input type="password" id="delete-password" class="form-input" minlength="4" placeholder="暗証番号を入力" required>
       </div>
       <div style="display: flex; justify-content: flex-end; gap: 8px;">
