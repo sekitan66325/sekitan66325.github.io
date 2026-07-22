@@ -1,0 +1,84 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   管理者パネル専用追加スタイル
+   ========================================================================== */
+
+/* ステータスバッジ（公開中 / 非表示中） */
+.admin-badge {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.badge-visible {
+  background: rgba(48, 209, 88, 0.2);
+  color: #30d158;
+  border: 0.5px solid rgba(48, 209, 88, 0.4);
+}
+
+.badge-hidden {
+  background: rgba(255, 69, 58, 0.2);
+  color: #ff453a;
+  border: 0.5px solid rgba(255, 69, 58, 0.4);
+}
+
+/* 操作ボタンエリア */
+.admin-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.btn-admin {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-admin:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-danger {
+  color: var(--color-error);
+  border-color: rgba(255, 69, 58, 0.3);
+}
+
+.btn-success {
+  color: #30d158;
+  border-color: rgba(48, 209, 88, 0.3);
+}
+
+/* 編集・操作ログカード */
+.log-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  font-size: 0.825rem;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.log-change {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 6px;
+  font-family: inherit;
+  white-space: pre-wrap;
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>真岡線運用掲示板 - 管理者ダッシュボード</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="header-inner" style="display: flex; justify-content: space-between; align-items: center;">
+      <h1 class="logo">掲示板 管理者パネル</h1>
+      <button id="logout-btn" class="btn-admin btn-danger" style="display: none;" onclick="handleLogout()">ログアウト</button>
+    </div>
+  </header>
+
+  <main class="container" id="main-container">
+    
+    <section id="login-view" style="max-width: 380px; margin: 40px auto;">
+      <div class="notice-section" style="text-align: center;">
+        <strong style="font-size: 1.1rem; margin-bottom: 12px;">管理者ログイン</strong>
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group" style="text-align: left;">
+            <label class="form-label">管理者ID</label>
+            <input type="text" id="login-id" class="form-input" required placeholder="admin">
+          </div>
+          <div class="form-group" style="text-align: left;">
+            <label class="form-label">パスワード</label>
+            <input type="password" id="login-pass" class="form-input" required placeholder="••••••••">
+          </div>
+          <button type="submit" id="login-submit-btn" class="form-submit-btn" style="margin-top: 12px;">ログイン</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="dashboard-view" style="display: none;">
+      
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <button id="tab-btn-posts" class="btn-admin active" onclick="switchAdminTab('posts')" style="background: var(--text-link); color: #fff;">投稿管理</button>
+        <button id="tab-btn-logs" class="btn-admin" onclick="switchAdminTab('logs')">操作・編集ログ</button>
+      </div>
+
+      <div id="panel-posts">
+        <div class="board-header-row">
+          <h2 class="section-title">投稿一覧（全件）</h2>
+          <div class="search-box">
+            <input type="search" id="admin-search" class="search-input" placeholder="投稿検索..." oninput="renderAdminPosts()">
+          </div>
+        </div>
+
+        <ul id="admin-post-list" style="list-style: none;">
+          <li style="text-align: center; color: var(--text-secondary); padding: 20px;">読み込み中...</li>
+        </ul>
+      </div>
+
+      <div id="panel-logs" style="display: none;">
+        <h2 class="section-title">操作・変更履歴 (edit_log)</h2>
+        <div id="admin-log-list">
+          <div style="text-align: center; color: var(--text-secondary); padding: 20px;">読み込み中...</div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="password-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 style="margin-top:0; font-size: 1.1rem; color: var(--text-primary);">初回パスワードの変更</h3>
+      <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">
+        セキュリティ保護のため、初期パスワードを変更してください。
+      </p>
+      <form onsubmit="handleChangePassword(event)">
+        <div class="form-group">
+          <label class="form-label">新しいパスワード（半角英数字4桁以上）</label>
+          <input type="password" id="new-password" class="form-input" minlength="4" required>
+        </div>
+        <button type="submit" class="form-submit-btn">変更して開始する</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="admin-edit-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 style="margin-top:0; font-size: 1.1rem; color: var(--text-primary);">投稿内容の直接修正</h3>
+      <input type="hidden" id="admin-edit-id">
+      <div class="form-group" style="margin-top: 12px;">
+        <label class="form-label">本文</label>
+        <textarea id="admin-edit-message" class="form-textarea" rows="5"></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+        <button type="button" onclick="closeAdminEditModal()" class="btn-admin">キャンセル</button>
+        <button type="button" onclick="submitAdminEdit()" class="form-submit-btn" style="width: auto; padding: 8px 16px; margin: 0;">保存する</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
