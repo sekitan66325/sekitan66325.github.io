@@ -205,6 +205,9 @@ let filteredPosts = [];  // 検索絞り込み後のデータ保持用
 let currentPage = 1;     // 現在のページ番号
 const ITEMS_PER_PAGE = 10; // 1ページあたりの表示件数
 
+/**
+ * 時刻フォーマット（yyyy/MM/dd HH:mm:ss）
+ */
 function formatTimestamp(timestampStr) {
   if (!timestampStr) return '';
   const str = String(timestampStr);
@@ -498,11 +501,44 @@ async function submitPostEdit() {
 }
 
 /**
- * 削除処理
+ * 削除モーダル表示
  */
-async function handlePostDelete(id) {
-  const password = prompt('投稿時に設定した半角英数字4桁以上の暗証番号を入力してください:');
-  if (!password) return;
+function handlePostDelete(id) {
+  const modal = document.getElementById('delete-modal');
+  const idInput = document.getElementById('delete-post-id');
+  const passwordInput = document.getElementById('delete-password');
+
+  if (!modal) return;
+
+  idInput.value = id;
+  passwordInput.value = '';
+
+  modal.style.display = 'flex';
+}
+
+function closeDeleteModal() {
+  const modal = document.getElementById('delete-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+/**
+ * 削除データの送信
+ */
+async function submitPostDelete() {
+  const id = document.getElementById('delete-post-id').value;
+  const password = document.getElementById('delete-password').value.trim();
+  const deleteSubmitBtn = document.querySelector('#delete-modal button[onclick="submitPostDelete()"]');
+
+  const passRegex = /^[a-zA-Z0-9]{4,}$/;
+  if (!passRegex.test(password)) {
+    alert('暗証番号は半角英数字4桁以上で入力してください。');
+    return;
+  }
+
+  if (deleteSubmitBtn) {
+    deleteSubmitBtn.disabled = true;
+    deleteSubmitBtn.textContent = '削除中...';
+  }
 
   const payload = {
     action: 'delete',
@@ -523,6 +559,7 @@ async function handlePostDelete(id) {
 
     if (result.status === 'success') {
       alert('投稿を削除しました。');
+      closeDeleteModal();
       fetchBoardData();
     } else {
       alert('削除失敗: ' + (result.message || '暗証番号が間違っています。'));
@@ -530,6 +567,11 @@ async function handlePostDelete(id) {
   } catch (error) {
     console.error('削除エラー:', error);
     alert('通信エラーが発生しました。');
+  } finally {
+    if (deleteSubmitBtn) {
+      deleteSubmitBtn.disabled = false;
+      deleteSubmitBtn.textContent = '削除する';
+    }
   }
 }
 
