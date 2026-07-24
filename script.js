@@ -1,4 +1,4 @@
-// Service Workerの登録（PWA化対応）
+// Service Workerの登録
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch((err) => {
@@ -49,9 +49,8 @@ function formatBytes(bytes, decimals = 1) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
 }
 
-
 /* ==========================================================================
-   2. スライド＆リキッドグラスバー
+   2. スライド＆ナビゲーション制御
    ========================================================================== */
 const slider = document.getElementById('app-slider');
 const tabBar = document.getElementById('tab-bar');
@@ -194,20 +193,16 @@ window.addEventListener('resize', () => {
   updateGliderPosition(index);
 });
 
-
 /* ==========================================================================
-   3. 掲示板API通信 ＆ UI描画処理 (検索・ページネーション対応)
+   3. 掲示板API通信 ＆ UI描画処理
    ========================================================================== */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyA_836JV_xFiWXXaVqbifUDkjIxxvY6Bv-CdunB8Jsj3kcMzmBbJIRuKtMJiYEPIrz/exec';
 
-let allPosts = [];       // 全投稿データ保持用
-let filteredPosts = [];  // 検索絞り込み後のデータ保持用
-let currentPage = 1;     // 現在のページ番号
-const ITEMS_PER_PAGE = 10; // 1ページあたりの表示件数
+let allPosts = [];
+let filteredPosts = [];
+let currentPage = 1;
+const ITEMS_PER_PAGE = 10;
 
-/**
- * 時刻フォーマット（yyyy/MM/dd HH:mm:ss）
- */
 function formatTimestamp(timestampStr) {
   if (!timestampStr) return '';
   const str = String(timestampStr);
@@ -233,9 +228,6 @@ function escapeHTML(str) {
   );
 }
 
-/**
- * 投稿データを取得
- */
 async function fetchBoardData() {
   const boardList = document.getElementById('board-list');
   if (!boardList) return;
@@ -252,9 +244,6 @@ async function fetchBoardData() {
   }
 }
 
-/**
- * リアルタイム検索ハンドラー（型安全版）
- */
 function handleSearchInput() {
   const searchInput = document.getElementById('board-search');
   const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
@@ -275,9 +264,6 @@ function handleSearchInput() {
   renderBoardPosts();
 }
 
-/**
- * 現在のページの投稿10件分を表示・ページネーション描画
- */
 function renderBoardPosts() {
   const boardList = document.getElementById('board-list');
   const paginationContainer = document.getElementById('pagination');
@@ -323,9 +309,6 @@ function renderBoardPosts() {
   }
 }
 
-/**
- * ページ移動処理
- */
 function changePage(newPage) {
   currentPage = newPage;
   renderBoardPosts();
@@ -335,9 +318,6 @@ function changePage(newPage) {
   }
 }
 
-/**
- * 投稿送信ハンドラー
- */
 async function handlePostSubmit(event) {
   event.preventDefault();
 
@@ -389,7 +369,6 @@ async function handlePostSubmit(event) {
       if (messageInput) messageInput.value = '';
       if (passwordInput) passwordInput.value = '';
       
-      // 投稿完了後にアコーディオンを自動で閉じる
       const accordion = document.getElementById('form-accordion');
       if (accordion && accordion.classList.contains('open')) {
         toggleFormAccordion();
@@ -411,9 +390,6 @@ async function handlePostSubmit(event) {
   }
 }
 
-/**
- * 編集モーダル表示
- */
 function handlePostEdit(id, currentMessage) {
   const modal = document.getElementById('edit-modal');
   const idInput = document.getElementById('edit-post-id');
@@ -439,9 +415,6 @@ function closeEditModal() {
   if (modal) modal.style.display = 'none';
 }
 
-/**
- * 編集データの送信
- */
 async function submitPostEdit() {
   const id = document.getElementById('edit-post-id').value;
   const message = document.getElementById('edit-message').value.trim();
@@ -500,9 +473,6 @@ async function submitPostEdit() {
   }
 }
 
-/**
- * 削除モーダル表示
- */
 function handlePostDelete(id) {
   const modal = document.getElementById('delete-modal');
   const idInput = document.getElementById('delete-post-id');
@@ -521,9 +491,6 @@ function closeDeleteModal() {
   if (modal) modal.style.display = 'none';
 }
 
-/**
- * 削除データの送信
- */
 async function submitPostDelete() {
   const id = document.getElementById('delete-post-id').value;
   const password = document.getElementById('delete-password').value.trim();
@@ -575,9 +542,6 @@ async function submitPostDelete() {
   }
 }
 
-/**
- * 投稿フォームのアコーディオン開閉制御
- */
 function toggleFormAccordion() {
   const accordion = document.getElementById('form-accordion');
   if (!accordion) return;

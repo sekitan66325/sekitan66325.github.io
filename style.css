@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. 基本配色 & タイポグラフィ（Apple HIG 準拠・完全地続きダークUI）
+   1. 基本配色 & タイポグラフィ
    ========================================================================== */
 :root {
   --bg-system: #000000;
@@ -10,8 +10,8 @@
   
   --text-primary: #f5f5f7;
   --text-secondary: #86868b;
-  --text-link: #2997ff;       /* Apple System Blue */
-  --color-error: #ff453a;      /* Apple System Red */
+  --text-link: #2997ff;
+  --color-error: #ff453a;
 }
 
 * {
@@ -31,7 +31,7 @@ body {
 
 .header-inner, .container, .footer-inner {
   width: 100%;
-  max-width: 45rem; /* 720px */
+  max-width: 45rem;
   margin-left: auto;
   margin-right: auto;
   padding-left: 20px;
@@ -77,7 +77,6 @@ body {
   margin-bottom: 12px;
 }
 
-/* 注意書き（汎用） */
 .notice-section {
   background-color: var(--bg-secondary);
   border-radius: 12px;
@@ -100,7 +99,6 @@ body {
   line-height: 1.5;
 }
 
-/* 掲示板最下部 注意事項リスト */
 .board-rules-notice {
   margin-top: 32px;
   margin-bottom: 24px;
@@ -121,7 +119,6 @@ body {
   margin-bottom: 0;
 }
 
-/* アコーディオン型 投稿フォーム (Liquid Glass & スムース伸縮) */
 .board-form-accordion {
   background: rgba(28, 28, 30, 0.65);
   backdrop-filter: blur(20px) saturate(180%);
@@ -132,14 +129,13 @@ body {
   overflow: hidden;
 }
 
-/* アコーディオンヘッダー（通常時） */
 .form-accordion-summary {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: var(--card-bg, #1c1c1e); /* ベースのカード背景色 */
+  background: var(--card-bg, #1c1c1e);
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -149,33 +145,28 @@ body {
   transition: background-color 0.2s ease, border-radius 0.2s ease;
 }
 
-/* 展開時 (.open)：ヘッダーの背景色をフォーム領域と完全に一致させる */
 .board-form-accordion.open .form-accordion-summary {
-  background: transparent; /* 親カードと同じ背景色に透かす */
+  background: transparent;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-/* アコーディオン全体の外枠（展開時に一体化させる場合） */
 .board-form-accordion {
   background: var(--card-bg, #1c1c1e);
   border-radius: 12px;
-  overflow: hidden; /* 中身のはみ出しを防ぎ角丸を統一 */
+  overflow: hidden;
 }
 
-/* アコーディオンアイコン（SVGシェブロン） */
 .accordion-icon {
   color: var(--text-secondary);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
 }
 
-/* 開いたときにくるっと下向き→上向きへ回転 */
 .board-form-accordion.open .accordion-icon {
   transform: rotate(180deg);
 }
 
-/* 開閉アニメーションのGrid伸縮構造 */
 .accordion-content-wrapper {
   display: grid;
   grid-template-rows: 0fr;
@@ -195,7 +186,6 @@ body {
   border-top: none;
 }
 
-/* 入力レギュレーションボックス */
 .rule-box {
   background-color: transparent;
   padding: 0;
@@ -218,15 +208,13 @@ body {
   margin-bottom: 10px;
 }
 
-/* 記入例エリア全体のコンテナ */
 .rule-example-container {
   margin-top: 10px;
-  background-color: rgba(255, 255, 255, 0.025); /* 入力欄より暗く馴染むトーン */
+  background-color: rgba(255, 255, 255, 0.025);
   border-radius: 8px;
   padding: 10px 14px;
 }
 
-/* 「記入例」の小ラベル */
 .rule-example-label {
   display: block;
   font-size: 0.725rem;
@@ -236,14 +224,13 @@ body {
   opacity: 0.8;
 }
 
-/* 記入例の本文 */
 .rule-example {
   font-size: 0.8rem;
   font-family: inherit;
-  color: #8e8e93; /* 入力欄（明るい白）と分けて控えめなグレーに */
+  color: #8e8e93;
   white-space: pre-wrap;
   line-height: 1.5;
-  border: none; /* 枠線を撤去 */
+  border: none;
 }
 
 .form-group {
@@ -253,10 +240,11 @@ body {
 .form-label {
   display: block;
   font-size: 0.75rem;
-  color: var(--text-primary); /* グレーから白（#f5f5f7）へ変更 */
+  color: var(--text-primary);
   margin-bottom: 4px;
   font-weight: 500;
 }
+
 .form-input, .form-textarea {
   width: 100%;
   background-color: rgba(255, 255, 255, 0.06);
@@ -293,7 +281,6 @@ body {
   opacity: 0.75;
 }
 
-/* 掲示板ヘッダー & 検索バー */
 .board-header-row {
   display: flex;
   flex-wrap: wrap;
@@ -429,7 +416,6 @@ body {
   opacity: 1;
 }
 
-/* ページネーション（10件切り替えコントロール） */
 .pagination-container {
   display: flex;
   align-items: center;
@@ -535,7 +521,7 @@ body {
 }
 
 /* ==========================================================================
-   6. スライド＆リキッドグラスバー
+   6. スライド＆ナビゲーション
    ========================================================================== */
 html, body {
   overflow-x: hidden;
@@ -619,7 +605,9 @@ html, body {
 
 .tab-btn.active { color: var(--text-primary); }
 
-/* モーダル */
+/* ==========================================================================
+   7. モーダル & フッター
+   ========================================================================== */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0;
@@ -639,7 +627,6 @@ html, body {
   padding: 20px;
 }
 
-/* フッター */
 .site-footer {
   background-color: var(--bg-system);
   padding: 48px 0 32px 0;

@@ -1,4 +1,3 @@
-// ※ ご自身のGASのWebアプリURLを設定してください
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyA_836JV_xFiWXXaVqbifUDkjIxxvY6Bv-CdunB8Jsj3kcMzmBbJIRuKtMJiYEPIrz/exec';
 
 let adminToken = sessionStorage.getItem('admin_token') || '';
