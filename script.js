@@ -240,7 +240,7 @@ async function fetchBoardData() {
     renderBoardPosts();
   } catch (error) {
     console.error('データ取得エラー:', error);
-    boardList.innerHTML = `<li style="padding: 24px; text-align: center; color: var(--color-error); font-size: 0.85rem;">データの取得に失敗しました。</li>`;
+    boardList.innerHTML = `<li style="padding: 24px; text-align: center; color: var(--color-error, #ff453a); font-size: 0.85rem; list-style: none;">データの取得に失敗しました。</li>`;
   }
 }
 
@@ -282,15 +282,16 @@ function renderBoardPosts() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentPosts = filteredPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
+  // 改行や特殊文字によるJSエラーを防ぐため、引数にはIDのみを渡す
   boardList.innerHTML = currentPosts.map(post => `
     <li class="board-post-card">
       <div class="post-header">
         <span class="post-author">${escapeHTML(post.name)}</span>
         <span class="post-time">${formatTimestamp(post.timestamp)}</span>
       </div>
-      <div class="post-body">${escapeHTML(post.message)}</div>
+      <div class="post-body">${escapeHTML(post.message).replace(/\n/g, '<br>')}</div>
       <div class="post-actions">
-        <button class="post-btn-edit" onclick="handlePostEdit('${post.id}', '${escapeHTML(post.message)}')">編集</button>
+        <button class="post-btn-edit" onclick="handlePostEdit('${post.id}')">編集</button>
         <button class="post-btn-delete" onclick="handlePostDelete('${post.id}')">削除</button>
       </div>
     </li>
@@ -323,7 +324,7 @@ async function handlePostSubmit(event) {
 
   const submitBtn = document.getElementById('submit-btn');
   const nameInput = document.getElementById('board-name');
-  const messageInput = document.getElementById('board-message') || document.getElementById('board-meaage');
+  const messageInput = document.getElementById('board-message');
   const passwordInput = document.getElementById('board-password');
 
   const name = nameInput ? nameInput.value.trim() : '';
@@ -390,7 +391,8 @@ async function handlePostSubmit(event) {
   }
 }
 
-function handlePostEdit(id, currentMessage) {
+// IDから対象の投稿を検索して無加工のメッセージをモーダルに読み込む
+function handlePostEdit(id) {
   const modal = document.getElementById('edit-modal');
   const idInput = document.getElementById('edit-post-id');
   const messageInput = document.getElementById('edit-message');
@@ -398,13 +400,14 @@ function handlePostEdit(id, currentMessage) {
 
   if (!modal) return;
 
+  const targetPost = allPosts.find(p => String(p.id) === String(id));
+  if (!targetPost) {
+    alert('対象の投稿が見つかりませんでした。');
+    return;
+  }
+
   idInput.value = id;
-  messageInput.value = currentMessage
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&#39;/g, "'")
-    .replace(/&quot;/g, '"');
+  messageInput.value = targetPost.message;
   passwordInput.value = '';
 
   modal.style.display = 'flex';
