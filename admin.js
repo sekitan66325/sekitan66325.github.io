@@ -169,6 +169,7 @@ function renderAdminPosts() {
     return;
   }
 
+  // onclickにはIDのみを渡し、改行によるJS構文エラーを回避
   list.innerHTML = filtered.map(p => `
     <li class="board-post-card" style="position: relative;">
       <div class="post-header">
@@ -180,9 +181,9 @@ function renderAdminPosts() {
         </div>
         <span class="post-time">${p.timestamp}</span>
       </div>
-      <div class="post-body">${escapeHTML(p.message)}</div>
+      <div class="post-body">${escapeHTML(p.message).replace(/\n/g, '<br>')}</div>
       <div class="admin-actions">
-        <button class="btn-admin" onclick="openAdminEditModal('${p.id}', '${escapeHTML(p.message)}')">直接編集</button>
+        <button class="btn-admin" onclick="openAdminEditModal('${p.id}')">直接編集</button>
         ${p.is_hidden 
           ? `<button class="btn-admin btn-success" onclick="toggleHidePost('${p.id}', false)">復元する</button>`
           : `<button class="btn-admin btn-danger" onclick="toggleHidePost('${p.id}', true)">非表示にする</button>`
@@ -215,12 +216,17 @@ async function toggleHidePost(id, toHide) {
 }
 
 /**
- * 6. 管理者直接編集
+ * 6. 管理者直接編集モーダル表示
  */
-function openAdminEditModal(id, currentMsg) {
+function openAdminEditModal(id) {
+  const target = allAdminPosts.find(p => String(p.id) === String(id));
+  if (!target) {
+    alert('対象の投稿が見つかりませんでした。');
+    return;
+  }
+
   document.getElementById('admin-edit-id').value = id;
-  document.getElementById('admin-edit-message').value = currentMsg
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+  document.getElementById('admin-edit-message').value = target.message || '';
   document.getElementById('admin-edit-modal').style.display = 'flex';
 }
 
