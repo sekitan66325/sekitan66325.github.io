@@ -196,7 +196,7 @@ window.addEventListener('resize', () => {
 /* ==========================================================================
    3. 掲示板API通信 ＆ UI描画処理
    ========================================================================== */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyszofgPEFeNoex5y5ED8plEESIVVTr9-foLGQmJ95RL6x6S71T3TUY3-93Jqg0Tz5Rhg/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyL8HldTWyKyzMzKiloys53kriGJ7lRiLWUaQnV55X6ZpQNZN91if3ehA868oT7Ifwq8w/exec';
 
 let allPosts = [];
 let filteredPosts = [];
