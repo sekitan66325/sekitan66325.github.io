@@ -467,10 +467,12 @@ body {
   position: relative;
 }
 
+/* 区切り線の基本位置（左右20pxを空ける） */
 .list-item:not(:last-child)::after {
   content: "";
   position: absolute;
   bottom: 0;
+  left: 20px;
   right: 20px;
   height: 0.5px;
   background-color: var(--border-separator);
@@ -478,8 +480,8 @@ body {
   pointer-events: none;
 }
 
+/* 電車アイコン（.card-img-wrapper）があるリストのみアイコン直下を避けて左88pxから開始 */
 .list-item:has(.card-img-wrapper):not(:last-child)::after { left: 88px; }
-.list-item:has(.report-btn):not(:last-child)::after { left: 20px; }
 
 .btn-link, .report-btn {
   display: flex;
@@ -495,8 +497,20 @@ body {
   user-select: none;
 }
 
-.btn-link:hover, .report-btn:hover { background-color: rgba(255, 255, 255, 0.04); }
-.btn-link:active, .report-btn:active { background-color: #2c2c2e !important; }
+/* 全録シリーズ・バナー画像付きカード用リンクスタイル */
+.btn-link-card {
+  display: block;
+  width: 100%;
+  padding: 12px 20px 16px 20px; /* パディングを既存リスト（.btn-link）と完全一致 */
+  text-decoration: none;
+  color: var(--text-primary);
+  background-color: transparent;
+  transition: background-color 150ms ease;
+  user-select: none;
+}
+
+.btn-link:hover, .report-btn:hover, .btn-link-card:hover { background-color: rgba(255, 255, 255, 0.04); }
+.btn-link:active, .report-btn:active, .btn-link-card:active { background-color: #2c2c2e !important; }
 
 .item-left-block { display: flex; align-items: center; gap: 14px; }
 .card-img-wrapper {
@@ -518,6 +532,28 @@ body {
   content: ""; display: inline-block; width: 8px; height: 8px;
   border-top: 2px solid #545456; border-right: 2px solid #545456;
   transform: rotate(45deg);
+}
+
+/* バナー画像カード内部レイアウト */
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-banner-wrapper {
+  width: 100%;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.card-banner-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 /* ==========================================================================
