@@ -672,3 +672,8 @@ html, body {
 .footer-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-bottom: 20px; list-style: none; }
 .footer-link { font-size: 0.875rem; color: var(--text-link); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 40px; padding: 0 10px; border-radius: 8px; }
 .copyright { font-size: 0.75rem; color: var(--text-secondary); opacity: 0.7; }
+
+/* reCAPTCHA バッジ非表示 */
+.grecaptcha-badge {
+  visibility: hidden;
+}
