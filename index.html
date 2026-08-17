@@ -11,6 +11,9 @@
   <!-- 3. キーワード設定 (meta keywords) -->
   <meta name="keywords" content="真岡鐵道, 真岡線, 運用表, 運用情報, モオカ14形, SLもおか, C12 66, DE10 1535, 目撃情報, 掲示板">
 
+  <!-- reCAPCHA -->
+  <script src="https://www.google.com/recaptcha/api.js?render=6Le6FootAAAAAFJXorR6fmJznnlopnZCSC_9xK8f"></script>
+
   <!-- 4. OGPタグ（X/TwitterなどのSNSで共有された時のカード表示設定） -->
   <meta property="og:title" content="真岡鐵道 車両運用情報・目撃掲示板">
   <meta property="og:description" content="真岡鐵道（モオカ14形・SLもおか・DE10）の運用資料ダウンロード＆目撃情報掲示板。">
@@ -341,18 +344,18 @@
                   </div>
                 </div>
 
-                <form id="board-form" onsubmit="handlePostSubmit(event)">
+                <form id="board-form" onsubmit="handlePostSubmit(event)" autocomplete="off">
                   <div class="form-group">
                     <label class="form-label">投稿者名</label>
-                    <input type="text" id="board-name" class="form-input" placeholder="" required>
+                    <input type="text" id="board-name" name="author_name" class="form-input" autocomplete="nickname" placeholder="" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">目撃情報・本文</label>
-                    <textarea id="board-message" class="form-textarea" rows="3" placeholder="" required></textarea>
+                    <textarea id="board-message" name="board_body" class="form-textarea" rows="3" autocomplete="off" placeholder="" required></textarea>
                   </div>
                   <div class="form-group">
                     <label class="form-label">削除・編集用暗証番号（半角英数字4桁以上）</label>
-                    <input type="password" id="board-password" class="form-input" minlength="4" placeholder="" required>
+                    <input type="password" id="board-password" name="edit_pin" class="form-input" minlength="4" autocomplete="new-password" data-1password-ignore="true" data-bwignore="true" placeholder="" required>
                   </div>
                   <button type="submit" id="submit-btn" class="form-submit-btn">投稿する</button>
                 </form>

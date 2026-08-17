@@ -196,7 +196,8 @@ window.addEventListener('resize', () => {
 /* ==========================================================================
    3. 掲示板API通信 ＆ UI描画処理
    ========================================================================== */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyA_836JV_xFiWXXaVqbifUDkjIxxvY6Bv-CdunB8Jsj3kcMzmBbJIRuKtMJiYEPIrz/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxPqljPklmIPQlJhIU16ppYRn689gCNUau5i_h_mmRZVmoPvqOBlinaWmEQ3-G63asz/exec';
+const RECAPTCHA_SITE_KEY = '6Le6FootAAAAAFJXorR6fmJznnlopnZCSC_9xK8f'; // ★発行されたサイトキーを設定
 
 let allPosts = [];
 let filteredPosts = [];
@@ -282,7 +283,6 @@ function renderBoardPosts() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentPosts = filteredPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  // 改行や特殊文字によるJSエラーを防ぐため、引数にはIDのみを渡す
   boardList.innerHTML = currentPosts.map(post => `
     <li class="board-post-card">
       <div class="post-header">
@@ -347,14 +347,26 @@ async function handlePostSubmit(event) {
     submitBtn.textContent = '送信中...';
   }
 
-  const payload = {
-    action: 'create',
-    name: name,
-    message: message,
-    password: password
-  };
-
   try {
+    // reCAPTCHA v3 トークンの非同期取得
+    const recaptchaToken = await new Promise((resolve, reject) => {
+      if (typeof grecaptcha === 'undefined') {
+        reject(new Error('reCAPTCHA ライブラリが読み込まれていません。'));
+        return;
+      }
+      grecaptcha.ready(() => {
+        grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' }).then(resolve).catch(reject);
+      });
+    });
+
+    const payload = {
+      action: 'create',
+      name: name,
+      message: message,
+      password: password,
+      recaptchaToken: recaptchaToken // ★トークンをペイロードに追加
+    };
+
     const response = await fetch(GAS_URL, {
       method: 'POST',
       headers: {
@@ -382,7 +394,7 @@ async function handlePostSubmit(event) {
     }
   } catch (error) {
     console.error('投稿エラー:', error);
-    alert('通信エラーが発生しました。');
+    alert('通信エラーまたはスパム判定エラーが発生しました。');
   } finally {
     if (submitBtn) {
       submitBtn.disabled = false;
