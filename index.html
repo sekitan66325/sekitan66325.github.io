@@ -351,21 +351,27 @@
                   </div>
                 </div>
 
-                <form id="board-form" onsubmit="handlePostSubmit(event)" autocomplete="off">
+                <form id="board-form" onsubmit="handlePostSubmit(event)">
                   <div class="form-group">
                     <label class="form-label">投稿者名</label>
-                    <input type="text" id="board-name" name="author_name" class="form-input" autocomplete="nickname" placeholder="" required>
+                    <!-- username として明示 -->
+                    <input type="text" id="board-name" name="username" class="form-input" autocomplete="username" placeholder="" required>
                   </div>
+                  
                   <div class="form-group">
                     <label class="form-label">目撃情報・本文</label>
-                    <textarea id="board-message" name="board_body" class="form-textarea" rows="3" autocomplete="off" placeholder="" required></textarea>
+                    <textarea id="board-message" name="board_body" class="form-textarea" rows="3" placeholder="" required></textarea>
                   </div>
+                  
                   <div class="form-group">
                     <label class="form-label">削除・編集用暗証番号（半角英数字4桁以上）</label>
-                    <input type="password" id="board-password" name="edit_pin" class="form-input" minlength="4" autocomplete="new-password" data-1password-ignore="true" data-bwignore="true" placeholder="" required>
+                    <!-- current-password として明示 -->
+                    <input type="password" id="board-password" name="password" class="form-input" minlength="4" autocomplete="current-password" placeholder="" required>
                   </div>
+                  
                   <button type="submit" id="submit-btn" class="form-submit-btn">投稿する</button>
                 </form>
+
               </div>
             </div>
           </div>

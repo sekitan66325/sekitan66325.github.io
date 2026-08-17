@@ -22,17 +22,23 @@
     <section id="login-view" style="max-width: 380px; margin: 40px auto;">
       <div class="notice-section" style="text-align: center;">
         <strong style="font-size: 1.1rem; margin-bottom: 12px;">管理者ログイン</strong>
-        <form onsubmit="handleLogin(event)">
-          <div class="form-group" style="text-align: left;">
+
+        <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
+          <div class="form-group">
             <label class="form-label">管理者ID</label>
-            <input type="text" id="login-id" class="form-input" required placeholder="admin">
+            <!-- classはそのままで OK / autocomplete="username" を指定 -->
+            <input type="text" id="admin-id" name="admin_username" class="form-input" autocomplete="username" required>
           </div>
-          <div class="form-group" style="text-align: left;">
+          
+          <div class="form-group">
             <label class="form-label">パスワード</label>
-            <input type="password" id="login-pass" class="form-input" required placeholder="••••••••">
+            <!-- classはそのままで OK / autocomplete="current-password" を指定 -->
+            <input type="password" id="admin-password" name="admin_password" class="form-input" autocomplete="current-password" required>
           </div>
-          <button type="submit" id="login-submit-btn" class="form-submit-btn" style="margin-top: 12px;">ログイン</button>
+          
+          <button type="submit" class="form-submit-btn">ログイン</button>
         </form>
+
       </div>
     </section>
 
