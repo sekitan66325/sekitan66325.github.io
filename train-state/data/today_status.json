@@ -1,0 +1,71 @@
+{
+  "service_date": "2026-08-15",
+  "updated_at": "2026-08-15T10:15:00+09:00",
+  "official_info": {
+    "status_code": "normal",
+    "text": "公式: 平常通り運転しております",
+    "link_url": "",
+    "has_detail": false,
+    "fetched_at": "2026-08-15T10:15:00+09:00"
+  },
+  "operations": {
+    "A1": {
+      "formation": [
+        "14-2",
+        "14-6"
+      ]
+    },
+    "A2": {
+      "formation": [
+        "14-1",
+        "14-8"
+      ]
+    },
+    "A3": {
+      "formation": [
+        "14-3",
+        "14-5"
+      ]
+    },
+    "A4": {
+      "formation": [
+        "14-4",
+        "14-9"
+      ]
+    },
+    "A5": {
+      "formation": [
+        "14-6",
+        "14-2"
+      ]
+    },
+    "A99": {
+      "formation": [
+        "C12-66",
+        "50-1",
+        "50-2",
+        "50-3",
+        "DE10-1535"
+      ]
+    }
+  },
+  "train_overrides": {
+    "T124L": {
+      "status": "partially_cancelled",
+      "actual_start": "M07",
+      "actual_end": "M01",
+      "delay_minutes": 0,
+      "memo": "茂木〜真岡間運休、真岡〜下館間のみ区間運転"
+    },
+    "T9901L": {
+      "status": "normal",
+      "delay_minutes": 5,
+      "station_delays": {
+        "M07": 5,
+        "M12": 2,
+        "M17": 0
+      },
+      "memo": "真岡出庫時5分遅延、益子・七井間で回復運転適用"
+    }
+  }
+}

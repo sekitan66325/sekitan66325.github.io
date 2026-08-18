@@ -1,210 +1,134 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>真岡線 列車走行位置・ダイヤグラム</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>真岡線 列車走行位置・ダイヤグラム</title>
+<meta name="description" content="真岡鐵道真岡線の列車走行位置、ダイヤグラム、路線時刻表を表示するSPAデモ。">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <header>
-    <div class="header-title">真岡鐵道 真岡線</div>
-    <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchView('liveView')">走行位置</button>
-      <button class="tab-btn" onclick="switchView('diagramView')">ダイヤグラム</button>
-      <button class="tab-btn" onclick="switchView('timetableView')">時刻表</button>
+<header class="site-header">
+  <div class="header-inner">
+    <div>
+      <div class="eyebrow">MOKA RAILWAY / MOKA LINE</div>
+      <h1 class="logo">真岡線 列車走行位置</h1>
     </div>
-  </header>
-
-  <div id="offlineBanner" class="banner">
-    ⚠️ オフライン運用モード（基本ダイヤのみ表示中）
-  </div>
-
-  <a id="officialNoticeBanner" class="banner" href="#" target="_blank">
-    <span>取得中...</span>
-  </a>
-
-  <main id="liveView" class="view-panel active">
-    <div class="track-container" id="liveTrackView">
-      <div class="station-line"></div>
-      </div>
-  </main>
-
-  <main id="diagramView" class="view-panel">
-    <div class="diagram-wrapper">
-      <svg id="diagramSvg"></svg>
-    </div>
-  </main>
-
-  <main id="timetableView" class="view-panel">
-    <div style="text-align: center; color: var(--text-secondary); padding: 40px 0;">
-      全線路線時刻表表示エリア
-    </div>
-  </main>
-
-  <div id="trainModal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modalTrainTitle">列車詳細</h3>
-        <button class="close-btn" onclick="closeModal()">✕</button>
-      </div>
-      <div id="modalTrainBody" style="font-size: 14px; line-height: 1.6;">
-        </div>
+    <div class="header-clock">
+      <span id="service-date-label">2026年8月15日</span>
+      <strong id="clock">--:--:--</strong>
     </div>
   </div>
+</header>
 
-  <script src="TrainStateEngine.js"></script>
-  <script src="Renderer.js"></script>
-  <script>
-    // 定数・API URLの設定
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzqdaDKu3Neu-ZVjWya66WJvxMIPPwwahYIHBgGzaXdLdyYCxjcof-QHHpSq7V3lv6kAg/exec"; // STEP 2で取得したWebアプリURL
-    let stationsData = [];
-    let timetableData = [];
-    let todayStatusData = {};
-    let renderer = null;
+<div id="offline-banner" class="offline-banner hidden">オフライン運用モード（基本ダイヤのみ表示中）</div>
 
-    // 初期化処理
-    async function initApp() {
-      try {
-        const [resSt, resTt] = await Promise.all([
-          fetch('stations.json'),
-          fetch('timetable.json')
-        ]);
-        stationsData = await resSt.json();
-        timetableData = await resTt.json();
+<main class="container">
+  <section id="notice" class="notice-section status-normal">
+    <div class="notice-icon" id="notice-icon">✓</div>
+    <div class="notice-copy">
+      <strong id="notice-title">公式: 平常通り運転しております</strong>
+      <span id="notice-updated">当日運行情報を表示中</span>
+    </div>
+    <a id="notice-link" class="notice-chevron hidden" target="_blank" rel="noopener" aria-label="公式詳細">›</a>
+  </section>
 
-        renderer = new MokaRenderer(stationsData);
-        setupTrackNodes();
+  <section class="toolbar">
+    <div class="toolbar-title">
+      <span class="section-kicker">SERVICE DATE</span>
+      <h2 id="date-title">2026年8月15日（土）</h2>
+    </div>
+    <div class="toolbar-actions">
+      <button class="glass-btn" id="now-btn">現在時刻</button>
+      <label class="date-control">運行日 <input id="date-input" type="date" value="2026-08-15"></label>
+    </div>
+  </section>
 
-        // 初回状態取得 & タイマー開始
-        await fetchLiveStatus();
-        setInterval(updateAppLoop, 10000); // 10秒ごとに状態計算更新
-        setInterval(fetchLiveStatus, 60000); // 1分ごとにGAS API再通信
+  <nav class="view-tabs" aria-label="表示切替">
+    <button class="view-tab active" data-view="position">走行位置</button>
+    <button class="view-tab" data-view="diagram">ダイヤグラム</button>
+    <button class="view-tab" data-view="timetable">時刻表</button>
+  </nav>
 
-      } catch (e) {
-        console.error("Initialization Error:", e);
-        document.getElementById('offlineBanner').style.display = 'flex';
-      }
-    }
+  <section id="view-position" class="view-panel active">
+    <div class="panel-head">
+      <div>
+        <span class="section-kicker">LIVE POSITION</span>
+        <h2>列車走行位置</h2>
+      </div>
+      <div class="legend">
+        <span><i class="dot up"></i>上り</span>
+        <span><i class="dot down"></i>下り</span>
+        <span><i class="dot stopped"></i>停車</span>
+      </div>
+    </div>
+    <div class="position-card">
+      <div class="position-axis">
+        <div class="direction-label up-label">上り<br><small>下館方面</small></div>
+        <div class="rail-line" id="position-line"></div>
+        <div class="direction-label down-label">下り<br><small>茂木方面</small></div>
+      </div>
+      <div class="station-list" id="station-list"></div>
+      <div class="position-trains" id="position-trains"></div>
+      <div class="position-time">
+        <span>現在</span><strong id="position-current-time">--:--</strong>
+        <small>サービス時間軸 05:00 — 29:00</small>
+      </div>
+    </div>
+    <div class="summary-grid" id="summary-grid"></div>
+  </section>
 
-    // 走行位置の基本路線ノード描画
-    function setupTrackNodes() {
-      const container = document.getElementById('liveTrackView');
-      stationsData.forEach(st => {
-        const row = document.createElement('div');
-        row.className = 'station-row';
-        row.innerHTML = `
-          <div class="station-node ${st.can_exchange ? 'exchange' : ''}"></div>
-          <div class="station-name">${st.name}</div>
-        `;
-        container.appendChild(row);
-      });
-    }
+  <section id="view-diagram" class="view-panel">
+    <div class="panel-head">
+      <div><span class="section-kicker">DIAGRAM</span><h2>ダイヤグラム</h2></div>
+      <div class="diagram-tools">
+        <button class="seg-btn active" data-dir="all">全列車</button>
+        <button class="seg-btn" data-dir="up">上り</button>
+        <button class="seg-btn" data-dir="down">下り</button>
+      </div>
+    </div>
+    <div class="diagram-shell">
+      <div class="diagram-scroll" id="diagram-scroll">
+        <svg id="diagram-svg" role="img" aria-label="真岡線ダイヤグラム"></svg>
+      </div>
+    </div>
+    <p class="helper">列車線をタップすると詳細を表示します。予定線と当日実績線を分離して描画します。</p>
+  </section>
 
-    // GAS APIからのリアルタイムステータス取得
-    async function fetchLiveStatus() {
-      try {
-        const res = await fetch(GAS_API_URL);
-        if (!res.ok) throw new Error("API Response Error");
-        todayStatusData = await res.json();
-        
-        document.getElementById('offlineBanner').style.display = 'none';
-        renderer.renderOfficialNotice(todayStatusData.official_info);
-        updateAppLoop();
-      } catch (e) {
-        console.warn("Offline fallback active:", e);
-        document.getElementById('offlineBanner').style.display = 'flex';
-      }
-    }
+  <section id="view-timetable" class="view-panel">
+    <div class="panel-head">
+      <div><span class="section-kicker">TIMETABLE</span><h2>路線時刻表</h2></div>
+      <div class="diagram-tools">
+        <button class="seg-btn tt-dir active" data-dir="up">上り</button>
+        <button class="seg-btn tt-dir" data-dir="down">下り</button>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-scroll">
+        <table id="timetable-table"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
+    <p class="helper">サービス分数を用いて24時以降の時刻も同一運行日として処理します。</p>
+  </section>
+</main>
 
-    // メイン更新ループ (時刻計算 & 画面再描画)
-    function updateAppLoop() {
-      if (!renderer || !timetableData.length) return;
+<nav class="floating-tab-bar" aria-label="メインナビゲーション">
+  <button class="tab-btn active" data-view="position">走行位置</button>
+  <button class="tab-btn" data-view="diagram">ダイヤ</button>
+  <button class="tab-btn" data-view="timetable">時刻表</button>
+</nav>
 
-      const now = new Date();
-      const serviceContext = normalizeToServiceContext(now);
-      const isHoliday = now.getDay() === 0 || now.getDay() === 6;
+<div class="modal-overlay hidden" id="train-modal">
+  <article class="modal-content">
+    <button class="modal-close" id="modal-close" aria-label="閉じる">×</button>
+    <div id="modal-body"></div>
+  </article>
+</div>
 
-      const trainStates = computeAllTrainStates(
-        timetableData, 
-        todayStatusData, 
-        serviceContext.service_minutes, 
-        isHoliday
-      );
-
-      renderer.renderLivePositionView(trainStates);
-      renderer.renderDiagramSVG(timetableData, todayStatusData);
-    }
-
-    // タブ切替機能
-    function switchView(viewId) {
-      document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-      document.getElementById(viewId).classList.add('active');
-      event.target.classList.add('active');
-    }
-
-    // モーダル表示
-    function showTrainModal(train) {
-      document.getElementById('modalTrainTitle').innerText = `${train.train_no}次列車 (${train.destination}行)`;
-      
-      let html = `<p><strong>方向:</strong> ${train.direction === 'up' ? '上り' : '下り'}</p>`;
-      html += `<table style="width:100%; margin-top:10px; border-collapse:collapse;">
-        <tr style="border-bottom:1px solid var(--border-color); text-align:left;">
-          <th>駅名</th><th>予定着</th><th>予定発</th><th>遅延</th>
-        </tr>`;
-
-      train.actual_stations.forEach(st => {
-        const stationObj = stationsData.find(s => s.code === st.code);
-        html += `<tr style="border-bottom:0.5px solid var(--border-color); ${st.is_cancelled ? 'opacity:0.4;' : ''}">
-          <td>${stationObj ? stationObj.name : st.code} ${st.is_cancelled ? '(運休)' : ''}</td>
-          <td>${st.arr_scheduled || '-'}</td>
-          <td>${st.dep_scheduled || '-'}</td>
-          <td>${st.delay_minutes > 0 ? '+' + st.delay_minutes + '分' : '定時'}</td>
-        </tr>`;
-      });
-      html += `</table>`;
-
-      document.getElementById('modalTrainBody').innerHTML = html;
-      document.getElementById('trainModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('trainModal').style.display = 'none';
-    }
-
-    /**
-     * 現在日時をサービス日時・サービス分数(午前5時切り替え)に変換
-     * @param {Date} dateObj 
-     */
-    function normalizeToServiceContext(dateObj) {
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'Asia/Tokyo',
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', hour12: false
-      });
-      const parts = Object.fromEntries(formatter.formatToParts(dateObj).map(p => [p.type, p.value]));
-      
-      let hours = parseInt(parts.hour, 10);
-      if (hours === 24) hours = 0;
-      const minutes = parseInt(parts.minute, 10);
-
-      let totalMinutes = hours * 60 + minutes;
-
-      // 深夜0:00〜4:59は前日扱い（+24時間 = 1440分）
-      if (hours < 5) {
-        totalMinutes += 1440;
-      }
-
-      return {
-        service_minutes: totalMinutes
-      };
-    }
-    
-    // 起動
-    window.addEventListener('DOMContentLoaded', initApp);
-  </script>
+<footer class="site-footer">
+  <strong>真岡線 列車走行位置</strong>
+  <span>仕様書準拠フロントエンド / Demo Data</span>
+</footer>
+<script src="script.js"></script>
 </body>
 </html>
