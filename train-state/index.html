@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>真岡線 列車走行位置・ダイヤグラム</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-title">真岡鐵道 真岡線</div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchView('liveView')">走行位置</button>
+      <button class="tab-btn" onclick="switchView('diagramView')">ダイヤグラム</button>
+      <button class="tab-btn" onclick="switchView('timetableView')">時刻表</button>
+    </div>
+  </header>
+
+  <div id="offlineBanner" class="banner">
+    ⚠️ オフライン運用モード（基本ダイヤのみ表示中）
+  </div>
+
+  <a id="officialNoticeBanner" class="banner" href="#" target="_blank">
+    <span>取得中...</span>
+  </a>
+
+  <main id="liveView" class="view-panel active">
+    <div class="track-container" id="liveTrackView">
+      <div class="station-line"></div>
+      </div>
+  </main>
+
+  <main id="diagramView" class="view-panel">
+    <div class="diagram-wrapper">
+      <svg id="diagramSvg"></svg>
+    </div>
+  </main>
+
+  <main id="timetableView" class="view-panel">
+    <div style="text-align: center; color: var(--text-secondary); padding: 40px 0;">
+      全線路線時刻表表示エリア
+    </div>
+  </main>
+
+  <div id="trainModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTrainTitle">列車詳細</h3>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div id="modalTrainBody" style="font-size: 14px; line-height: 1.6;">
+        </div>
+    </div>
+  </div>
+
+  <script src="TrainStateEngine.js"></script>
+  <script src="Renderer.js"></script>
+  <script>
+    // 定数・API URLの設定
+    const GAS_API_URL = "YOUR_GAS_DEPLOYED_WEB_APP_URL"; // STEP 2で取得したWebアプリURL
+    let stationsData = [];
+    let timetableData = [];
+    let todayStatusData = {};
+    let renderer = null;
+
+    // 初期化処理
+    async function initApp() {
+      try {
+        const [resSt, resTt] = await Promise.all([
+          fetch('stations.json'),
+          fetch('timetable.json')
+        ]);
+        stationsData = await resSt.json();
+        timetableData = await resTt.json();
+
+        renderer = new MokaRenderer(stationsData);
+        setupTrackNodes();
+
+        // 初回状態取得 & タイマー開始
+        await fetchLiveStatus();
+        setInterval(updateAppLoop, 10000); // 10秒ごとに状態計算更新
+        setInterval(fetchLiveStatus, 60000); // 1分ごとにGAS API再通信
+
+      } catch (e) {
+        console.error("Initialization Error:", e);
+        document.getElementById('offlineBanner').style.display = 'flex';
+      }
+    }
+
+    // 走行位置の基本路線ノード描画
+    function setupTrackNodes() {
+      const container = document.getElementById('liveTrackView');
+      stationsData.forEach(st => {
+        const row = document.createElement('div');
+        row.className = 'station-row';
+        row.innerHTML = `
+          <div class="station-node ${st.can_exchange ? 'exchange' : ''}"></div>
+          <div class="station-name">${st.name}</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // GAS APIからのリアルタイムステータス取得
+    async function fetchLiveStatus() {
+      try {
+        const res = await fetch(GAS_API_URL);
+        if (!res.ok) throw new Error("API Response Error");
+        todayStatusData = await res.json();
+        
+        document.getElementById('offlineBanner').style.display = 'none';
+        renderer.renderOfficialNotice(todayStatusData.official_info);
+        updateAppLoop();
+      } catch (e) {
+        console.warn("Offline fallback active:", e);
+        document.getElementById('offlineBanner').style.display = 'flex';
+      }
+    }
+
+    // メイン更新ループ (時刻計算 & 画面再描画)
+    function updateAppLoop() {
+      if (!renderer || !timetableData.length) return;
+
+      const now = new Date();
+      const serviceContext = normalizeToServiceContext(now);
+      const isHoliday = now.getDay() === 0 || now.getDay() === 6;
+
+      const trainStates = computeAllTrainStates(
+        timetableData, 
+        todayStatusData, 
+        serviceContext.service_minutes, 
+        isHoliday
+      );
+
+      renderer.renderLivePositionView(trainStates);
+      renderer.renderDiagramSVG(timetableData, todayStatusData);
+    }
+
+    // タブ切替機能
+    function switchView(viewId) {
+      document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(viewId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // モーダル表示
+    function showTrainModal(train) {
+      document.getElementById('modalTrainTitle').innerText = `${train.train_no}次列車 (${train.destination}行)`;
+      
+      let html = `<p><strong>方向:</strong> ${train.direction === 'up' ? '上り' : '下り'}</p>`;
+      html += `<table style="width:100%; margin-top:10px; border-collapse:collapse;">
+        <tr style="border-bottom:1px solid var(--border-color); text-align:left;">
+          <th>駅名</th><th>予定着</th><th>予定発</th><th>遅延</th>
+        </tr>`;
+
+      train.actual_stations.forEach(st => {
+        const stationObj = stationsData.find(s => s.code === st.code);
+        html += `<tr style="border-bottom:0.5px solid var(--border-color); ${st.is_cancelled ? 'opacity:0.4;' : ''}">
+          <td>${stationObj ? stationObj.name : st.code} ${st.is_cancelled ? '(運休)' : ''}</td>
+          <td>${st.arr_scheduled || '-'}</td>
+          <td>${st.dep_scheduled || '-'}</td>
+          <td>${st.delay_minutes > 0 ? '+' + st.delay_minutes + '分' : '定時'}</td>
+        </tr>`;
+      });
+      html += `</table>`;
+
+      document.getElementById('modalTrainBody').innerHTML = html;
+      document.getElementById('trainModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('trainModal').style.display = 'none';
+    }
+
+    // 起動
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>

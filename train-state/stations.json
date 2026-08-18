@@ -1,0 +1,19 @@
+[
+  { "code": "M01", "name": "下館", "order": 1, "distance_km": 0.0, "can_exchange": false },
+  { "code": "M02", "name": "下館二高前", "order": 2, "distance_km": 2.2, "can_exchange": false },
+  { "code": "M03", "name": "折本", "order": 3, "distance_km": 4.6, "can_exchange": true },
+  { "code": "M04", "name": "ひぐち", "order": 4, "distance_km": 6.6, "can_exchange": false },
+  { "code": "M05", "name": "久下田", "order": 5, "distance_km": 8.5, "can_exchange": true },
+  { "code": "M06", "name": "寺内", "order": 6, "distance_km": 12.6, "can_exchange": false },
+  { "code": "M07", "name": "真岡", "order": 7, "distance_km": 16.4, "can_exchange": true },
+  { "code": "M08", "name": "北真岡", "order": 8, "distance_km": 18.0, "can_exchange": false },
+  { "code": "M09", "name": "西田井", "order": 9, "distance_km": 21.2, "can_exchange": true },
+  { "code": "M10", "name": "北山", "order": 10, "distance_km": 22.9, "can_exchange": false },
+  { "code": "M11", "name": "益子", "order": 11, "distance_km": 25.1, "can_exchange": false },
+  { "code": "M12", "name": "七井", "order": 12, "distance_km": 28.4, "can_exchange": true },
+  { "code": "M13", "name": "多田羅", "order": 13, "distance_km": 31.2, "can_exchange": false },
+  { "code": "M14", "name": "市塙", "order": 14, "distance_km": 34.3, "can_exchange": true },
+  { "code": "M15", "name": "笹原田", "order": 15, "distance_km": 38.1, "can_exchange": false },
+  { "code": "M16", "name": "天矢場", "order": 16, "distance_km": 39.2, "can_exchange": false },
+  { "code": "M17", "name": "茂木", "order": 17, "distance_km": 41.9, "can_exchange": false }
+]
