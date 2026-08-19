@@ -96,16 +96,70 @@ function effectiveTrains(){
     const result=evaluateTrainState(actual,state.currentMinutes??720);
     return {...train,override:ov,actual,result,position:positionForState(train,actual,result)};
   });
+
 }
+
 function renderNotice(){
-  const n=DATA.status?.official_info||{};
-  const box=$("#notice"),title=$("#notice-title"),updated=$("#notice-updated"),link=$("#notice-link");
-  box.className="notice-section "+(n.status_code==="delay"?"status-delay":n.status_code==="unknown"?"status-unknown":"status-normal");
-  $("#notice-icon").textContent=n.status_code==="delay"?"!":n.status_code==="unknown"?"?":"✓";
-  title.textContent=n.status_code==="delay"?n.text:n.status_code==="unknown"?"公式運行情報を取得できませんでした（サイトをご確認ください）":"公式: 平常通り運転しております";
-  updated.textContent=`取得: ${n.fetched_at?new Date(n.fetched_at).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",hour12:false}):"—"}`;
-  if(n.link_url){link.href=n.link_url;link.classList.remove("hidden")}else link.classList.add("hidden");
+  const n = DATA.status?.official_info || {};
+
+  const box = $("#notice");
+  const title = $("#notice-title");
+  const updated = $("#notice-updated");
+  const link = $("#notice-link");
+
+  const statusCode = n.status_code || "unknown";
+
+  box.className =
+    "notice-section " +
+    (
+      statusCode === "delay"
+        ? "status-delay"
+        : statusCode === "unknown"
+          ? "status-unknown"
+          : "status-normal"
+    );
+
+  $("#notice-icon").textContent =
+    statusCode === "delay"
+      ? "!"
+      : statusCode === "unknown"
+        ? "?"
+        : "✓";
+
+  /*
+   * GASから取得した公式文言をそのまま表示する
+   */
+  if (statusCode === "unknown") {
+    title.textContent =
+      "公式運行情報を取得できませんでした（サイトをご確認ください）";
+  } else {
+    title.textContent = n.text || "公式運行情報を取得できませんでした";
+  }
+
+  /*
+   * GASが最後に公式HPを取得した時刻
+   */
+  updated.textContent =
+    `取得: ${
+      n.fetched_at
+        ? new Date(n.fetched_at).toLocaleString("ja-JP", {
+            timeZone: "Asia/Tokyo",
+            hour12: false
+          })
+        : "—"
+    }`;
+
+  /*
+   * 詳細ページへのリンク
+   */
+  if (n.link_url) {
+    link.href = n.link_url;
+    link.classList.remove("hidden");
+  } else {
+    link.classList.add("hidden");
+  }
 }
+
 function renderStations(){
   const host=$("#station-list");host.innerHTML="";
   const max=DATA.stations.at(-1).distance_km;
@@ -117,6 +171,7 @@ function renderStations(){
     host.appendChild(el);
   });
 }
+
 function renderPosition(){
   const host=$("#position-trains");host.innerHTML="";
   const trains=effectiveTrains();
@@ -144,7 +199,9 @@ function renderPosition(){
   $("#summary-grid").innerHTML=`<div class="summary-card"><span>運転中</span><strong>${running}本</strong></div><div class="summary-card"><span>駅停車中</span><strong>${stopped}本</strong></div><div class="summary-card"><span>到着保持</span><strong>${arrived}本</strong></div>`;
   $("#position-current-time").textContent=formatServiceTime(state.currentMinutes);
 }
+
 function svgEl(name,attrs={}){const e=document.createElementNS("http://www.w3.org/2000/svg",name);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e}
+
 function renderDiagram(){
   const svg=$("#diagram-svg");svg.innerHTML="";
   const trains=effectiveTrains().filter(t=>state.diagramDir==="all"||t.direction===state.diagramDir);
@@ -178,6 +235,7 @@ function renderDiagram(){
   });
   $("#diagram-scroll").scrollLeft=0;
 }
+
 function renderTimetable(){
   const trains=effectiveTrains().filter(t=>t.direction===state.timetableDir);
   const th=$("#timetable-table thead"),tb=$("#timetable-table tbody");th.innerHTML="";tb.innerHTML="";
@@ -196,6 +254,7 @@ function renderTimetable(){
     trEl.addEventListener("click",()=>openTrainModal(t));tb.appendChild(trEl);
   });
 }
+
 function openTrainModal(t){
   const stateText={RUNNING:"駅間走行中",STOPPED:"駅停車中",ARRIVED:"終着駅到着",OUT_OF_SERVICE:"運転時間外"}[t.result.state];
   const formation=DATA.status.operations[t.operation_id]?.formation||[];
@@ -209,6 +268,7 @@ function openTrainModal(t){
     <div class="station-detail"><h4>停車駅・実効時刻</h4>${t.actual.map(s=>`<div class="stop-row ${s.is_cancelled?"cancel":""}"><span>${DATA.stations.find(x=>x.code===s.code)?.name||s.code}</span><span>${s.arr_actual!=null?formatServiceTime(s.arr_actual):"—"}</span><span>${s.dep_actual!=null?formatServiceTime(s.dep_actual):"—"}</span></div>`).join("")}</div>`;
   $("#train-modal").classList.remove("hidden");
 }
+
 function updateClock(){
   if(!state.liveClock)return;
   const ctx=normalizeToServiceContext(new Date());
@@ -218,18 +278,50 @@ function updateClock(){
   $("#date-title").textContent=serviceDateLabel(state.serviceDate);
   renderPosition();
 }
+
 async function loadData(){
   try{
-    const [s,t,st]=await Promise.all([fetch("data/stations.json").then(r=>r.json()),fetch("data/timetable.json").then(r=>r.json()),fetch("data/today_status.json").then(r=>r.json())]);
-    if(!Array.isArray(s)||!Array.isArray(t)||!validateStatus(st))throw new Error("schema");
-    DATA.stations=s;DATA.timetable=t;DATA.status=st;
+    const [s,t,st]=await Promise.all([
+      fetch("data/stations.json").then(r=>r.json()),
+      fetch("data/timetable.json").then(r=>r.json()),
+      fetch(CONFIG.GAS_API_URL).then(r=>{
+        if(!r.ok) throw new Error("GAS API HTTP " + r.status);
+        return r.json();
+      })
+    ]);
+
+    if(!Array.isArray(s)||!Array.isArray(t)||!validateStatus(st))
+      throw new Error("schema");
+
+    DATA.stations=s;
+    DATA.timetable=t;
+    DATA.status=st;
+
   }catch(e){
-    console.error(e);$("#offline-banner").classList.remove("hidden");
-    // safe local fallback
-    DATA.stations=STATIONS_FALLBACK;DATA.timetable=[];DATA.status={service_date:state.serviceDate,official_info:{status_code:"unknown"},operations:{},train_overrides:{}};
+    console.error(e);
+    $("#offline-banner").classList.remove("hidden");
+
+    DATA.stations=STATIONS_FALLBACK;
+    DATA.timetable=[];
+    DATA.status={
+      service_date:state.serviceDate,
+      official_info:{
+        status_code:"unknown",
+        text:"公式運行情報を取得できませんでした",
+        link_url:"",
+        has_detail:false,
+        fetched_at:null
+      },
+      operations:{},
+      train_overrides:{}
+    };
   }
-  renderNotice();renderStations();renderAll();
+
+  renderNotice();
+  renderStations();
+  renderAll();
 }
+
 function renderAll(){renderPosition();renderDiagram();renderTimetable()}
 $$(".view-tab,.tab-btn").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
 function setView(v){state.view=v;$$(".view-tab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));$$(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.view===v));$$(".view-panel").forEach(p=>p.classList.toggle("active",p.id==="view-"+v));if(v==="diagram")renderDiagram();if(v==="timetable")renderTimetable()}
