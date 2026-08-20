@@ -495,8 +495,9 @@ function renderDiagram(){
         "font-size":"9",
         "font-weight":"600",
         "data-train-id":t.train_id,
-        transform: `translate(${tp.x + 4}, ${tp.y}) rotate(${angle})`,
-        dy: "9" // Offset below the line (right side)
+        transform: `translate(${tp.x}, ${tp.y}) rotate(${angle})`,
+        dx: "8",
+        dy: t.direction === "up" ? "12" : "-4"
       });
       lab.textContent=t.train_no;
       svg.appendChild(lab);
@@ -719,3 +720,6 @@ setInterval(updateClock, 1000);
 renderNotice();
 
 loadData();
+
+// Init glider correctly on load
+window.addEventListener("load", () => setView(state.view || "position"));

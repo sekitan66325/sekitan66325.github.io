@@ -296,7 +296,7 @@ input[type=date] { border: 0; background: transparent; color: var(--text-primary
 .pos-station-row.exchange .pos-station-name { font-weight: 800; }
 
 /* Center: rail line area */
-.pos-rail-area { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; min-height: 60px; }
+.pos-rail-area { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; min-height: 80px; }
 
 /* The vertical rail line */
 .pos-rail-column {
@@ -323,7 +323,15 @@ input[type=date] { border: 0; background: transparent; color: var(--text-primary
   border: 3px solid var(--rail-color);
   z-index: 3;
 }
-.pos-station-row.exchange .pos-rail-dot { width: 18px; height: 18px; border-width: 4px; }
+.pos-station-row.exchange .pos-rail-dot { width: 18px; height: 18px; border-width: 4px; display: flex; align-items: center; justify-content: center; }
+.pos-station-row.exchange .pos-rail-dot::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--rail-color);
+  border-radius: 50%;
+}
 
 /* Down trains (left of rail) */
 .pos-trains-down {
@@ -372,7 +380,7 @@ input[type=date] { border: 0; background: transparent; color: var(--text-primary
 }
 
 /* Between-station train marker */
-.pos-between-train { position: absolute; z-index: 5; display: flex; align-items: center; gap: 5px; cursor: pointer; animation: fadeInCard 0.3s ease; }
+.pos-between-train { position: absolute; z-index: 5; display: flex; align-items: center; gap: 5px; cursor: pointer; animation: fadeInCard 0.3s ease; transform: translateY(-50%); }
 
 /* SEPARATOR between station rows */
 .pos-station-row + .pos-station-row { border-top: 1px solid var(--border-subtle); }
