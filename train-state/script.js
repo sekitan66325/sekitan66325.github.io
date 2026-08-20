@@ -296,7 +296,7 @@ function renderPosition(){
     const hostRect = host.getBoundingClientRect();
     const topY = firstDot.top + firstDot.height/2 - hostRect.top;
     const bottomY = lastDot.top + lastDot.height/2 - hostRect.top;
-    const railLeft = firstDot.left + firstDot.width/2 - hostRect.left - 3;
+    const railLeft = firstDot.left + firstDot.width/2 - hostRect.left;
     
     railLine.style.left = railLeft + "px";
     railLine.style.top = topY + "px";
