@@ -63,22 +63,18 @@
         <h2>列車走行位置</h2>
       </div>
       <div class="legend">
-        <span><i class="dot up"></i>上り</span>
         <span><i class="dot down"></i>下り</span>
-        <span><i class="dot stopped"></i>停車</span>
+        <span><i class="dot up"></i>上り</span>
+        <span class="legend-stopped"><span class="stopped-badge-sample">停車中</span></span>
       </div>
     </div>
     <div class="position-card">
-      <div class="position-axis">
-        <div class="direction-label up-label">上り<br><small>下館方面</small></div>
-        <div class="rail-line" id="position-line"></div>
-        <div class="direction-label down-label">下り<br><small>茂木方面</small></div>
-      </div>
-      <div class="station-list" id="station-list"></div>
-      <div class="position-trains" id="position-trains"></div>
       <div class="position-time">
         <span>現在</span><strong id="position-current-time">--:--</strong>
         <small>サービス時間軸 05:00 — 29:00</small>
+      </div>
+      <div class="position-body" id="position-body">
+        <!-- Dynamically populated: station rows with rail line and trains -->
       </div>
     </div>
     <div class="summary-grid" id="summary-grid"></div>
