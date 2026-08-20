@@ -397,7 +397,7 @@ function renderDiagram(){
   const trains=effectiveTrains().filter(t=>state.diagramDir==="all"||t.direction===state.diagramDir);
 
   const maxDist = DATA.stations.at(-1).distance_km; // 41.9 km
-  const width=2900, left=82, topPad=38, bottomPad=55;
+  const width=4500, left=82, topPad=38, bottomPad=55;
   const chartHeight = 600;
   const height = chartHeight + topPad + bottomPad;
 
@@ -406,7 +406,7 @@ function renderDiagram(){
   svg.setAttribute("height",height);
 
   const maxM=1740, minM=300;
-  const timeX = m => left + (m - minM) * 2;
+  const timeX = m => left + (m - minM) * 3; // 1 minute = 3px for wider diagram
 
   // Y position based on distance: 茂木(top) → 下館(bottom)
   // 茂木 = distance_km 41.9 → top, 下館 = distance_km 0 → bottom
@@ -723,3 +723,67 @@ loadData();
 
 // Init glider correctly on load
 window.addEventListener("load", () => setView(state.view || "position"));
+
+// Tab Bar Drag Logic
+const tabBar = document.querySelector('.floating-tab-bar');
+const glider = document.getElementById('tab-glider');
+const tabs = Array.from(document.querySelectorAll('.view-tab'));
+
+if (tabBar && glider) {
+  let isDragging = false;
+  let startX = 0;
+  let currentX = 0;
+  let dragStartTime = 0;
+
+  const startDrag = (e) => {
+    isDragging = true;
+    glider.style.transition = 'none'; // Disable transition while dragging
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    currentX = startX;
+    dragStartTime = Date.now();
+  };
+
+  const moveDrag = (e) => {
+    if (!isDragging) return;
+    currentX = e.touches ? e.touches[0].clientX : e.clientX;
+    const barRect = tabBar.getBoundingClientRect();
+    let offsetX = currentX - barRect.left - (glider.clientWidth / 2);
+
+    const maxOffset = barRect.width - glider.clientWidth - 4;
+    offsetX = Math.max(4, Math.min(offsetX, maxOffset)); // clamp inside bar
+
+    glider.style.transform = `translateX(${offsetX}px)`;
+  };
+
+  const endDrag = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    glider.style.transition = ''; // Restore CSS transition
+
+    const barRect = tabBar.getBoundingClientRect();
+    const gliderCenter = currentX - barRect.left;
+
+    // Find closest tab
+    let closestTab = tabs[0];
+    let minDistance = Infinity;
+
+    tabs.forEach(tab => {
+      const tabRect = tab.getBoundingClientRect();
+      const tabCenter = tabRect.left - barRect.left + tabRect.width / 2;
+      const distance = Math.abs(gliderCenter - tabCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestTab = tab;
+      }
+    });
+
+    setView(closestTab.dataset.view);
+  };
+
+  tabBar.addEventListener('mousedown', startDrag);
+  tabBar.addEventListener('touchstart', startDrag, { passive: true });
+  window.addEventListener('mousemove', moveDrag);
+  window.addEventListener('mouseup', endDrag);
+  window.addEventListener('touchmove', moveDrag, { passive: true });
+  window.addEventListener('touchend', endDrag);
+}
