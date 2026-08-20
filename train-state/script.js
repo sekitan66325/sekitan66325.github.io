@@ -734,7 +734,7 @@ window.addEventListener("load", () => setView(state.view || "position"));
 // Tab Bar Drag Logic
 const tabBar = document.querySelector('.floating-tab-bar');
 const glider = document.getElementById('tab-glider');
-const tabs = Array.from(document.querySelectorAll('.view-tab'));
+const tabs = Array.from(document.querySelectorAll('.floating-tab-bar .tab-btn'));
 
 if (tabBar && glider) {
   let isDragging = false;
