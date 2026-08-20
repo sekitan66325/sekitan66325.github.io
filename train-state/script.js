@@ -99,16 +99,34 @@ function effectiveTrains(){
 
 }
 
-function renderNotice(){
-  const n = DATA.status?.official_info || {};
-
+function renderNotice() {
   const box = $("#notice");
   const title = $("#notice-title");
   const updated = $("#notice-updated");
   const link = $("#notice-link");
+  const icon = $("#notice-icon");
 
+  // ========================================
+  // GASからまだ運行情報を取得していない
+  // ========================================
+  if (!DATA.status) {
+    box.className = "notice-section status-loading";
+
+    icon.textContent = "…";
+    title.textContent = "公式運行情報を取得しています";
+    updated.textContent = "取得中…";
+
+    link.classList.add("hidden");
+
+    return;
+  }
+
+  const n = DATA.status.official_info || {};
   const statusCode = n.status_code || "unknown";
 
+  // ========================================
+  // 状態ごとの表示
+  // ========================================
   box.className =
     "notice-section " +
     (
@@ -119,39 +137,51 @@ function renderNotice(){
           : "status-normal"
     );
 
-  $("#notice-icon").textContent =
+  // アイコン
+  icon.textContent =
     statusCode === "delay"
       ? "!"
       : statusCode === "unknown"
         ? "?"
         : "✓";
 
-  /*
-   * GASから取得した公式文言をそのまま表示する
-   */
+  // ========================================
+  // 公式運行情報の本文
+  // ========================================
   if (statusCode === "unknown") {
+
     title.textContent =
+      n.text ||
       "公式運行情報を取得できませんでした（サイトをご確認ください）";
+
   } else {
-    title.textContent = n.text || "公式運行情報を取得できませんでした";
+
+    // GASから取得した公式文言をそのまま表示
+    title.textContent =
+      n.text ||
+      "公式運行情報を取得できませんでした";
+
   }
 
-  /*
-   * GASが最後に公式HPを取得した時刻
-   */
+  // ========================================
+  // GASが公式HPを取得した時刻
+  // ========================================
   updated.textContent =
     `取得: ${
       n.fetched_at
-        ? new Date(n.fetched_at).toLocaleString("ja-JP", {
-            timeZone: "Asia/Tokyo",
-            hour12: false
-          })
+        ? new Date(n.fetched_at).toLocaleString(
+            "ja-JP",
+            {
+              timeZone: "Asia/Tokyo",
+              hour12: false
+            }
+          )
         : "—"
     }`;
 
-  /*
-   * 詳細ページへのリンク
-   */
+  // ========================================
+  // 詳細ページへのリンク
+  // ========================================
   if (n.link_url) {
     link.href = n.link_url;
     link.classList.remove("hidden");
@@ -160,98 +190,372 @@ function renderNotice(){
   }
 }
 
-function renderStations(){
-  const host=$("#station-list");host.innerHTML="";
-  const max=DATA.stations.at(-1).distance_km;
-  DATA.stations.forEach((s,i)=>{
-    const el=document.createElement("div");el.className="station-marker"+(s.can_exchange?" exchange":"");
-    const y=2+(s.distance_km/max)*96;
-    el.style.top=y+"%";
-    el.innerHTML=`<span class="station-dot"></span><span class="station-name">${s.name}</span><span class="station-km">${s.distance_km.toFixed(1)} km</span>`;
-    host.appendChild(el);
-  });
+// =====================================================
+// Shield SVG icon for train markers
+// =====================================================
+function shieldSVG(fillColor){
+  return `<svg viewBox="0 0 30 34" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15 1 L28 7 L28 18 Q28 28 15 33 Q2 28 2 18 L2 7 Z"
+          fill="${fillColor}" stroke="rgba(0,0,0,.15)" stroke-width="1"/>
+  </svg>`;
 }
 
+// =====================================================
+// POSITION VIEW — Render (reference image layout)
+// =====================================================
+// Stations displayed: 茂木 (top) → 下館 (bottom)
+// Down trains: LEFT of rail,  Up trains: RIGHT of rail
+function renderStations(){}  // No longer used separately
+
 function renderPosition(){
-  const host=$("#position-trains");host.innerHTML="";
+  const host=$("#position-body"); host.innerHTML="";
   const trains=effectiveTrains();
-  const groups={};
+
+  // Reversed station order: 茂木(top) → 下館(bottom)
+  const stationsReversed = [...DATA.stations].reverse();
+
+  // Build map: station code → trains at/near this station
+  const stationTrains = {};
+  stationsReversed.forEach(s=>{stationTrains[s.code]={up:[],down:[]}});
+
+  // Between-station trains (for interpolation display)
+  const betweenTrains = [];
+
   trains.filter(t=>t.position).forEach(t=>{
-    const key=t.position.station+":"+Math.round(t.position.progress*10)/10;
-    (groups[key]??=[]).push(t);
+    if(t.result.state==="STOPPED"||t.result.state==="ARRIVED"){
+      const code = t.result.station_code;
+      if(stationTrains[code]){
+        stationTrains[code][t.direction].push(t);
+      }
+    } else if(t.result.state==="RUNNING"){
+      betweenTrains.push(t);
+    }
   });
-  const lanes=new Map();
-  for(const group of Object.values(groups))group.forEach((t,i)=>lanes.set(t.train_id,i));
-  const max=DATA.stations.at(-1).distance_km;
-  trains.filter(t=>t.position).forEach(t=>{
-    const base=DATA.stations[t.position.station], next=DATA.stations[Math.min(DATA.stations.length-1,t.position.station+1)];
-    const dist=base.distance_km+(next.distance_km-base.distance_km)*t.position.progress;
-    const y=2+(dist/max)*96;
-    const lane=lanes.get(t.train_id)||0;
-    const xOffset=(t.direction==="up"?-1:1)*(45+lane*54);
-    const el=document.createElement("div");el.className=`train-marker ${t.direction} ${t.result.state.toLowerCase()}`;
-    el.style.left=`calc(50% + ${xOffset}px)`;el.style.top=y+"%";
-    const status=t.result.state==="RUNNING"?"走行中":t.result.state==="STOPPED"?"停車中":"到着";
-    el.innerHTML=`<span class="train-point"></span><span class="train-chip">${t.train_no} ${status}</span>`;
-    el.title=`${t.train_no} ${status}`;el.onclick=()=>openTrainModal(t);host.appendChild(el);
+
+  // Render each station row
+  stationsReversed.forEach((s,i)=>{
+    const row = document.createElement("div");
+    row.className = "pos-station-row" + (s.can_exchange?" exchange":"");
+
+    // Station label (left)
+    const label = document.createElement("div");
+    label.className = "pos-station-label";
+    label.innerHTML = `
+      <div class="pos-station-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="7" y1="18" x2="7" y2="21" stroke="currentColor" stroke-width="1.5"/><line x1="17" y1="18" x2="17" y2="21" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="21" x2="19" y2="21" stroke="currentColor" stroke-width="1.5"/></svg></div>
+      <span class="pos-station-name">${s.name}</span>
+    `;
+
+    // Rail area (center)
+    const railArea = document.createElement("div");
+    railArea.className = "pos-rail-area";
+
+    // Rail dot
+    const dot = document.createElement("div");
+    dot.className = "pos-rail-dot";
+    dot.style.top = "50%";
+    railArea.appendChild(dot);
+
+    // Down trains (left of rail)
+    const downTrains = stationTrains[s.code].down;
+    if(downTrains.length > 0){
+      const downContainer = document.createElement("div");
+      downContainer.className = "pos-trains-down";
+      downTrains.forEach(t=>{
+        downContainer.appendChild(createTrainCard(t));
+      });
+      railArea.appendChild(downContainer);
+    }
+
+    // Up trains (right of rail)
+    const upTrains = stationTrains[s.code].up;
+    if(upTrains.length > 0){
+      const upContainer = document.createElement("div");
+      upContainer.className = "pos-trains-up";
+      upTrains.forEach(t=>{
+        upContainer.appendChild(createTrainCard(t));
+      });
+      railArea.appendChild(upContainer);
+    }
+
+    row.appendChild(label);
+    row.appendChild(railArea);
+    host.appendChild(row);
   });
+
+  // Add continuous rail line
+  const railLine = document.createElement("div");
+  railLine.className = "pos-rail-column";
+  // Position it within the rail area column
+  const firstRailArea = host.querySelector(".pos-rail-area");
+  if(firstRailArea){
+    const bodyRect = host.getBoundingClientRect();
+    const railLeft = firstRailArea.getBoundingClientRect().left - bodyRect.left + firstRailArea.offsetWidth/2 - 3;
+    railLine.style.left = railLeft + "px";
+    railLine.style.top = "0";
+    railLine.style.bottom = "0";
+    host.style.position = "relative";
+    host.appendChild(railLine);
+  }
+
+  // Handle between-station running trains
+  betweenTrains.forEach(t=>{
+    const fromIdx = stationsReversed.findIndex(s=>s.code===t.result.from_station);
+    const toIdx = stationsReversed.findIndex(s=>s.code===t.result.to_station);
+    if(fromIdx===-1||toIdx===-1)return;
+    const rows = host.querySelectorAll(".pos-station-row");
+    if(!rows[fromIdx]||!rows[toIdx])return;
+
+    const fromRect = rows[fromIdx].getBoundingClientRect();
+    const toRect = rows[toIdx].getBoundingClientRect();
+    const hostRect = host.getBoundingClientRect();
+    const fromY = fromRect.top - hostRect.top + fromRect.height/2;
+    const toY = toRect.top - hostRect.top + toRect.height/2;
+    const y = fromY + (toY - fromY) * t.result.progress;
+
+    const railArea = rows[0]?.querySelector(".pos-rail-area");
+    if(!railArea)return;
+    const railAreaRect = railArea.getBoundingClientRect();
+    const railCenterX = railAreaRect.left - hostRect.left + railAreaRect.width/2;
+
+    const marker = document.createElement("div");
+    marker.className = "pos-between-train";
+    marker.style.top = y + "px";
+
+    if(t.direction==="down"){
+      marker.style.right = (host.offsetWidth - railCenterX + 18) + "px";
+      marker.style.flexDirection = "row-reverse";
+    } else {
+      marker.style.left = (railCenterX + 18) + "px";
+    }
+
+    marker.appendChild(createTrainCard(t));
+    marker.onclick = ()=>openTrainModal(t);
+    host.appendChild(marker);
+  });
+
+  // Summary
   const running=trains.filter(t=>t.result.state==="RUNNING").length,stopped=trains.filter(t=>t.result.state==="STOPPED").length,arrived=trains.filter(t=>t.result.state==="ARRIVED").length;
   $("#summary-grid").innerHTML=`<div class="summary-card"><span>運転中</span><strong>${running}本</strong></div><div class="summary-card"><span>駅停車中</span><strong>${stopped}本</strong></div><div class="summary-card"><span>到着保持</span><strong>${arrived}本</strong></div>`;
   $("#position-current-time").textContent=formatServiceTime(state.currentMinutes);
 }
 
+function createTrainCard(t){
+  const card = document.createElement("div");
+  card.className = "pos-train-card";
+
+  const isStopped = t.result.state==="STOPPED" || t.result.state==="ARRIVED";
+  const shieldColor = t.direction==="up" ? "#333" : (t.direction==="down" ? "#333" : "#333");
+
+  // Shield icon
+  const shield = document.createElement("div");
+  shield.className = "pos-train-shield";
+  shield.innerHTML = shieldSVG(shieldColor);
+
+  // Info chip
+  const info = document.createElement("div");
+  info.className = "pos-train-info";
+
+  let infoHTML = `<span class="pos-train-no">${t.train_no}</span>`;
+
+  if(isStopped){
+    infoHTML += `<span class="pos-stopped-badge">停車中</span>`;
+  }
+
+  infoHTML += `<span class="pos-train-dest">${t.destination} 行</span>`;
+  info.innerHTML = infoHTML;
+
+  if(t.direction==="down"){
+    // Down: info on left, shield on right
+    card.appendChild(info);
+    card.appendChild(shield);
+  } else {
+    // Up: shield on left, info on right
+    card.appendChild(shield);
+    card.appendChild(info);
+  }
+
+  card.onclick = ()=>openTrainModal(t);
+  card.title = `${t.train_no} ${t.destination}行`;
+  return card;
+}
+
+// =====================================================
+// DIAGRAM — 茂木(top) → 下館(bottom), distance-based
+// =====================================================
 function svgEl(name,attrs={}){const e=document.createElementNS("http://www.w3.org/2000/svg",name);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e}
 
 function renderDiagram(){
   const svg=$("#diagram-svg");svg.innerHTML="";
   const trains=effectiveTrains().filter(t=>state.diagramDir==="all"||t.direction===state.diagramDir);
-  const width=2900,left=82,top=38,rowH=31,height=DATA.stations.length*rowH+top+55;
-  svg.setAttribute("viewBox",`0 0 ${width} ${height}`);svg.setAttribute("width",width);svg.setAttribute("height",height);
-  const maxM=1740,minM=300,timeX=m=>left+(m-minM)*2;
-  // background grid
+
+  const maxDist = DATA.stations.at(-1).distance_km; // 41.9 km
+  const width=2900, left=82, topPad=38, bottomPad=55;
+  const chartHeight = 600;
+  const height = chartHeight + topPad + bottomPad;
+
+  svg.setAttribute("viewBox",`0 0 ${width} ${height}`);
+  svg.setAttribute("width",width);
+  svg.setAttribute("height",height);
+
+  const maxM=1740, minM=300;
+  const timeX = m => left + (m - minM) * 2;
+
+  // Y position based on distance: 茂木(top) → 下館(bottom)
+  // 茂木 = distance_km 41.9 → top, 下館 = distance_km 0 → bottom
+  const yOf = code => {
+    const st = DATA.stations.find(s=>s.code===code);
+    if(!st) return topPad;
+    const ratio = (maxDist - st.distance_km) / maxDist; // 茂木=0 (top), 下館=1 (bottom)
+    return topPad + ratio * chartHeight;
+  };
+
+  // Time grid
   for(let m=300;m<=1740;m+=60){
-    const x=timeX(m);svg.appendChild(svgEl("line",{x1:x,y1:0,x2:x,y2:height,stroke:"#2c2c2e","stroke-width":m%360===300?1.2:.7}));
-    const txt=svgEl("text",{x:x+3,y:20,fill:"#777", "font-size":"11"});txt.textContent=formatServiceTime(m);svg.appendChild(txt);
+    const x=timeX(m);
+    svg.appendChild(svgEl("line",{x1:x,y1:0,x2:x,y2:height,stroke:"#ddd","stroke-width":m%360===300?1.2:.5}));
+    const txt=svgEl("text",{x:x+3,y:20,fill:"#999","font-size":"11"});
+    txt.textContent=formatServiceTime(m);svg.appendChild(txt);
   }
-  DATA.stations.forEach((s,i)=>{
-    const y=top+i*rowH;
-    svg.appendChild(svgEl("line",{x1:left,y1:y,x2:width,y2:y,stroke:s.can_exchange?"#4b4b4f":"#2b2b2d","stroke-width":s.can_exchange?1.2:.7}));
-    const label=svgEl("text",{x:8,y:y+4,fill:s.can_exchange?"#f5f5f7":"#999","font-size":"11","font-weight":s.can_exchange?600:400});label.textContent=s.name;svg.appendChild(label);
-    const km=svgEl("text",{x:left-8,y:y+4,fill:"#666","font-size":"8","text-anchor":"end"});km.textContent=s.distance_km.toFixed(1);svg.appendChild(km);
+
+  // Station lines (distance-based, 茂木=top, 下館=bottom)
+  const stationsReversed = [...DATA.stations].reverse(); // 茂木 first
+  stationsReversed.forEach(s=>{
+    const y = yOf(s.code);
+    svg.appendChild(svgEl("line",{x1:left,y1:y,x2:width,y2:y,stroke:s.can_exchange?"#bbb":"#e0e0e0","stroke-width":s.can_exchange?1.2:.7}));
+    const label=svgEl("text",{x:8,y:y+4,fill:s.can_exchange?"#333":"#888","font-size":"11","font-weight":s.can_exchange?600:400});
+    label.textContent=s.name;svg.appendChild(label);
+    const km=svgEl("text",{x:left-8,y:y+4,fill:"#aaa","font-size":"8","text-anchor":"end"});
+    km.textContent=s.distance_km.toFixed(1);svg.appendChild(km);
   });
-  const yOf=code=>top+stationPos(code)*rowH;
+
+  // Draw train lines
   trains.forEach(t=>{
+    // Scheduled line (thin, semi-transparent)
     const pts=[];
-    t.stations.forEach(st=>{if(st.dep)pts.push([timeX(timeStringToMinutes(st.dep)),yOf(st.code)]);else if(st.arr)pts.push([timeX(timeStringToMinutes(st.arr)),yOf(st.code)])});
+    t.stations.forEach(st=>{
+      const arrM = timeStringToMinutes(st.arr);
+      const depM = timeStringToMinutes(st.dep);
+      // Add arrival point
+      if(arrM != null) pts.push([timeX(arrM), yOf(st.code)]);
+      // Add departure point (if different from arrival → shows dwell time as horizontal line)
+      if(depM != null && depM !== arrM) pts.push([timeX(depM), yOf(st.code)]);
+    });
     if(pts.length<2)return;
-    const path=svgEl("polyline",{points:pts.map(p=>p.join(",")).join(" "),fill:"none",stroke:t.direction==="up"?"#2997ff":"#bf5af2","stroke-width":2,"opacity":.34,"data-train-id":t.train_id});
+
+    const schedColor = t.direction==="up" ? "#2997ff" : "#a855f7";
+    const path=svgEl("polyline",{points:pts.map(p=>p.join(",")).join(" "),fill:"none",stroke:schedColor,"stroke-width":1.5,"opacity":.3,"data-train-id":t.train_id});
     path.style.cursor="pointer";path.addEventListener("click",()=>openTrainModal(t));svg.appendChild(path);
-    const act=t.actual.filter(s=>!s.is_cancelled).map(s=>[s.dep_actual??s.arr_actual,yOf(s.code)]).filter(p=>p[0]!=null);
-    if(act.length>1){
-      const ap=svgEl("polyline",{points:act.map(p=>`${timeX(p[0])},${p[1]}`).join(" "),fill:"none",stroke:t.direction==="up"?"#2997ff":"#bf5af2","stroke-width":4,"opacity":.95,"data-train-id":t.train_id,"stroke-linecap":"round"});
+
+    // Actual line (thick, opaque)
+    const actPts=[];
+    t.actual.filter(s=>!s.is_cancelled).forEach(s=>{
+      if(s.arr_actual!=null) actPts.push([timeX(s.arr_actual), yOf(s.code)]);
+      if(s.dep_actual!=null && s.dep_actual !== s.arr_actual) actPts.push([timeX(s.dep_actual), yOf(s.code)]);
+    });
+    if(actPts.length>1){
+      const ap=svgEl("polyline",{points:actPts.map(p=>`${p[0]},${p[1]}`).join(" "),fill:"none",stroke:schedColor,"stroke-width":3,"opacity":.9,"data-train-id":t.train_id,"stroke-linecap":"round","stroke-linejoin":"round"});
       ap.style.cursor="pointer";ap.addEventListener("click",()=>openTrainModal(t));svg.appendChild(ap);
     }
-    const first=pts[0],lab=svgEl("text",{x:first[0]+5,y:first[1]-4,fill:"#ddd","font-size":"9","data-train-id":t.train_id});lab.textContent=t.train_no;svg.appendChild(lab);
+
+    // Train number label
+    const first=pts[0];
+    const lab=svgEl("text",{x:first[0]+5,y:first[1]-5,fill:"#555","font-size":"9","font-weight":"600","data-train-id":t.train_id});
+    lab.textContent=t.train_no;svg.appendChild(lab);
   });
+
+  // Now-time indicator line
+  if(state.currentMinutes!=null && state.currentMinutes>=minM && state.currentMinutes<=maxM){
+    const nx = timeX(state.currentMinutes);
+    svg.appendChild(svgEl("line",{x1:nx,y1:topPad,x2:nx,y2:topPad+chartHeight,stroke:"#ef4444","stroke-width":1.5,"stroke-dasharray":"6,3",opacity:.7}));
+    const nowLabel = svgEl("text",{x:nx+3,y:topPad-4,fill:"#ef4444","font-size":"9","font-weight":"700"});
+    nowLabel.textContent = "現在";
+    svg.appendChild(nowLabel);
+  }
+
   $("#diagram-scroll").scrollLeft=0;
 }
 
+// =====================================================
+// TIMETABLE — Vertical trains (columns), stations (rows)
+// =====================================================
 function renderTimetable(){
   const trains=effectiveTrains().filter(t=>t.direction===state.timetableDir);
-  const th=$("#timetable-table thead"),tb=$("#timetable-table tbody");th.innerHTML="";tb.innerHTML="";
-  th.innerHTML=`<tr><th>列車</th>${DATA.stations.map(s=>`<th>${s.name}</th>`).join("")}</tr>`;
-  trains.forEach(t=>{
-    const trEl=document.createElement("tr");
-    trEl.innerHTML=`<td class="train-no ${t.direction==="up"?"up-color":"down-color"}">${t.train_no}<br><small>${t.destination}</small></td>`;
-    DATA.stations.forEach(s=>{
-      const st=t.stations.find(x=>x.code===s.code);const actual=t.actual.find(x=>x.code===s.code);
-      const td=document.createElement("td");
-      if(!st){td.textContent="—";td.style.color="#555"}
-      else if(actual?.is_cancelled){td.innerHTML=`<span class="cancel">運休</span>`}
-      else {const a=st.arr,d=st.dep;td.innerHTML=a&&d&&a!==d?`${a}<br>${d}`:(d||a||"—")}
-      trEl.appendChild(td);
+
+  // Sort trains by first departure time
+  trains.sort((a,b)=>{
+    const aFirst = a.stations.find(s=>s.dep)?.dep || "99:99";
+    const bFirst = b.stations.find(s=>s.dep)?.dep || "99:99";
+    return timeStringToMinutes(aFirst) - timeStringToMinutes(bFirst);
+  });
+
+  const th=$("#timetable-table thead"), tb=$("#timetable-table tbody");
+  th.innerHTML=""; tb.innerHTML="";
+
+  // Station order: 上り → 茂木(top)→下館(bottom), 下り → 下館(top)→茂木(bottom)
+  let orderedStations;
+  if(state.timetableDir === "up"){
+    orderedStations = [...DATA.stations].reverse(); // 茂木→下館
+  } else {
+    orderedStations = [...DATA.stations]; // 下館→茂木
+  }
+
+  // Header rows
+  // Row 1: 列車番号
+  const trainNoRow = document.createElement("tr");
+  trainNoRow.className = "tt-header-row tt-trainno";
+  trainNoRow.innerHTML = `<th>列車番号</th>` + trains.map(t=>`<th>${t.train_no}</th>`).join("");
+  th.appendChild(trainNoRow);
+
+  // Row 2: 行先
+  const destRow = document.createElement("tr");
+  destRow.className = "tt-header-row tt-dest";
+  destRow.innerHTML = `<th>行先</th>` + trains.map(t=>`<th>${t.destination}</th>`).join("");
+  th.appendChild(destRow);
+
+  // Body: each station is a row, each train is a column
+  orderedStations.forEach(s=>{
+    const tr = document.createElement("tr");
+    // Station name cell
+    const stCell = document.createElement("td");
+    stCell.innerHTML = `<strong>${s.name}</strong>`;
+    tr.appendChild(stCell);
+
+    trains.forEach(t=>{
+      const st = t.stations.find(x=>x.code===s.code);
+      const actual = t.actual.find(x=>x.code===s.code);
+      const td = document.createElement("td");
+
+      if(!st){
+        // This train doesn't serve this station at all
+        td.innerHTML = `<span class="tt-nonstop">‖</span>`;
+      } else if(actual?.is_cancelled){
+        td.innerHTML = `<span class="tt-cancel">運休</span>`;
+      } else {
+        const a = st.arr;
+        const d = st.dep;
+
+        if(a===null && d===null){
+          td.innerHTML = `<span class="tt-nonstop">‖</span>`;
+        } else if(a===null && d!==null){
+          // Origin station — only departure
+          td.innerHTML = `<span class="tt-dep">${d}発</span>`;
+        } else if(a!==null && d===null){
+          // Terminal station — only arrival
+          td.innerHTML = `<span class="tt-arr">${a}着</span>`;
+        } else if(a===d){
+          // Pass-through (same arr/dep) → レ
+          td.innerHTML = `<span class="tt-pass">レ</span>`;
+        } else {
+          // Normal stop — show arrival and departure
+          td.innerHTML = `<span class="tt-arr">${a}着</span><span class="tt-dep">${d}発</span>`;
+        }
+      }
+
+      td.style.cursor = "pointer";
+      td.addEventListener("click",()=>openTrainModal(t));
+      tr.appendChild(td);
     });
-    trEl.addEventListener("click",()=>openTrainModal(t));tb.appendChild(trEl);
+    tb.appendChild(tr);
   });
 }
 
@@ -301,8 +605,20 @@ async function loadData(){
     console.error(e);
     $("#offline-banner").classList.remove("hidden");
 
-    DATA.stations=STATIONS_FALLBACK;
-    DATA.timetable=[];
+    // Try loading local data at minimum
+    try {
+      if(!DATA.stations.length){
+        const s = await fetch("data/stations.json").then(r=>r.json());
+        if(Array.isArray(s)) DATA.stations = s;
+      }
+      if(!DATA.timetable.length){
+        const t = await fetch("data/timetable.json").then(r=>r.json());
+        if(Array.isArray(t)) DATA.timetable = t;
+      }
+    } catch(e2){ console.error(e2); }
+
+    if(!DATA.stations.length) DATA.stations = STATIONS_FALLBACK;
+
     DATA.status={
       service_date:state.serviceDate,
       official_info:{
@@ -317,8 +633,14 @@ async function loadData(){
     };
   }
 
+  // Initialize current time automatically
+  const ctx = normalizeToServiceContext(new Date());
+  state.serviceDate = ctx.service_date;
+  state.currentMinutes = ctx.service_minutes;
+  state.liveClock = true;
+  $("#date-input").value = state.serviceDate;
+
   renderNotice();
-  renderStations();
   renderAll();
 }
 
@@ -329,6 +651,12 @@ $("#date-input").addEventListener("change",e=>{state.serviceDate=e.target.value;
 $("#now-btn").addEventListener("click",()=>{state.liveClock=true;const c=normalizeToServiceContext(new Date());state.serviceDate=c.service_date;state.currentMinutes=c.service_minutes;$("#date-input").value=state.serviceDate;renderAll()});
 $$(".seg-btn").forEach(b=>b.addEventListener("click",()=>{const d=b.dataset.dir;if(b.classList.contains("tt-dir")){state.timetableDir=d;$$(".tt-dir").forEach(x=>x.classList.toggle("active",x===b));renderTimetable()}else{state.diagramDir=d;$$(".diagram-tools .seg-btn:not(.tt-dir)").forEach(x=>x.classList.toggle("active",x===b));renderDiagram()}}));
 $("#modal-close").onclick=()=>$("#train-modal").classList.add("hidden");$("#train-modal").addEventListener("click",e=>{if(e.target.id==="train-modal")$("#train-modal").classList.add("hidden")});
+
 const STATIONS_FALLBACK = [];
-setInterval(updateClock,1000);
+
+setInterval(updateClock, 1000);
+
+// 初期状態：まだGASから取得していない
+renderNotice();
+
 loadData();
