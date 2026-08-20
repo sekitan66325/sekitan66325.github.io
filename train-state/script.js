@@ -687,7 +687,14 @@ async function loadData(){
 }
 
 function renderAll(){renderPosition();renderDiagram();renderTimetable()}
-$$(".view-tab,.tab-btn").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
+$$(".view-tab,.tab-btn").forEach(b=>b.addEventListener("click",(e)=>{
+  if (window._isDraggingForClick) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+  setView(b.dataset.view);
+}));
 function setView(v){
   state.view=v;
   $$(".view-tab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
@@ -759,6 +766,11 @@ if (tabBar && glider) {
     if (!isDragging) return;
     isDragging = false;
     glider.style.transition = ''; // Restore CSS transition
+
+    if (Math.abs(currentX - startX) > 5) {
+      window._isDraggingForClick = true;
+      setTimeout(() => window._isDraggingForClick = false, 100);
+    }
 
     const barRect = tabBar.getBoundingClientRect();
     const gliderCenter = currentX - barRect.left;
