@@ -9,13 +9,19 @@ function timeStringToMinutes(t){
   if(h < 5) h += 24;
   return h*60+m;
 }
+function formatYMD(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
 function normalizeToServiceContext(d){
-  const parts = new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(d);
+  const parts = new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(d);
   const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));
-  let h=Number(p.hour); if(h===24)h=0;
+  let h=Number(p.hour);
   const base=new Date(Number(p.year),Number(p.month)-1,Number(p.day));
-  if(h<5){base.setDate(base.getDate()-1);return {service_date:base.toISOString().slice(0,10),service_minutes:(h+24)*60+Number(p.minute)}}
-  return {service_date:`${p.year}-${p.month}-${p.day}`,service_minutes:h*60+Number(p.minute)};
+  if(h<5){base.setDate(base.getDate()-1);return {service_date:formatYMD(base),service_minutes:(h+24)*60+Number(p.minute)}}
+  return {service_date:formatYMD(base),service_minutes:h*60+Number(p.minute)};
 }
 function formatServiceTime(m){
   if(m==null)return "—"; let h=Math.floor(m/60), mm=String(m%60).padStart(2,"0"); return `${String(h).padStart(2,"0")}:${mm}`;
@@ -617,12 +623,26 @@ function openTrainModal(t){
 function updateClock(){
   if(!state.liveClock)return;
   const ctx=normalizeToServiceContext(new Date());
+  
+  if (ctx.service_date !== state.serviceDate) {
+    state.serviceDate = ctx.service_date;
+    state.currentMinutes = ctx.service_minutes;
+    $("#date-input").value = state.serviceDate;
+    loadData();
+    return;
+  }
+  
   const minutesChanged = state.currentMinutes !== ctx.service_minutes;
-  state.currentMinutes=ctx.service_date===state.serviceDate?ctx.service_minutes:state.currentMinutes;
+  state.currentMinutes = ctx.service_minutes;
+  
   $("#clock").textContent=new Date().toLocaleTimeString("ja-JP",{timeZone:"Asia/Tokyo",hour12:false});
   $("#service-date-label").textContent=serviceDateLabel(state.serviceDate);
   $("#date-title").textContent=serviceDateLabel(state.serviceDate);
-  if(minutesChanged) renderPosition();
+  
+  if(minutesChanged) {
+    renderPosition();
+    if(state.view === "diagram") renderDiagram();
+  }
 }
 
 async function loadData(){
