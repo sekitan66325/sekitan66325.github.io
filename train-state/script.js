@@ -245,7 +245,6 @@ function renderPosition(){
     const label = document.createElement("div");
     label.className = "pos-station-label";
     label.innerHTML = `
-      <div class="pos-station-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="7" y1="18" x2="7" y2="21" stroke="currentColor" stroke-width="1.5"/><line x1="17" y1="18" x2="17" y2="21" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="21" x2="19" y2="21" stroke="currentColor" stroke-width="1.5"/></svg></div>
       <span class="pos-station-name">${s.name}</span>
     `;
 
@@ -433,8 +432,6 @@ function renderDiagram(){
     svg.appendChild(svgEl("line",{x1:left,y1:y,x2:width,y2:y,stroke:s.can_exchange?"var(--svg-station-line)":"var(--svg-station-line-alt)","stroke-width":s.can_exchange?1.2:.7}));
     const label=svgEl("text",{x:8,y:y+4,fill:s.can_exchange?"var(--svg-station-text)":"var(--svg-station-text-alt)","font-size":"11","font-weight":s.can_exchange?600:400});
     label.textContent=s.name;svg.appendChild(label);
-    const km=svgEl("text",{x:left-8,y:y+4,fill:"var(--svg-station-km)","font-size":"8","text-anchor":"end"});
-    km.textContent=s.distance_km.toFixed(1);svg.appendChild(km);
   });
 
   // Draw train lines
@@ -656,7 +653,25 @@ async function loadData(){
 
 function renderAll(){renderPosition();renderDiagram();renderTimetable()}
 $$(".view-tab,.tab-btn").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
-function setView(v){state.view=v;$$(".view-tab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));$$(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.view===v));$$(".view-panel").forEach(p=>p.classList.toggle("active",p.id==="view-"+v));if(v==="diagram")renderDiagram();if(v==="timetable")renderTimetable()}
+function setView(v){
+  state.view=v;
+  $$(".view-tab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+  $$(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+  $$(".view-panel").forEach(p=>p.classList.toggle("active",p.id==="view-"+v));
+  
+  const activeBtn = document.querySelector(`.floating-tab-bar .tab-btn[data-view="${v}"]`);
+  if(activeBtn) {
+    const glider = document.getElementById("tab-glider");
+    if(glider) {
+      glider.style.width = activeBtn.offsetWidth + "px";
+      glider.style.transform = `translateX(${activeBtn.offsetLeft - 4}px)`;
+    }
+  }
+
+  if(v==="position")renderPosition();
+  if(v==="diagram")renderDiagram();
+  if(v==="timetable")renderTimetable();
+}
 $("#date-input").addEventListener("change",e=>{state.serviceDate=e.target.value;state.liveClock=false;const date=new Date(`${state.serviceDate}T12:00:00+09:00`);state.currentMinutes=date.getHours()*60+date.getMinutes();renderNotice();renderAll()});
 $("#now-btn").addEventListener("click",()=>{state.liveClock=true;const c=normalizeToServiceContext(new Date());state.serviceDate=c.service_date;state.currentMinutes=c.service_minutes;$("#date-input").value=state.serviceDate;renderAll()});
 $$(".seg-btn").forEach(b=>b.addEventListener("click",()=>{const d=b.dataset.dir;if(b.classList.contains("tt-dir")){state.timetableDir=d;$$(".tt-dir").forEach(x=>x.classList.toggle("active",x===b));renderTimetable()}else{state.diagramDir=d;$$(".diagram-tools .seg-btn:not(.tt-dir)").forEach(x=>x.classList.toggle("active",x===b));renderDiagram()}}));
