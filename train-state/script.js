@@ -427,10 +427,12 @@ function renderDiagram(){
 
   // Station lines (distance-based, 茂木=top, 下館=bottom)
   const stationsReversed = [...DATA.stations].reverse(); // 茂木 first
-  stationsReversed.forEach(s=>{
+  stationsReversed.forEach((s, i)=>{
+    const isTerminal = i === 0 || i === stationsReversed.length - 1;
+    const isExchange = s.can_exchange || isTerminal;
     const y = yOf(s.code);
-    svg.appendChild(svgEl("line",{x1:left,y1:y,x2:width,y2:y,stroke:s.can_exchange?"var(--svg-station-line)":"var(--svg-station-line-alt)","stroke-width":s.can_exchange?1.2:.7}));
-    const label=svgEl("text",{x:8,y:y+4,fill:s.can_exchange?"var(--svg-station-text)":"var(--svg-station-text-alt)","font-size":"11","font-weight":s.can_exchange?600:400});
+    svg.appendChild(svgEl("line",{x1:left,y1:y,x2:width,y2:y,stroke:isExchange?"var(--svg-station-line)":"var(--svg-station-line-alt)","stroke-width":isExchange?1.2:.7}));
+    const label=svgEl("text",{x:8,y:y+4,fill:isExchange?"var(--svg-station-text)":"var(--svg-station-text-alt)","font-size":"11","font-weight":isExchange?600:400});
     label.textContent=s.name;svg.appendChild(label);
   });
 
@@ -463,10 +465,42 @@ function renderDiagram(){
       ap.style.cursor="pointer";ap.addEventListener("click",()=>openTrainModal(t));svg.appendChild(ap);
     }
 
-    // Train number label
-    const first=pts[0];
-    const lab=svgEl("text",{x:first[0]+5,y:first[1]-5,fill:"var(--svg-train-text)","font-size":"9","font-weight":"600","data-train-id":t.train_id});
-    lab.textContent=t.train_no;svg.appendChild(lab);
+    // Train number label at origin and Moka station
+    const targetPoints = [];
+    if(pts.length > 1) {
+      // 1. Origin station
+      targetPoints.push({x: pts[0][0], y: pts[0][1], nextX: pts[1][0], nextY: pts[1][1]});
+      
+      // 2. Moka station (if it's not the origin)
+      const mokaCode = DATA.stations.find(s=>s.name==="真岡")?.code;
+      if (mokaCode && t.stations[0].code !== mokaCode) {
+        const mokaY = yOf(mokaCode);
+        const mokaPtIdx = pts.findLastIndex(p => Math.abs(p[1] - mokaY) < 1);
+        if (mokaPtIdx !== -1 && mokaPtIdx < pts.length - 1) {
+          targetPoints.push({
+            x: pts[mokaPtIdx][0], y: pts[mokaPtIdx][1], 
+            nextX: pts[mokaPtIdx+1][0], nextY: pts[mokaPtIdx+1][1]
+          });
+        }
+      }
+    }
+
+    targetPoints.forEach(tp => {
+      const dx = tp.nextX - tp.x;
+      const dy = tp.nextY - tp.y;
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+      
+      const lab=svgEl("text",{
+        fill:"var(--svg-train-text)",
+        "font-size":"9",
+        "font-weight":"600",
+        "data-train-id":t.train_id,
+        transform: `translate(${tp.x + 4}, ${tp.y}) rotate(${angle})`,
+        dy: "9" // Offset below the line (right side)
+      });
+      lab.textContent=t.train_no;
+      svg.appendChild(lab);
+    });
   });
 
   // Now-time indicator line
