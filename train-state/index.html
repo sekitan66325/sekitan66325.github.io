@@ -28,6 +28,7 @@
 </header>
 
 <div id="offline-banner" class="offline-banner hidden">オフライン運用モード（基本ダイヤのみ表示中）</div>
+<div id="irregular-banner" class="hidden" style="background:#d32f2f; color:#fff; padding:8px 16px; text-align:center; font-size:14px; font-weight:bold; position:sticky; top:0; z-index:100;">通常ダイヤとは異なる運行状況です。詳細は公式HPをご確認ください。</div>
 
 <main class="container">
   <section id="notice" class="notice-section status-normal">
@@ -73,7 +74,6 @@
     <div class="position-card">
       <div class="position-time">
         <span>現在</span><strong id="position-current-time">--:--</strong>
-        <small>サービス時間軸 05:00 — 29:00</small>
       </div>
       <div class="position-body" id="position-body">
         <!-- Dynamically populated: station rows with rail line and trains -->
@@ -112,7 +112,6 @@
         <table id="timetable-table"><thead></thead><tbody></tbody></table>
       </div>
     </div>
-    <p class="helper">サービス分数を用いて24時以降の時刻も同一運行日として処理します。</p>
   </section>
 </main>
 
@@ -130,11 +129,22 @@
   </article>
 </div>
 
+<div class="modal-overlay hidden" id="warning-modal" style="z-index: 9999;">
+  <article class="modal-content" style="text-align: center;">
+    <h3 style="color:#d32f2f; margin-bottom: 15px;">運行状況に関する注意</h3>
+    <p style="margin-bottom: 20px; line-height: 1.6;">この画面は通常ダイヤで運転している場合の状況を示すもので、現在の運行状況とは異なるものを表示している場合があります。了承の上ご覧ください。<br><br>詳細な運転状況は真岡鐵道HPからご確認ください。</p>
+    <button id="warning-confirm-btn" style="background:#2997ff; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">確認して進む</button>
+  </article>
+</div>
+
 <footer class="site-footer">
   <strong>真岡線 列車走行位置</strong>
   <span>仕様書準拠フロントエンド / Demo Data</span>
 </footer>
+
 <script src="config.js"></script>
+<script src="TrainStateEngine.js"></script>
+<script src="Renderer.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
