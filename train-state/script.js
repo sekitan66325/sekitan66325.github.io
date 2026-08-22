@@ -335,34 +335,12 @@ function effectiveTrains() {
 
   const allTrains = [...crossover, ...today];
 
-  const ops = {};
-  for(const t of allTrains) {
-    if(t.result.state !== "OUT_OF_SERVICE") {
-      if(!ops[t.operation_id]) ops[t.operation_id] = [];
-      ops[t.operation_id].push(t);
-    }
-  }
-
-  const activeTrains = [];
-  for(const op in ops) {
-    const list = ops[op];
-    if(list.length === 1) {
-      activeTrains.push(list[0]);
-    } else {
-      const genuine = list.filter(t => t.result.state !== "PRE_DEPARTURE");
-      if(genuine.length > 0) {
-        genuine.sort((a,b)=>(a.actual[0].dep_actual??0)-(b.actual[0].dep_actual??0));
-        activeTrains.push(genuine[0]);
-      } else {
-        list.sort((a,b)=>(a.actual[0].dep_actual??0)-(b.actual[0].dep_actual??0));
-        activeTrains.push(list[0]);
-      }
-    }
-  }
+  // Filter out trains that are completely out of service
+  const activeTrains = allTrains.filter(t => t.result.state !== "OUT_OF_SERVICE");
 
   return activeTrains.sort((a,b)=>{
-    const aTime = a.actual[0].dep_actual ?? 9999;
-    const bTime = b.actual[0].dep_actual ?? 9999;
+    const aTime = a.actual[0]?.dep_actual ?? 9999;
+    const bTime = b.actual[0]?.dep_actual ?? 9999;
     return aTime - bTime;
   });
 }
