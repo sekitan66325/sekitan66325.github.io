@@ -7,11 +7,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -111,11 +107,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -215,11 +207,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -269,11 +257,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -343,11 +327,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -417,11 +397,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -521,11 +497,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -595,11 +567,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -649,11 +617,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -723,11 +687,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -797,11 +757,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -851,11 +807,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -905,11 +857,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -979,11 +927,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1033,11 +977,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1107,11 +1047,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1161,11 +1097,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1235,11 +1167,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1309,11 +1237,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1363,11 +1287,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1437,11 +1357,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1541,11 +1457,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1595,11 +1507,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1669,11 +1577,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1773,11 +1677,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1827,11 +1727,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1901,11 +1797,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -1955,11 +1847,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2059,11 +1947,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2113,11 +1997,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2167,11 +2047,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2271,11 +2147,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2345,11 +2217,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2419,11 +2287,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2473,11 +2337,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2577,11 +2437,7 @@
     "destination": "下館",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2831,11 +2687,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -2905,11 +2757,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3009,11 +2857,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3063,11 +2907,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3167,11 +3007,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3241,11 +3077,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3315,11 +3147,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3369,11 +3197,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3443,11 +3267,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3547,11 +3367,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3621,11 +3437,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3675,11 +3487,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3729,11 +3537,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3803,11 +3607,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3907,11 +3707,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -3961,11 +3757,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4035,11 +3827,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4109,11 +3897,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4213,11 +3997,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4287,11 +4067,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4341,11 +4117,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4445,11 +4217,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4519,11 +4287,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4573,11 +4337,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4627,11 +4387,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4701,11 +4457,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4755,11 +4507,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4829,11 +4577,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4883,11 +4627,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -4937,11 +4677,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -5041,11 +4777,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -5095,11 +4827,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -5169,11 +4897,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -5243,11 +4967,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -5347,11 +5067,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -5401,11 +5117,7 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
@@ -5475,11 +5187,7 @@
     "destination": "真岡",
     "operation_rule": {
       "service_type": "regular",
-      "days_off": [
-        "sat",
-        "sun",
-        "holiday"
-      ],
+      "days_off": [],
       "dates_run": [],
       "dates_off": []
     },
