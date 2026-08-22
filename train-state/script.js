@@ -2,8 +2,8 @@ const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const DATA = { stations: [], timetable: [], prevTimetable: [], status: null };
 const state = { view: "position", serviceDate: "2026-08-15", currentMinutes: null, liveClock: true, diagramDir: "all", timetableDir: "up" };
-const ARRIVED_HOLD_MINUTES = 3; // 終着駅到着後の保持時間（分）
-const DEPARTURE_HOLD_MINUTES = 15; // 始発駅発車前の保持時間（分）
+const ARRIVED_HOLD_MINUTES = 3; // 終着駅到着後の保持時間
+const DEPARTURE_HOLD_MINUTES = 15; // 始発駅発車前の保持時間
 
 /**
  * HH:MM 蠖｢蠑上E譎ょ綾譁EE怜E繧偵し繝ｼ繝薙せ蛻・焁E300縲・739)縺E螟画鋤
