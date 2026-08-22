@@ -1,9 +1,9 @@
-const $ = (s, root = document) => root.querySelector(s);
-const $$ = (s, root = document) => [...root.querySelectorAll(s)];
-const DATA = { stations: [], timetable: [], prevTimetable: [], status: null };
-const state = { view: "position", serviceDate: "2026-08-15", currentMinutes: null, liveClock: true, diagramDir: "all", timetableDir: "up" };
-const ARRIVED_HOLD_MINUTES = 3; // 終着駅到着後の保持時間
-const DEPARTURE_HOLD_MINUTES = 15; // 始発駅発車前の保持時間
+var $ = (s, root = document) => root.querySelector(s);
+var $$ = (s, root = document) => [...root.querySelectorAll(s)];
+var DATA = { stations: [], timetable: [], prevTimetable: [], status: null };
+var state = { view: "position", serviceDate: "2026-08-15", currentMinutes: null, liveClock: true, diagramDir: "all", timetableDir: "up" };
+var ARRIVED_HOLD_MINUTES = 3; // 終着駅到着後の保持時間
+var DEPARTURE_HOLD_MINUTES = 15; // 始発駅発車前の保持時間
 
 /**
  * HH:MM 蠖｢蠑上E譎ょ綾譁EE怜E繧偵し繝ｼ繝薙せ蛻・焁E300縲・739)縺E螟画鋤
@@ -952,8 +952,8 @@ function setView(v) {
   if (v === "timetable") renderTimetable();
 }
 
-let _resizeTimer;
-const _resizeObs = new ResizeObserver(() => {
+var _resizeTimer;
+var _resizeObs = new ResizeObserver(() => {
   clearTimeout(_resizeTimer);
   _resizeTimer = setTimeout(() => {
     if (state.view === "position") renderPosition();
@@ -967,7 +967,7 @@ $("#now-btn").addEventListener("click", () => { state.liveClock = true; const c 
 $$(".seg-btn").forEach(b => b.addEventListener("click", () => { const d = b.dataset.dir; if (b.classList.contains("tt-dir")) { state.timetableDir = d; $$(".tt-dir").forEach(x => x.classList.toggle("active", x === b)); renderTimetable() } else { state.diagramDir = d; $$(".diagram-tools .seg-btn:not(.tt-dir)").forEach(x => x.classList.toggle("active", x === b)); renderDiagram() } }));
 $("#modal-close").onclick = () => $("#train-modal").classList.add("hidden"); $("#train-modal").addEventListener("click", e => { if (e.target.id === "train-modal") $("#train-modal").classList.add("hidden") });
 
-const STATIONS_FALLBACK = [];
+var STATIONS_FALLBACK = [];
 
 setInterval(updateClock, 1000);
 
@@ -979,9 +979,9 @@ loadData();
 window.addEventListener("load", () => setView(state.view || "position"));
 
 // Tab Bar Drag Logic
-const tabBar = document.querySelector('.floating-tab-bar');
-const glider = document.getElementById('tab-glider');
-const tabs = Array.from(document.querySelectorAll('.floating-tab-bar .tab-btn'));
+var tabBar = document.querySelector('.floating-tab-bar');
+var glider = document.getElementById('tab-glider');
+var tabs = Array.from(document.querySelectorAll('.floating-tab-bar .tab-btn'));
 
 if (tabBar && glider) {
   let isDragging = false;
