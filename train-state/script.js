@@ -254,8 +254,15 @@ function normalizeToServiceContext(d) {
   const parts = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(d);
   const p = Object.fromEntries(parts.map(x => [x.type, x.value]));
   let h = Number(p.hour);
-  const base = new Date(Number(p.year), Number(p.month) - 1, Number(p.day));
-  return { service_date: formatYMD(base), service_minutes: h * 60 + Number(p.minute) };
+  let base = new Date(Number(p.year), Number(p.month) - 1, Number(p.day));
+  let mins = h * 60 + Number(p.minute);
+  
+  if (h < 4) {
+    base.setDate(base.getDate() - 1);
+    mins += 1440;
+  }
+  
+  return { service_date: formatYMD(base), service_minutes: mins };
 }
 function formatServiceTime(m) {
   if (m == null) return "—"; let h = Math.floor(m / 60), mm = String(m % 60).padStart(2, "0"); return `${String(h).padStart(2, "0")}:${mm}`;
@@ -335,10 +342,7 @@ function effectiveTrains() {
 
   const allTrains = [...crossover, ...today];
 
-  // Filter out trains that are completely out of service
-  const activeTrains = allTrains.filter(t => t.result.state !== "OUT_OF_SERVICE");
-
-  return activeTrains.sort((a,b)=>{
+  return allTrains.sort((a,b)=>{
     const aTime = a.actual[0]?.dep_actual ?? 9999;
     const bTime = b.actual[0]?.dep_actual ?? 9999;
     return aTime - bTime;
@@ -718,7 +722,12 @@ function renderDiagram() {
     svg.appendChild(nowLabel);
   }
 
-  $("#diagram-scroll").scrollLeft = 0;
+  const scroll = $("#diagram-scroll");
+  if (!scroll.dataset.didAutoScroll && state.currentMinutes != null) {
+    const nx = timeX(state.currentMinutes);
+    scroll.scrollLeft = Math.max(0, nx - scroll.clientWidth / 2);
+    scroll.dataset.didAutoScroll = "true";
+  }
 }
 
 function renderTimetable() {
@@ -941,7 +950,7 @@ var _resizeObs = new ResizeObserver(() => {
 _resizeObs.observe(document.body);
 
 $("#date-input").addEventListener("change", e => { state.serviceDate = e.target.value; state.liveClock = false; const date = new Date(`${state.serviceDate}T12:00:00+09:00`); state.currentMinutes = date.getHours() * 60 + date.getMinutes(); renderNotice(); renderAll() });
-$("#now-btn").addEventListener("click", () => { state.liveClock = true; const c = normalizeToServiceContext(new Date()); state.serviceDate = c.service_date; state.currentMinutes = c.service_minutes; $("#date-input").value = state.serviceDate; renderAll() });
+$("#now-btn").addEventListener("click", () => { state.liveClock = true; const c = normalizeToServiceContext(new Date()); state.serviceDate = c.service_date; state.currentMinutes = c.service_minutes; $("#date-input").value = state.serviceDate; $("#diagram-scroll").dataset.didAutoScroll = ""; renderAll() });
 $$(".seg-btn").forEach(b => b.addEventListener("click", () => { const d = b.dataset.dir; if (b.classList.contains("tt-dir")) { state.timetableDir = d; $$(".tt-dir").forEach(x => x.classList.toggle("active", x === b)); renderTimetable() } else { state.diagramDir = d; $$(".diagram-tools .seg-btn:not(.tt-dir)").forEach(x => x.classList.toggle("active", x === b)); renderDiagram() } }));
 $("#modal-close").onclick = () => $("#train-modal").classList.add("hidden"); $("#train-modal").addEventListener("click", e => { if (e.target.id === "train-modal") $("#train-modal").classList.add("hidden") });
 
