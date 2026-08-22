@@ -2,13 +2,248 @@ const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const DATA = { stations: [], timetable: [], prevTimetable: [], status: null };
 const state = { view: "position", serviceDate: "2026-08-15", currentMinutes: null, liveClock: true, diagramDir: "all", timetableDir: "up" };
+const ARRIVED_HOLD_MINUTES = 3; // 終着駅到着後の保持時間（分）
+const DEPARTURE_HOLD_MINUTES = 15; // 始発駅発車前の保持時間（分）
 
-function timeStringToMinutes(t) {
-  if (t == null) return null;
-  let [h, m] = t.split(":").map(Number);
-  if (h < 5) h += 24; // 深夜0〜4時は24〜28時として扱い時刻の単調増加を保証
-  return h * 60 + m;
+/**
+ * HH:MM 蠖｢蠑上E譎ょ綾譁EE怜E繧偵し繝ｼ繝薙せ蛻・焁E300縲・739)縺E螟画鋤
+ * @param {string} timeStr - "06:02" 繧・"25:15" 縺E縺E縺E譎ょ綾譁EE怜E
+ * @returns {number|null} 繧E繝ｼ繝薙せ蛻・焁E(萓E 05:00 -> 300)
+ */
+function timeStringToMinutes(timeStr) {
+  if (!timeStr) return null;
+  const parts = timeStr.split(':');
+  if (parts.length !== 2) return null;
+  
+  const hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+  if (isNaN(hours) || isNaN(minutes)) return null;
+  
+  return hours * 60 + minutes;
 }
+
+/**
+ * 1. 驕玖�E�梧律蛻�E�螳壹Ο繧�E�繝�EぁE
+ * 謖�E�E�壽征EserviceDate)縺�E�蟁E��縺励※蟁E��雎｡蛻苓ｻ翫′驕玖�E�後！E��後ｋ縺玖ｩ穂ｾ�E�
+ * * 蜁E��蜈磯�E�・�E�・
+ * 1. dates_off・育音螳夐°莨第律�E俁E��Efalse
+ * 2. dates_run・育音螳夐°霁E��譌･・俁E��Etrue
+ * 3. service_type === "extra"・郁�E譎ょ・霁E��E��俁E��Efalse
+ * 4. days_off・域屁E��･繝ｻ逾晁E��驕倶�E�題ｨ�E�螳夲�E�俁E��Efalse
+ * 5. 縺昴�E�莉�E�螟�E筐�Etrue
+ * * @param {Object} train - 蝓ｺ譛ｬ繝繧�E�繝､縺�E�蛻苓ｻ翫が繝悶ず繧�E�繧�E�繝�E
+ * @param {string} serviceDate - "YYYY-MM-DD"
+ * @param {boolean} isHoliday - 蠖捺律縺悟悄譌･逾晁E��縺九�E縺・°
+ * @returns {boolean} 驕玖�E�後！E��後ｋ蝣�E�蜷・true
+ */
+function isTrainOperatingOnDate(train, serviceDate, isHoliday = false) {
+  const rule = train.operation_rule || {};
+  const datesOff = rule.dates_off || [];
+  const datesRun = rule.dates_run || [];
+  const daysOff = rule.days_off || [];
+
+  // 1. 迚ｹ螳夐°莨第律繝�Eぉ繝�EぁE
+  if (datesOff.includes(serviceDate)) return false;
+
+  // 2. 迚ｹ螳夐°霁E��譌･繝�Eぉ繝�EぁE
+  if (datesRun.includes(serviceDate)) return true;
+
+  // 3. 閾�E�譎ょ・霁E��メ繧�E�繝�Eけ�E・ates_run 縺�E�髱櫁E���E�蠖薙・閾�E�譎ょ・霁E��・驕倶�E�托ｼ・
+  if (rule.service_type === 'extra') return false;
+
+  // 4. 譖懈律繝ｻ逾晁E��驕倶�E�代メ繧�E�繝�EぁE
+  if (isHoliday && (daysOff.includes('sat') || daysOff.includes('sun') || daysOff.includes('holiday'))) {
+    return false;
+  }
+
+  // 5. 繝�Eヵ繧�E�繝ｫ繝磯°霁E��
+  return true;
+}
+
+/**
+ * 2. 螳溷柑譎ょ綾縺�E�邂怜�E・磯≦蟒ｶ蝗槫�E��E�繝ｻ蛹�E�髢馴°莨代・驕ｩ逕ｨ・・
+ * * @param {Object} train - 蝓ｺ譛ｬ繝繧�E�繝､縺�E�蛻苓ｻ翫が繝悶ず繧�E�繧�E�繝�E
+ * @param {Object} override - 蠖捺律繧�E�繝ｼ繝�E・繝ｩ繧�E�繝峨ョ繝ｼ繧�E� (train_overrides[train_id])
+ * @returns {Array<Object>} 蜷・�E�・・螳溷柑譎ょ綾繝ｻ驕�E�E��E�繝ｻ驕倶�E�代ヵ繝ｩ繧�E�驟榊�E
+ */
+function calculateActualTimetable(train, override) {
+  const baseDelay = override?.delay_minutes || 0;
+  const stationDelays = override?.station_delays || {};
+
+  let actualStart = train.stations[0].code;
+  let actualEnd = train.stations[train.stations.length - 1].code;
+
+  // 蛹�E�髢馴°莨代・繝�EΜ繝�E・繧�E�繝ｧ繝ｳ・亥�E�伜惠讀懁E���E� & 騾�E�陦梧婿蜷代・鬁E�E�E�乗､懁E���E�・・
+  if (override?.actual_start && override?.actual_end) {
+    const startIdx = train.stations.findIndex(s => s.code === override.actual_start);
+    const endIdx = train.stations.findIndex(s => s.code === override.actual_end);
+
+    if (startIdx !== -1 && endIdx !== -1 && startIdx <= endIdx) {
+      actualStart = override.actual_start;
+      actualEnd = override.actual_end;
+    } else {
+      console.warn(`[Data Anomaly] Invalid or reversed actual_start/end for ${train.train_id}. Falling back to full route.`);
+    }
+  }
+
+  let isWithinActiveSegment = false;
+
+  return train.stations.map((st) => {
+    if (st.code === actualStart) isWithinActiveSegment = true;
+    
+    const isCancelled = !isWithinActiveSegment;
+    const currentDelay = stationDelays[st.code] !== undefined ? stationDelays[st.code] : baseDelay;
+
+    const arrScheduledMin = timeStringToMinutes(st.arr);
+    const depScheduledMin = timeStringToMinutes(st.dep);
+
+    const arrMinutes = arrScheduledMin !== null ? arrScheduledMin + currentDelay : null;
+    const depMinutes = depScheduledMin !== null ? depScheduledMin + currentDelay : null;
+
+    const result = {
+      code: st.code,
+      arr_scheduled: st.arr,
+      dep_scheduled: st.dep,
+      arr_actual: arrMinutes,
+      dep_actual: depMinutes,
+      delay_minutes: currentDelay,
+      is_cancelled: isCancelled
+    };
+
+    if (st.code === actualEnd) isWithinActiveSegment = false;
+
+    return result;
+  });
+}
+
+/**
+ * 3. 蛻苓ｻ顔�E諷九�E蛻�E�螳夲�E�・迥�E�諷具�E�・
+ * * @param {Array<Object>} actualStations - calculateActualTimetable() 縺�E�謌ｻ繧雁E��E�
+ * @param {number} currentMinutes - 迴�E�蝨�E�縺�E�繧�E�繝ｼ繝薙せ蛻・焁E(300縲・739)
+ * @returns {Object} { state, station_code, from_station, to_station, progress }
+ */
+function evaluateTrainState(actualStations, currentMinutes) {
+  // 驕倶�E�第欠螳壹�E�E��後※縺・↑縺・怏蜉�E�鬧・そ繧�E�繝｡繝ｳ繝医�E�謚ｽ蜁E��
+  const activeStations = actualStations.filter(s => !s.is_cancelled);
+  if (activeStations.length < 2) return { state: 'OUT_OF_SERVICE' };
+
+  const firstStation = activeStations[0];
+  const lastStation = activeStations[activeStations.length - 1];
+
+  // 1. 蟋狗匱逋ｺ霁E��燕繝�Eぉ繝�EぁE
+  if (currentMinutes < firstStation.dep_actual) {
+    if (currentMinutes >= firstStation.dep_actual - DEPARTURE_HOLD_MINUTES) {
+      return { 
+        state: 'PRE_DEPARTURE', 
+        station_code: firstStation.code 
+      };
+    }
+    return { state: 'OUT_OF_SERVICE' };
+  }
+
+  // 2. 邨ら捩鬧・芦逹蠕後�E菫晁E�� (5蛻・俣) 縺翫�E�縺�E�蝨丞､夜�E遘ｻ
+  if (currentMinutes >= lastStation.arr_actual) {
+    if (currentMinutes < lastStation.arr_actual + ARRIVED_HOLD_MINUTES) {
+      return { 
+        state: 'ARRIVED', 
+        station_code: lastStation.code 
+      };
+    }
+    return { state: 'OUT_OF_SERVICE' };
+  }
+
+  // 3. 蜷・�E�・〒縺�E�蛛懆�E�翫メ繧�E�繝�EぁE
+  for (let i = 0; i < activeStations.length; i++) {
+    const st = activeStations[i];
+    if (st.arr_actual !== null && st.dep_actual !== null) {
+      // 逋ｺ逹譎ょ綾縺悟�E荳・域治譎る�E�・〒縺�E�縺・夐℃/荳迸�E�蛛懆�E�奁E��峨・1蛻・俣蟁E��蠢・
+      if (st.arr_actual === st.dep_actual && currentMinutes === st.arr_actual) {
+        return { 
+          state: 'STOPPED', 
+          station_code: st.code, 
+          is_instant_stop: true 
+        };
+      }
+      if (st.arr_actual <= currentMinutes && currentMinutes < st.dep_actual) {
+        return { 
+          state: 'STOPPED', 
+          station_code: st.code, 
+          is_instant_stop: false 
+        };
+      }
+    }
+  }
+
+  // 4. 鬧・俣襍ｰ陦後メ繧�E�繝�Eけ�E磯≦蟒ｶ蝗槫�E��E�譎ゅ・繧�E�繝ｭ髯�E�邂励ぎ繝ｼ繝�E�E�偁E��・
+  for (let i = 0; i < activeStations.length - 1; i++) {
+    const fromSt = activeStations[i];
+    const toSt = activeStations[i + 1];
+    
+    if (fromSt.dep_actual !== null && toSt.arr_actual !== null) {
+      if (fromSt.dep_actual <= currentMinutes && currentMinutes < toSt.arr_actual) {
+        // 謁E�隕∵凾髢薙′繧�E�繝ｭ縺�E�縺溘�E雋�縺�E�縺�E�繧句屓蠕ｩ驕玖�E��E�荳肴紛蜷医∈縺�E�繧�E�繝ｼ繝会ｼ域怙蟆乗園隕∵凾髢薙ａE蛻・↓蝗�E�螳夲�E�・
+        const totalTime = Math.max(1, toSt.arr_actual - fromSt.dep_actual);
+        const elapsedTime = currentMinutes - fromSt.dep_actual;
+        const progress = Math.min(1.0, Math.max(0.0, elapsedTime / totalTime));
+
+        return {
+          state: 'RUNNING',
+          from_station: fromSt.code,
+          to_station: toSt.code,
+          progress: progress
+        };
+      }
+    }
+  }
+
+  return { state: 'OUT_OF_SERVICE' };
+}
+
+/**
+ * 4. 繝｡繧�E�繝ｳ蜈ｬ髢矩未謨�E�: 繝繧�E�繝､蜈ｨ蛻苓ｻ翫・迥�E�諷倶�E�諡�E�險育�E�・
+ * * @param {Array<Object>} timetable - 蝓ｺ譛ｬ繝繧�E�繝､驟榊�E
+ * @param {Object} todayStatus - GAS API縺九ｉ蜿門�E�励�E�縺溷�E�捺律繧�E�繝�E・繧�E�繧�E�
+ * @param {number} currentMinutes - 險育�E�怜ｯ�E�雎｡譎ょ綾・医し繝ｼ繝薙せ蛻・焚�E・
+ * @param {boolean} isHoliday - 蝨滓律逾晏�E螳・
+ * @returns {Array<Object>} 迥�E�諷玖ｨ育�E�礼�E�先棡繧貞性繧薙□蛻苓ｻ翫Μ繧�E�繝�E
+ */
+function computeAllTrainStates(timetable, todayStatus, currentMinutes, isHoliday = false) {
+  const serviceDate = todayStatus.service_date;
+  const overrides = todayStatus.train_overrides || {};
+
+  return timetable.map(train => {
+    // 驕玖�E�梧律蛻�E�螳・
+    const isOperating = isTrainOperatingOnDate(train, serviceDate, isHoliday);
+    if (!isOperating) {
+      return {
+        train_id: train.train_id,
+        train_no: train.train_no,
+        direction: train.direction,
+        is_operating: false,
+        state_info: { state: 'OUT_OF_SERVICE' }
+      };
+    }
+
+    // 繧�E�繝ｼ繝�E・繝ｩ繧�E�繝牙叙蠕�E・・螳溷柑譎ょ綾險育�E�・
+    const override = overrides[train.train_id] || null;
+    const actualStations = calculateActualTimetable(train, override);
+
+    // 蛻苓ｻ顔�E諷玖ｨ育�E�・
+    const stateInfo = evaluateTrainState(actualStations, currentMinutes);
+
+    return {
+      train_id: train.train_id,
+      train_no: train.train_no,
+      direction: train.direction,
+      operation_id: train.operation_id,
+      destination: train.destination,
+      is_operating: true,
+      actual_stations: actualStations,
+      state_info: stateInfo
+    };
+  });
+}
+
 function formatYMD(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -57,57 +292,7 @@ function getTrainTypeColor(type) {
 function validateStatus(s) {
   return !!s && typeof s.service_date === "string" && s.official_info && s.operations && s.train_overrides;
 }
-function calculateActualTimetable(train, override = {}) {
-  const baseDelay = override.delay_minutes || 0, stationDelays = override.station_delays || {};
-  let start = train.stations[0].code, end = train.stations[train.stations.length - 1].code;
-  if (override.actual_start && override.actual_end) {
-    const si = train.stations.findIndex(x => x.code === override.actual_start), ei = train.stations.findIndex(x => x.code === override.actual_end);
-    if (si !== -1 && ei !== -1 && si <= ei) { start = override.actual_start; end = override.actual_end } else console.warn(`[Data Anomaly] Invalid or reversed actual_start/end for ${train.train_id}. Falling back to full route.`);
-  }
-  let active = false;
-  return train.stations.map(st => {
-    if (st.code === start) active = true;
-    const delay = stationDelays[st.code] !== undefined ? stationDelays[st.code] : baseDelay;
-    const item = {
-      code: st.code, arr_scheduled: st.arr, dep_scheduled: st.dep,
-      arr_actual: st.arr == null ? null : timeStringToMinutes(st.arr) + delay,
-      dep_actual: st.dep == null ? null : timeStringToMinutes(st.dep) + delay,
-      delay_minutes: delay, is_cancelled: !active
-    };
-    if (st.code === end) active = false;
-    return item;
-  });
-}
-const ARRIVED_HOLD_MINUTES = 3;
-const DEPARTURE_HOLD_MINUTES = 15;
-function evaluateTrainState(actualStations, currentMinutes) {
-  const a = actualStations.filter(s => !s.is_cancelled); if (a.length < 2) return { state: "OUT_OF_SERVICE" };
-  const first = a[0], last = a[a.length - 1];
-  if (currentMinutes < first.dep_actual) {
-    if (currentMinutes >= first.dep_actual - DEPARTURE_HOLD_MINUTES) {
-      return { state: "PRE_DEPARTURE", station_code: first.code };
-    }
-    return { state: "OUT_OF_SERVICE" };
-  }
-  if (currentMinutes >= last.arr_actual) {
-    if (currentMinutes < last.arr_actual + ARRIVED_HOLD_MINUTES) return { state: "ARRIVED", station_code: last.code };
-    return { state: "OUT_OF_SERVICE" };
-  }
-  for (const st of a) {
-    if (st.arr_actual !== null && st.dep_actual !== null) {
-      if (st.arr_actual === st.dep_actual && currentMinutes === st.arr_actual) return { state: "STOPPED", station_code: st.code, is_instant_stop: true };
-      if (st.arr_actual <= currentMinutes && currentMinutes < st.dep_actual) return { state: "STOPPED", station_code: st.code, is_instant_stop: false };
-    }
-  }
-  for (let i = 0; i < a.length - 1; i++) {
-    const f = a[i], t = a[i + 1];
-    if (f.dep_actual <= currentMinutes && currentMinutes < t.arr_actual) {
-      const total = Math.max(1, t.arr_actual - f.dep_actual), progress = Math.min(1, Math.max(0, (currentMinutes - f.dep_actual) / total));
-      return { state: "RUNNING", from_station: f.code, to_station: t.code, progress };
-    }
-  }
-  return { state: "OUT_OF_SERVICE" };
-}
+
 function stationPos(code) { return DATA.stations.findIndex(s => s.code === code) }
 function positionForState(train, actual, result) {
   if(result.state==="OUT_OF_SERVICE") return null;
@@ -194,7 +379,7 @@ function renderNotice() {
   if (!DATA.status) {
     box.className = "notice-section status-loading";
     icon.textContent = "…";
-    title.textContent = "公式運行情報を取得しています";
+    title.textContent = "公式運行情報を取得しています…";
     updated.textContent = "取得中…";
     link.classList.add("hidden");
     return;
@@ -238,7 +423,7 @@ function renderNotice() {
   if (statusCode === "unknown") {
     title.textContent =
       n.text ||
-      "公式運行情報を取得できませんでした（サイトをご確認ください）";
+      "公式運行情報を取得できませんでした。サイトをご確認ください。";
   } else {
     title.textContent =
       n.text ||
@@ -656,8 +841,8 @@ function updateClock() {
   const ctx = normalizeToServiceContext(new Date());
 
   if (ctx.service_date !== state.serviceDate) {
-    DATA.prevTimetable = [...DATA.timetable]; // 前日ダイヤを日またぎ列車用に保存
-    state.serviceDate = ctx.service_date;
+        DATA.prevTimetable = [...DATA.timetable]; // 前日ダイヤを日またぎ列車用に保存
+        state.serviceDate = ctx.service_date;
     state.currentMinutes = ctx.service_minutes;
     $("#date-input").value = state.serviceDate;
     loadData();
@@ -758,7 +943,7 @@ function setView(v) {
     const glider = document.getElementById("tab-glider");
     if (glider) {
       glider.style.width = activeBtn.offsetWidth + "px";
-      glider.style.transform = `translateX(${activeBtn.offsetLeft - 4}px)`;
+      glider.style.transform = "translateX(" + (activeBtn.offsetLeft - 4) + "px)";
     }
   }
 
@@ -786,8 +971,7 @@ const STATIONS_FALLBACK = [];
 
 setInterval(updateClock, 1000);
 
-// 初期状態：まだGASから取得していない
-renderNotice();
+// 初期状態ではまだGASから取得できていないためrenderNotice()はここでは呼ばない
 
 loadData();
 
