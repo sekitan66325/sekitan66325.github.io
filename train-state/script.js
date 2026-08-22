@@ -1,12 +1,12 @@
 const $ = (s,root=document)=>root.querySelector(s);
 const $$ = (s,root=document)=>[...root.querySelectorAll(s)];
-const DATA = {stations:[], timetable:[], status:null};
+const DATA = {stations:[], timetable:[], prevTimetable:[], status:null};
 const state = {view:"position", serviceDate:"2026-08-15", currentMinutes:null, liveClock:true, diagramDir:"all", timetableDir:"up"};
 
 function timeStringToMinutes(t){
   if(t==null) return null;
   let [h,m] = t.split(":").map(Number);
-  if(h < 5) h += 24;
+  if(h < 5) h += 24; // 深夜0〜4時は24〜28時として扱い時刻の単調増加を保証
   return h*60+m;
 }
 function formatYMD(date) {
@@ -20,7 +20,6 @@ function normalizeToServiceContext(d){
   const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));
   let h=Number(p.hour);
   const base=new Date(Number(p.year),Number(p.month)-1,Number(p.day));
-  if(h<5){base.setDate(base.getDate()-1);return {service_date:formatYMD(base),service_minutes:(h+24)*60+Number(p.minute)}}
   return {service_date:formatYMD(base),service_minutes:h*60+Number(p.minute)};
 }
 function formatServiceTime(m){
@@ -39,6 +38,22 @@ function serviceRuns(train,date){
   const key=["sun","mon","tue","wed","thu","fri","sat"][day];
   return !(r.days_off||[]).includes(key);
 }
+
+function getTrainType(train) {
+  if (train.train_no.startsWith("回")) return "empty";
+  if (train.train_no.startsWith("6")) return "sl";
+  if (train.operation_rule?.service_type === "extra") return "extra";
+  return "local";
+}
+function getTrainTypeColor(type) {
+  switch (type) {
+    case "sl": return "var(--train-sl)";
+    case "extra": return "var(--train-extra)";
+    case "empty": return "var(--train-empty)";
+    default: return "var(--train-local)";
+  }
+}
+
 function validateStatus(s){
   return !!s && typeof s.service_date==="string" && s.official_info && s.operations && s.train_overrides;
 }
@@ -95,14 +110,38 @@ function positionForState(train, actual, result){
   }
   return null;
 }
+function getPrevDate(dateStr){
+  const d=new Date(`${dateStr}T12:00:00+09:00`);
+  d.setDate(d.getDate()-1);
+  return formatYMD(d);
+}
+function buildTrainEntry(train, currentMins){
+  const ov=DATA.status.train_overrides[train.train_id]||{};
+  const actual=calculateActualTimetable(train,ov);
+  const result=evaluateTrainState(actual,currentMins??720);
+  return {...train,override:ov,actual,result,position:positionForState(train,actual,result)};
+}
 function effectiveTrains(){
-  return DATA.timetable.filter(t=>serviceRuns(t,state.serviceDate)).map(train=>{
-    const ov=DATA.status.train_overrides[train.train_id]||{};
-    const actual=calculateActualTimetable(train,ov);
-    const result=evaluateTrainState(actual,state.currentMinutes??720);
-    return {...train,override:ov,actual,result,position:positionForState(train,actual,result)};
-  });
+  const cur = state.currentMinutes ?? 720;
+  const today = DATA.timetable
+    .filter(t=>serviceRuns(t,state.serviceDate))
+    .map(t=>buildTrainEntry(t, cur));
 
+  // 前日から深夜をまたいで運転中の列車（0:00〜4:59 の間のみ対象）
+  let crossover = [];
+  if(cur < 300 && DATA.prevTimetable.length){
+    const prevDate = getPrevDate(state.serviceDate);
+    const extendedMins = cur + 1440; // 例: 00:10 → 前日時刻空間上の1450分として評価
+    crossover = DATA.prevTimetable
+      .filter(t=>serviceRuns(t,prevDate))
+      .filter(t=>t.stations.some(s=>
+        (s.arr && timeStringToMinutes(s.arr) >= 1440) ||
+        (s.dep && timeStringToMinutes(s.dep) >= 1440)
+      ))
+      .map(t=>buildTrainEntry(t, extendedMins));
+  }
+
+  return [...today, ...crossover];
 }
 
 function renderNotice() {
@@ -358,7 +397,8 @@ function createTrainCard(t){
   card.className = "pos-train-card";
 
   const isStopped = t.result.state==="STOPPED" || t.result.state==="ARRIVED";
-  const shieldColor = "var(--text-primary)";
+  const type = getTrainType(t);
+  const shieldColor = getTrainTypeColor(type);
 
   // Shield icon
   const shield = document.createElement("div");
@@ -404,7 +444,14 @@ function renderDiagram(){
 
   const maxDist = DATA.stations.at(-1).distance_km; // 41.9 km
   const width=4500, left=82, topPad=38, bottomPad=55;
-  const chartHeight = 600;
+  
+  // Calculate dynamic height
+  const container = $("#diagram-scroll");
+  const availableHeight = window.innerHeight - container.getBoundingClientRect().top - 90; // 90px for bottom padding/tabs
+  const containerHeight = Math.max(availableHeight, 400); // Minimum 400px
+  container.style.height = containerHeight + "px";
+  
+  const chartHeight = containerHeight - topPad - bottomPad;
   const height = chartHeight + topPad + bottomPad;
 
   svg.setAttribute("viewBox",`0 0 ${width} ${height}`);
@@ -456,7 +503,8 @@ function renderDiagram(){
     });
     if(pts.length<2)return;
 
-    const schedColor = t.direction==="up" ? "var(--svg-train-up)" : "var(--svg-train-down)";
+    const type = getTrainType(t);
+    const schedColor = getTrainTypeColor(type);
     const path=svgEl("polyline",{points:pts.map(p=>p.join(",")).join(" "),fill:"none",stroke:schedColor,"stroke-width":1.5,"opacity":.3,"data-train-id":t.train_id});
     path.style.cursor="pointer";path.addEventListener("click",()=>openTrainModal(t));svg.appendChild(path);
 
@@ -625,6 +673,7 @@ function updateClock(){
   const ctx=normalizeToServiceContext(new Date());
   
   if (ctx.service_date !== state.serviceDate) {
+    DATA.prevTimetable = [...DATA.timetable]; // 前日ダイヤを日またぎ列車用に保存
     state.serviceDate = ctx.service_date;
     state.currentMinutes = ctx.service_minutes;
     $("#date-input").value = state.serviceDate;
@@ -734,6 +783,17 @@ function setView(v){
   if(v==="diagram")renderDiagram();
   if(v==="timetable")renderTimetable();
 }
+
+let _resizeTimer;
+const _resizeObs = new ResizeObserver(() => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    if (state.view === "position") renderPosition();
+    else if (state.view === "diagram") renderDiagram();
+  }, 150);
+});
+_resizeObs.observe(document.body);
+
 $("#date-input").addEventListener("change",e=>{state.serviceDate=e.target.value;state.liveClock=false;const date=new Date(`${state.serviceDate}T12:00:00+09:00`);state.currentMinutes=date.getHours()*60+date.getMinutes();renderNotice();renderAll()});
 $("#now-btn").addEventListener("click",()=>{state.liveClock=true;const c=normalizeToServiceContext(new Date());state.serviceDate=c.service_date;state.currentMinutes=c.service_minutes;$("#date-input").value=state.serviceDate;renderAll()});
 $$(".seg-btn").forEach(b=>b.addEventListener("click",()=>{const d=b.dataset.dir;if(b.classList.contains("tt-dir")){state.timetableDir=d;$$(".tt-dir").forEach(x=>x.classList.toggle("active",x===b));renderTimetable()}else{state.diagramDir=d;$$(".diagram-tools .seg-btn:not(.tt-dir)").forEach(x=>x.classList.toggle("active",x===b));renderDiagram()}}));
