@@ -254,8 +254,15 @@ function normalizeToServiceContext(d) {
   const parts = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(d);
   const p = Object.fromEntries(parts.map(x => [x.type, x.value]));
   let h = Number(p.hour);
-  const base = new Date(Number(p.year), Number(p.month) - 1, Number(p.day));
-  return { service_date: formatYMD(base), service_minutes: h * 60 + Number(p.minute) };
+  let base = new Date(Number(p.year), Number(p.month) - 1, Number(p.day));
+  let mins = h * 60 + Number(p.minute);
+  
+  if (h < 4) {
+    base.setDate(base.getDate() - 1);
+    mins += 1440;
+  }
+  
+  return { service_date: formatYMD(base), service_minutes: mins };
 }
 function formatServiceTime(m) {
   if (m == null) return "—"; let h = Math.floor(m / 60), mm = String(m % 60).padStart(2, "0"); return `${String(h).padStart(2, "0")}:${mm}`;
@@ -335,34 +342,9 @@ function effectiveTrains() {
 
   const allTrains = [...crossover, ...today];
 
-  const ops = {};
-  for(const t of allTrains) {
-    if(t.result.state !== "OUT_OF_SERVICE") {
-      if(!ops[t.operation_id]) ops[t.operation_id] = [];
-      ops[t.operation_id].push(t);
-    }
-  }
-
-  const activeTrains = [];
-  for(const op in ops) {
-    const list = ops[op];
-    if(list.length === 1) {
-      activeTrains.push(list[0]);
-    } else {
-      const genuine = list.filter(t => t.result.state !== "PRE_DEPARTURE");
-      if(genuine.length > 0) {
-        genuine.sort((a,b)=>(a.actual[0].dep_actual??0)-(b.actual[0].dep_actual??0));
-        activeTrains.push(genuine[0]);
-      } else {
-        list.sort((a,b)=>(a.actual[0].dep_actual??0)-(b.actual[0].dep_actual??0));
-        activeTrains.push(list[0]);
-      }
-    }
-  }
-
-  return activeTrains.sort((a,b)=>{
-    const aTime = a.actual[0].dep_actual ?? 9999;
-    const bTime = b.actual[0].dep_actual ?? 9999;
+  return allTrains.sort((a,b)=>{
+    const aTime = a.actual[0]?.dep_actual ?? 9999;
+    const bTime = b.actual[0]?.dep_actual ?? 9999;
     return aTime - bTime;
   });
 }
@@ -421,13 +403,19 @@ function renderNotice() {
   }
 
   if (statusCode === "unknown") {
-    title.textContent =
-      n.text ||
-      "公式運行情報を取得できませんでした。サイトをご確認ください。";
+    const fallbackText = n.text || "公式運行情報を取得できませんでした。サイトをご確認ください。";
+    if (n.link_url) {
+      title.innerHTML = `<a href="${n.link_url}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">${fallbackText}</a>`;
+    } else {
+      title.textContent = fallbackText;
+    }
   } else {
-    title.textContent =
-      n.text ||
-      "公式運行情報を取得できませんでした";
+    const text = n.text || "公式運行情報を取得できませんでした";
+    if (n.link_url) {
+      title.innerHTML = `<a href="${n.link_url}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">${text}</a>`;
+    } else {
+      title.textContent = text;
+    }
   }
 
   updated.textContent =
@@ -740,7 +728,12 @@ function renderDiagram() {
     svg.appendChild(nowLabel);
   }
 
-  $("#diagram-scroll").scrollLeft = 0;
+  const scroll = $("#diagram-scroll");
+  if (!scroll.dataset.didAutoScroll && state.currentMinutes != null) {
+    const nx = timeX(state.currentMinutes);
+    scroll.scrollLeft = Math.max(0, nx - scroll.clientWidth / 2);
+    scroll.dataset.didAutoScroll = "true";
+  }
 }
 
 function renderTimetable() {
@@ -769,7 +762,7 @@ function renderTimetable() {
   orderedStations.forEach(s => {
     const tr = document.createElement("tr");
     const stCell = document.createElement("td");
-    stCell.innerHTML = `<strong>${s.name}</strong>`;
+    stCell.innerHTML = `<div class="tt-st-cell"><strong>${s.name}</strong><div class="tt-st-labels"><span>着</span><span>発</span></div></div>`;
     tr.appendChild(stCell);
 
     trains.forEach(t => {
@@ -785,20 +778,22 @@ function renderTimetable() {
         const a = st.arr;
         const d = st.dep;
 
-        if (a === null && d === null) {
+        if (a === "pass" || d === "pass" || a === "レ" || d === "レ") {
+          td.innerHTML = `<span class="tt-pass">レ</span>`;
+        } else if (a === d && a !== null) {
+          td.innerHTML = `<span class="tt-dep">${d}</span>`;
+        } else if (a === null && d === null) {
           td.innerHTML = ``;
         } else if (a === null && d !== null) {
-          td.innerHTML = `<span class="tt-dep">${d}</span>`;
+          td.innerHTML = `<div class="tt-times"><span class="tt-arr" style="visibility:hidden;">—</span><span class="tt-dep">${d}</span></div>`;
         } else if (a !== null && d === null) {
           if (s.code === "M07") {
-            td.innerHTML = `<span class="tt-arr">${a}</span><br><span class="tt-dep">＝</span>`;
+            td.innerHTML = `<div class="tt-times"><span class="tt-arr">${a}</span><span class="tt-dep">＝</span></div>`;
           } else {
-            td.innerHTML = `<span class="tt-arr">${a}</span>`;
+            td.innerHTML = `<div class="tt-times"><span class="tt-arr">${a}</span><span class="tt-dep" style="visibility:hidden;">—</span></div>`;
           }
-        } else if (a === d) {
-          td.innerHTML = `<span class="tt-pass">レ</span>`;
         } else {
-          td.innerHTML = `<span class="tt-arr">${a}</span><br><span class="tt-dep">${d}</span>`;
+          td.innerHTML = `<div class="tt-times"><span class="tt-arr">${a}</span><span class="tt-dep">${d}</span></div>`;
         }
       }
 
@@ -857,6 +852,10 @@ function updateClock() {
   $("#date-title").textContent = serviceDateLabel(state.serviceDate);
 
   if (minutesChanged) {
+    const h = Math.floor(state.currentMinutes / 60) % 24;
+    const m = state.currentMinutes % 60;
+    const timeInputEl = $("#time-input");
+    if (timeInputEl) timeInputEl.value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     renderPosition();
     if (state.view === "diagram") renderDiagram();
   }
@@ -918,6 +917,10 @@ async function loadData() {
   state.currentMinutes = ctx.service_minutes;
   state.liveClock = true;
   $("#date-input").value = state.serviceDate;
+  const h = Math.floor(state.currentMinutes / 60) % 24;
+  const m = state.currentMinutes % 60;
+  const timeInputEl = $("#time-input");
+  if (timeInputEl) timeInputEl.value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
   renderNotice();
   renderAll();
@@ -952,8 +955,8 @@ function setView(v) {
   if (v === "timetable") renderTimetable();
 }
 
-let _resizeTimer;
-const _resizeObs = new ResizeObserver(() => {
+var _resizeTimer;
+var _resizeObs = new ResizeObserver(() => {
   clearTimeout(_resizeTimer);
   _resizeTimer = setTimeout(() => {
     if (state.view === "position") renderPosition();
@@ -962,12 +965,40 @@ const _resizeObs = new ResizeObserver(() => {
 });
 _resizeObs.observe(document.body);
 
-$("#date-input").addEventListener("change", e => { state.serviceDate = e.target.value; state.liveClock = false; const date = new Date(`${state.serviceDate}T12:00:00+09:00`); state.currentMinutes = date.getHours() * 60 + date.getMinutes(); renderNotice(); renderAll() });
-$("#now-btn").addEventListener("click", () => { state.liveClock = true; const c = normalizeToServiceContext(new Date()); state.serviceDate = c.service_date; state.currentMinutes = c.service_minutes; $("#date-input").value = state.serviceDate; renderAll() });
+$("#date-input").addEventListener("change", e => { 
+  state.serviceDate = e.target.value; 
+  state.liveClock = false; 
+  const timeInput = $("#time-input") ? $("#time-input").value : "12:00";
+  const [h, m] = (timeInput || "12:00").split(":").map(Number);
+  state.currentMinutes = h * 60 + m; 
+  renderNotice(); renderAll() 
+});
+const timeInputEl2 = $("#time-input");
+if (timeInputEl2) {
+  timeInputEl2.addEventListener("change", e => { 
+    state.liveClock = false; 
+    const timeInput = e.target.value || "12:00";
+    const [h, m] = timeInput.split(":").map(Number);
+    state.currentMinutes = h * 60 + m; 
+    renderNotice(); renderAll() 
+  });
+}
+$("#now-btn").addEventListener("click", () => { 
+  state.liveClock = true; 
+  const c = normalizeToServiceContext(new Date()); 
+  state.serviceDate = c.service_date; 
+  state.currentMinutes = c.service_minutes; 
+  $("#date-input").value = state.serviceDate; 
+  const h = Math.floor(state.currentMinutes / 60) % 24;
+  const m = state.currentMinutes % 60;
+  if ($("#time-input")) $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  $("#diagram-scroll").dataset.didAutoScroll = ""; 
+  renderAll() 
+});
 $$(".seg-btn").forEach(b => b.addEventListener("click", () => { const d = b.dataset.dir; if (b.classList.contains("tt-dir")) { state.timetableDir = d; $$(".tt-dir").forEach(x => x.classList.toggle("active", x === b)); renderTimetable() } else { state.diagramDir = d; $$(".diagram-tools .seg-btn:not(.tt-dir)").forEach(x => x.classList.toggle("active", x === b)); renderDiagram() } }));
 $("#modal-close").onclick = () => $("#train-modal").classList.add("hidden"); $("#train-modal").addEventListener("click", e => { if (e.target.id === "train-modal") $("#train-modal").classList.add("hidden") });
 
-const STATIONS_FALLBACK = [];
+var STATIONS_FALLBACK = [];
 
 setInterval(updateClock, 1000);
 
@@ -979,9 +1010,9 @@ loadData();
 window.addEventListener("load", () => setView(state.view || "position"));
 
 // Tab Bar Drag Logic
-const tabBar = document.querySelector('.floating-tab-bar');
-const glider = document.getElementById('tab-glider');
-const tabs = Array.from(document.querySelectorAll('.floating-tab-bar .tab-btn'));
+var tabBar = document.querySelector('.floating-tab-bar');
+var glider = document.getElementById('tab-glider');
+var tabs = Array.from(document.querySelectorAll('.floating-tab-bar .tab-btn'));
 
 if (tabBar && glider) {
   let isDragging = false;
