@@ -756,7 +756,7 @@ function renderTimetable() {
   orderedStations.forEach(s => {
     const tr = document.createElement("tr");
     const stCell = document.createElement("td");
-    stCell.innerHTML = `<strong>${s.name}</strong>`;
+    stCell.innerHTML = `<div class="tt-st-cell"><strong>${s.name}</strong><div class="tt-st-labels"><span>着</span><span>発</span></div></div>`;
     tr.appendChild(stCell);
 
     trains.forEach(t => {
@@ -772,20 +772,22 @@ function renderTimetable() {
         const a = st.arr;
         const d = st.dep;
 
-        if (a === null && d === null) {
+        if (a === "pass" || d === "pass" || a === "レ" || d === "レ") {
+          td.innerHTML = `<span class="tt-pass">レ</span>`;
+        } else if (a === d && a !== null) {
+          td.innerHTML = `<span class="tt-dep">${d}</span>`;
+        } else if (a === null && d === null) {
           td.innerHTML = ``;
         } else if (a === null && d !== null) {
-          td.innerHTML = `<span class="tt-dep">${d}</span>`;
+          td.innerHTML = `<div class="tt-times"><span class="tt-arr" style="visibility:hidden;">—</span><span class="tt-dep">${d}</span></div>`;
         } else if (a !== null && d === null) {
           if (s.code === "M07") {
-            td.innerHTML = `<span class="tt-arr">${a}</span><br><span class="tt-dep">＝</span>`;
+            td.innerHTML = `<div class="tt-times"><span class="tt-arr">${a}</span><span class="tt-dep">＝</span></div>`;
           } else {
-            td.innerHTML = `<span class="tt-arr">${a}</span>`;
+            td.innerHTML = `<div class="tt-times"><span class="tt-arr">${a}</span><span class="tt-dep" style="visibility:hidden;">—</span></div>`;
           }
-        } else if (a === d) {
-          td.innerHTML = `<span class="tt-pass">レ</span>`;
         } else {
-          td.innerHTML = `<span class="tt-arr">${a}</span><br><span class="tt-dep">${d}</span>`;
+          td.innerHTML = `<div class="tt-times"><span class="tt-arr">${a}</span><span class="tt-dep">${d}</span></div>`;
         }
       }
 
@@ -844,6 +846,9 @@ function updateClock() {
   $("#date-title").textContent = serviceDateLabel(state.serviceDate);
 
   if (minutesChanged) {
+    const h = Math.floor(state.currentMinutes / 60) % 24;
+    const m = state.currentMinutes % 60;
+    $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     renderPosition();
     if (state.view === "diagram") renderDiagram();
   }
@@ -905,6 +910,9 @@ async function loadData() {
   state.currentMinutes = ctx.service_minutes;
   state.liveClock = true;
   $("#date-input").value = state.serviceDate;
+  const h = Math.floor(state.currentMinutes / 60) % 24;
+  const m = state.currentMinutes % 60;
+  $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
   renderNotice();
   renderAll();
@@ -949,8 +957,33 @@ var _resizeObs = new ResizeObserver(() => {
 });
 _resizeObs.observe(document.body);
 
-$("#date-input").addEventListener("change", e => { state.serviceDate = e.target.value; state.liveClock = false; const date = new Date(`${state.serviceDate}T12:00:00+09:00`); state.currentMinutes = date.getHours() * 60 + date.getMinutes(); renderNotice(); renderAll() });
-$("#now-btn").addEventListener("click", () => { state.liveClock = true; const c = normalizeToServiceContext(new Date()); state.serviceDate = c.service_date; state.currentMinutes = c.service_minutes; $("#date-input").value = state.serviceDate; $("#diagram-scroll").dataset.didAutoScroll = ""; renderAll() });
+$("#date-input").addEventListener("change", e => { 
+  state.serviceDate = e.target.value; 
+  state.liveClock = false; 
+  const timeInput = $("#time-input").value || "12:00";
+  const [h, m] = timeInput.split(":").map(Number);
+  state.currentMinutes = h * 60 + m; 
+  renderNotice(); renderAll() 
+});
+$("#time-input").addEventListener("change", e => { 
+  state.liveClock = false; 
+  const timeInput = e.target.value || "12:00";
+  const [h, m] = timeInput.split(":").map(Number);
+  state.currentMinutes = h * 60 + m; 
+  renderNotice(); renderAll() 
+});
+$("#now-btn").addEventListener("click", () => { 
+  state.liveClock = true; 
+  const c = normalizeToServiceContext(new Date()); 
+  state.serviceDate = c.service_date; 
+  state.currentMinutes = c.service_minutes; 
+  $("#date-input").value = state.serviceDate; 
+  const h = Math.floor(state.currentMinutes / 60) % 24;
+  const m = state.currentMinutes % 60;
+  $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  $("#diagram-scroll").dataset.didAutoScroll = ""; 
+  renderAll() 
+});
 $$(".seg-btn").forEach(b => b.addEventListener("click", () => { const d = b.dataset.dir; if (b.classList.contains("tt-dir")) { state.timetableDir = d; $$(".tt-dir").forEach(x => x.classList.toggle("active", x === b)); renderTimetable() } else { state.diagramDir = d; $$(".diagram-tools .seg-btn:not(.tt-dir)").forEach(x => x.classList.toggle("active", x === b)); renderDiagram() } }));
 $("#modal-close").onclick = () => $("#train-modal").classList.add("hidden"); $("#train-modal").addEventListener("click", e => { if (e.target.id === "train-modal") $("#train-modal").classList.add("hidden") });
 

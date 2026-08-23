@@ -436,8 +436,11 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
 .tt-header-row.tt-dest th { font-size: 0.65rem; color: var(--text-secondary); }
 
 /* Timetable cells */
-.tt-arr { font-size: 0.6rem; color: var(--text-secondary); display: block; }
-.tt-dep { font-size: 0.75rem; font-weight: 700; color: var(--text-primary); display: block; }
+.tt-st-cell { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tt-st-labels { display: flex; flex-direction: column; font-size: 0.55rem; color: var(--text-secondary); line-height: 1.3; }
+.tt-times { display: flex; flex-direction: column; align-items: center; line-height: 1.3; gap: 1px; }
+.tt-arr { font-size: 0.62rem; color: var(--text-secondary); }
+.tt-dep { font-size: 0.75rem; font-weight: 700; color: var(--text-primary); }
 .tt-pass { color: var(--text-secondary); font-size: 0.68rem; }
 .tt-nonstop { color: var(--border-separator); font-size: 0.68rem; }
 .tt-cancel { color: var(--red); font-size: 0.68rem; text-decoration: line-through; }
