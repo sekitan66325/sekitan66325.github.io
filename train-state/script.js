@@ -2,6 +2,12 @@ var $ = (s, root = document) => root.querySelector(s);
 var $$ = (s, root = document) => [...root.querySelectorAll(s)];
 var DATA = { stations: [], timetable: [], prevTimetable: [], status: null };
 var state = { view: "position", serviceDate: "2026-08-15", currentMinutes: null, liveClock: true, diagramDir: "all", timetableDir: "up" };
+
+function formatStationName(name) {
+  if (!name) return name;
+  return name === "下館二高前" ? "二高前" : name;
+}
+
 var ARRIVED_HOLD_MINUTES = 3; // 終着駅到着後の保持時間
 var DEPARTURE_HOLD_MINUTES = 15; // 始発駅発車前の保持時間
 
