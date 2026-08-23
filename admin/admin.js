@@ -376,6 +376,7 @@ function getStationName(code) {
   return s ? s.name : code;
 }
 
+
 function editTrain(trainId) {
   const t = timetableData.find(x => x.train_id === trainId);
   if (!t) return;
@@ -383,9 +384,13 @@ function editTrain(trainId) {
 
   const container = document.getElementById('train-editor-container');
   
-  const daysOffStr = (t.operation_rule.days_off || []).join(', ');
-  const datesRunStr = (t.operation_rule.dates_run || []).join(', ');
-  const datesOffStr = (t.operation_rule.dates_off || []).join(', ');
+  const daysOff = t.operation_rule.days_off || [];
+  const daysMap = { 0:"日", 1:"月", 2:"火", 3:"水", 4:"木", 5:"金", 6:"土" };
+  
+  const datesRunStr = (t.operation_rule.dates_run || []).join(',');
+  const datesOffStr = (t.operation_rule.dates_off || []).join(',');
+
+  const partialCancellations = t.partial_cancellations || [];
 
   let html = `
     <h3 style="margin-top:0;">列車編集: ${t.train_no} (${t.train_id})</h3>
@@ -416,22 +421,77 @@ function editTrain(trainId) {
       <div class="form-group">
         <label class="form-label">種別 (service_type)</label>
         <select id="edit-svc-type" class="form-input">
-          <option value="regular" ${t.operation_rule.service_type === 'regular' ? 'selected' : ''}>定期 (regular)</option>
+          <option value="regular" ${t.operation_rule.service_type === 'regular' ? 'selected' : ''}>普通 (regular)</option>
           <option value="extra" ${t.operation_rule.service_type === 'extra' ? 'selected' : ''}>臨時 (extra)</option>
+          <option value="sl" ${t.operation_rule.service_type === 'sl' ? 'selected' : ''}>SL (sl)</option>
+          <option value="deadhead" ${t.operation_rule.service_type === 'deadhead' ? 'selected' : ''}>回送 (deadhead)</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">運休曜日 (days_off) 例: 1,2</label>
-        <input type="text" id="edit-days-off" class="form-input" value="${daysOffStr}">
+        <label class="form-label">運休曜日 (days_off)</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+          ${[1,2,3,4,5,6,0].map(d => `
+            <label style="display:flex; align-items:center; gap:4px; font-size:0.9rem; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px; cursor:pointer;">
+              <input type="checkbox" class="edit-days-off-cb" value="${d}" ${daysOff.includes(d) ? 'checked' : ''}>
+              ${daysMap[d]}
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+      <div class="form-group">
+        <label class="form-label">運転日 (dates_run)</label>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <input type="date" id="date-run-input" class="form-input" style="flex:1;">
+          <button type="button" class="btn-admin" onclick="addDateChip('dates_run')">追加</button>
+        </div>
+        <input type="hidden" id="edit-dates-run" value="${datesRunStr}">
+        <div id="dates-run-chips" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
       </div>
       <div class="form-group">
-        <label class="form-label">運転日 (dates_run) 例: 2024-05-01</label>
-        <input type="text" id="edit-dates-run" class="form-input" value="${datesRunStr}">
+        <label class="form-label">運休日 (dates_off)</label>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <input type="date" id="date-off-input" class="form-input" style="flex:1;">
+          <button type="button" class="btn-admin" onclick="addDateChip('dates_off')">追加</button>
+        </div>
+        <input type="hidden" id="edit-dates-off" value="${datesOffStr}">
+        <div id="dates-off-chips" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">運休日 (dates_off) 例: 2024-05-03</label>
-        <input type="text" id="edit-dates-off" class="form-input" value="${datesOffStr}">
-      </div>
+    </div>
+
+    <h4 style="margin-top: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">日付指定の区間運休 (partial_cancellations)</h4>
+    <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px; margin-top: 12px;">
+      <table style="width: 100%; text-align: left; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th style="padding: 4px; color: var(--text-secondary);">日付</th>
+            <th style="padding: 4px; color: var(--text-secondary);">始発駅</th>
+            <th style="padding: 4px; color: var(--text-secondary);">終着駅</th>
+            <th style="padding: 4px;"></th>
+          </tr>
+        </thead>
+        <tbody id="edit-pc-body">
+          ${partialCancellations.map(pc => `
+            <tr>
+              <td style="padding: 4px;"><input type="date" class="form-input pc-date" value="${pc.date}"></td>
+              <td style="padding: 4px;">
+                <select class="form-input pc-start">
+                  ${stationsData.map(s => `<option value="${s.code}" ${s.code === pc.actual_start ? 'selected' : ''}>${s.name}</option>`).join('')}
+                </select>
+              </td>
+              <td style="padding: 4px;">
+                <select class="form-input pc-end">
+                  ${stationsData.map(s => `<option value="${s.code}" ${s.code === pc.actual_end ? 'selected' : ''}>${s.name}</option>`).join('')}
+                </select>
+              </td>
+              <td style="padding: 4px;"><button type="button" class="btn-admin btn-danger" style="padding: 4px 8px; font-size: 0.7rem;" onclick="this.closest('tr').remove()">削除</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <button type="button" class="btn-admin" style="margin-top: 12px; padding: 4px 12px; font-size: 0.8rem;" onclick="addPCRow()">+ 区間運休を追加</button>
     </div>
 
     <h4 style="margin-top: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">各駅時刻データ</h4>
@@ -467,7 +527,59 @@ function editTrain(trainId) {
 
   container.innerHTML = html;
   container.style.display = 'block';
+  
+  // Render chips initially
+  window.renderDateChips('dates_run');
+  window.renderDateChips('dates_off');
 }
+
+window.addPCRow = function() {
+  const tbody = document.getElementById('edit-pc-body');
+  const tr = document.createElement('tr');
+  const stOptions = stationsData.map(s => `<option value="${s.code}">${s.name}</option>`).join('');
+  tr.innerHTML = `
+    <td style="padding: 4px;"><input type="date" class="form-input pc-date"></td>
+    <td style="padding: 4px;"><select class="form-input pc-start">${stOptions}</select></td>
+    <td style="padding: 4px;"><select class="form-input pc-end">${stOptions}</select></td>
+    <td style="padding: 4px;"><button type="button" class="btn-admin btn-danger" style="padding: 4px 8px; font-size: 0.7rem;" onclick="this.closest('tr').remove()">削除</button></td>
+  `;
+  tbody.appendChild(tr);
+};
+
+window.addDateChip = function(type) {
+  const input = document.getElementById(type === 'dates_run' ? 'date-run-input' : 'date-off-input');
+  const hidden = document.getElementById(type === 'dates_run' ? 'edit-dates-run' : 'edit-dates-off');
+  const val = input.value;
+  if (!val) return;
+  
+  let current = hidden.value ? hidden.value.split(',') : [];
+  if (!current.includes(val)) {
+    current.push(val);
+    hidden.value = current.join(',');
+    window.renderDateChips(type);
+  }
+  input.value = '';
+};
+
+window.removeDateChip = function(type, val) {
+  const hidden = document.getElementById(type === 'dates_run' ? 'edit-dates-run' : 'edit-dates-off');
+  let current = hidden.value ? hidden.value.split(',') : [];
+  current = current.filter(d => d !== val);
+  hidden.value = current.join(',');
+  window.renderDateChips(type);
+};
+
+window.renderDateChips = function(type) {
+  const hidden = document.getElementById(type === 'dates_run' ? 'edit-dates-run' : 'edit-dates-off');
+  const container = document.getElementById(type === 'dates_run' ? 'dates-run-chips' : 'dates-off-chips');
+  const current = hidden.value ? hidden.value.split(',') : [];
+  
+  container.innerHTML = current.map(d => `
+    <div style="background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+      ${d} <span style="cursor:pointer; color: #ff6b6b; font-weight:bold;" onclick="window.removeDateChip('${type}', '${d}')">×</span>
+    </div>
+  `).join('');
+};
 
 function addStationRow() {
   const tbody = document.getElementById('edit-stations-body');
@@ -482,6 +594,7 @@ function addStationRow() {
   tbody.appendChild(tr);
 }
 
+
 function saveTrainData() {
   if (!currentTrainId) return;
   const t = timetableData.find(x => x.train_id === currentTrainId);
@@ -495,11 +608,24 @@ function saveTrainData() {
   const parseArray = (str) => str.split(',').map(s => s.trim()).filter(s => s !== '');
   t.operation_rule.service_type = document.getElementById('edit-svc-type').value;
   
-  const daysOffVals = parseArray(document.getElementById('edit-days-off').value);
-  t.operation_rule.days_off = daysOffVals.map(Number).filter(n => !isNaN(n));
+  const daysOffCbs = document.querySelectorAll('.edit-days-off-cb:checked');
+  t.operation_rule.days_off = Array.from(daysOffCbs).map(cb => Number(cb.value));
   
   t.operation_rule.dates_run = parseArray(document.getElementById('edit-dates-run').value);
   t.operation_rule.dates_off = parseArray(document.getElementById('edit-dates-off').value);
+
+  // Parse partial_cancellations
+  const pcRows = document.querySelectorAll('#edit-pc-body tr');
+  const pc = [];
+  pcRows.forEach(tr => {
+    const date = tr.querySelector('.pc-date').value;
+    const start = tr.querySelector('.pc-start').value;
+    const end = tr.querySelector('.pc-end').value;
+    if (date && start && end) {
+      pc.push({ date, actual_start: start, actual_end: end });
+    }
+  });
+  t.partial_cancellations = pc.length > 0 ? pc : undefined;
 
   const stRows = document.querySelectorAll('#edit-stations-body tr');
   t.stations = [];
