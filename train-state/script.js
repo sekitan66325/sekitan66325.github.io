@@ -768,7 +768,22 @@ function renderTimetable() {
   orderedStations.forEach(s => {
     const tr = document.createElement("tr");
     const stCell = document.createElement("td");
-    stCell.innerHTML = `<div class="tt-st-cell"><strong>${formatStationName(s.name)}</strong><div class="tt-st-labels"><span>着</span><span>発</span></div></div>`;
+    
+    let isStart = false;
+    let isEnd = false;
+    if (state.timetableDir === "up") {
+      isStart = (s.code === "M17");
+      isEnd = (s.code === "M01");
+    } else {
+      isStart = (s.code === "M01");
+      isEnd = (s.code === "M17");
+    }
+
+    let labelsHTML = `<span>着</span><span>発</span>`;
+    if (isStart) labelsHTML = `<span>発</span>`;
+    if (isEnd) labelsHTML = `<span>着</span>`;
+
+    stCell.innerHTML = `<div class="tt-st-cell"><strong>${formatStationName(s.name)}</strong><div class="tt-st-labels">${labelsHTML}</div></div>`;
     tr.appendChild(stCell);
 
     trains.forEach(t => {
@@ -784,26 +799,25 @@ function renderTimetable() {
         let a = st.arr;
         let d = st.dep;
 
-        if (t.direction === "down" && s.code === "M01") a = null;
-        if (t.direction === "up" && s.code === "M17") a = null;
-        
-        if (t.direction === "down" && s.code === "M17") d = null;
-        if (t.direction === "up" && s.code === "M01") d = null;
+        if (isStart) a = null;
+        if (isEnd) d = null;
 
         if (a === "pass" || d === "pass" || a === "レ" || d === "レ") {
           td.innerHTML = `<span class="tt-pass">レ</span>`;
         } else if (a === null && d === null) {
           td.innerHTML = ``;
-        } else if (a === null && d !== null) {
-          td.innerHTML = `<div class="tt-times"><span class="tt-arr" style="visibility:hidden;">—</span><span class="tt-dep">${d}</span></div>`;
+        } else if (isStart) {
+          td.innerHTML = `<div class="tt-times"><span class="tt-dep">${d || ""}</span></div>`;
+        } else if (isEnd) {
+          td.innerHTML = `<div class="tt-times"><span class="tt-dep">${a || ""}</span></div>`;
         } else if (a !== null && d === null) {
           if (s.code === "M07") {
             td.innerHTML = `<div class="tt-times"><span class="tt-dep">${a}</span><span class="tt-dep">＝</span></div>`;
-          } else if ((t.direction === "down" && s.code === "M17") || (t.direction === "up" && s.code === "M01")) {
-            td.innerHTML = `<div class="tt-times"><span class="tt-dep">${a}</span><span class="tt-dep" style="visibility:hidden;">—</span></div>`;
           } else {
             td.innerHTML = `<div class="tt-times"><span class="tt-arr">${a}</span><span class="tt-dep" style="visibility:hidden;">—</span></div>`;
           }
+        } else if (a === null && d !== null) {
+          td.innerHTML = `<div class="tt-times"><span class="tt-arr" style="visibility:hidden;">—</span><span class="tt-dep">${d}</span></div>`;
         } else {
           td.innerHTML = `<div class="tt-times"><span class="tt-arr">${a}</span><span class="tt-dep">${d}</span></div>`;
         }
