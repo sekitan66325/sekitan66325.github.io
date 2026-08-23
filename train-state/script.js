@@ -325,7 +325,18 @@ function getPrevDate(dateStr) {
   return formatYMD(d);
 }
 function buildTrainEntry(train, currentMins) {
-  const ov = DATA.status.train_overrides[train.train_id] || {};
+  let ov = DATA.status.train_overrides[train.train_id] || {};
+  
+  // Inject static partial_cancellations if applicable for today
+  if (train.partial_cancellations) {
+    const pc = train.partial_cancellations.find(p => p.date === state.serviceDate);
+    if (pc) {
+      ov = { ...ov };
+      if (!ov.actual_start) ov.actual_start = pc.actual_start;
+      if (!ov.actual_end) ov.actual_end = pc.actual_end;
+    }
+  }
+  
   const actual = calculateActualTimetable(train, ov);
   const result = evaluateTrainState(actual, currentMins ?? 720);
   return { ...train, override: ov, actual, result, position: positionForState(train, actual, result) };
