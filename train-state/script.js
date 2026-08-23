@@ -786,6 +786,9 @@ function renderTimetable() {
 
         if (t.direction === "down" && s.code === "M01") a = null;
         if (t.direction === "up" && s.code === "M17") a = null;
+        
+        if (t.direction === "down" && s.code === "M17") d = null;
+        if (t.direction === "up" && s.code === "M01") d = null;
 
         if (a === "pass" || d === "pass" || a === "レ" || d === "レ") {
           td.innerHTML = `<span class="tt-pass">レ</span>`;
@@ -795,7 +798,7 @@ function renderTimetable() {
           td.innerHTML = `<div class="tt-times"><span class="tt-arr" style="visibility:hidden;">—</span><span class="tt-dep">${d}</span></div>`;
         } else if (a !== null && d === null) {
           if (s.code === "M07") {
-            td.innerHTML = `<div class="tt-times"><span class="tt-arr">${a}</span><span class="tt-dep">＝</span></div>`;
+            td.innerHTML = `<div class="tt-times"><span class="tt-dep">${a}</span><span class="tt-dep">＝</span></div>`;
           } else if ((t.direction === "down" && s.code === "M17") || (t.direction === "up" && s.code === "M01")) {
             td.innerHTML = `<div class="tt-times"><span class="tt-dep">${a}</span><span class="tt-dep" style="visibility:hidden;">—</span></div>`;
           } else {
