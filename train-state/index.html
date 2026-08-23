@@ -47,10 +47,10 @@
     </div>
     <div class="toolbar-actions">
       <button class="glass-btn" id="now-btn">現在時刻</button>
-      <label class="date-control" onclick="document.getElementById('date-input').showPicker && document.getElementById('date-input').showPicker()">
+      <label class="date-control" onclick="if(event.target.tagName !== 'INPUT') { const i = document.getElementById('date-input'); i.showPicker && i.showPicker(); }">
         運行日 <input id="date-input" type="date" value="2026-08-15">
       </label>
-      <label class="date-control" onclick="document.getElementById('time-input').showPicker && document.getElementById('time-input').showPicker()">
+      <label class="date-control" onclick="if(event.target.tagName !== 'INPUT') { const i = document.getElementById('time-input'); i.showPicker && i.showPicker(); }">
         時刻 <input id="time-input" type="time" value="12:00">
       </label>
     </div>

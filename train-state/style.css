@@ -216,7 +216,19 @@ a {
 .glass-btn { cursor: pointer; }
 .glass-btn:hover, .seg-btn:hover { background: rgba(255, 255, 255, 0.1); }
 .date-control { display: flex; align-items: center; gap: 7px; color: var(--text-secondary); white-space: nowrap; }
-input[type=date] { border: 0; background: transparent; color: var(--text-primary); outline: 0; font-size: 0.76rem; }
+input[type=date], input[type=time] { border: 0; background: transparent; color: var(--text-primary); outline: 0; font-size: 0.76rem; font-family: inherit; }
+
+input[type="date"]::-webkit-datetime-edit-year-field:focus,
+input[type="date"]::-webkit-datetime-edit-month-field:focus,
+input[type="date"]::-webkit-datetime-edit-day-field:focus,
+input[type="time"]::-webkit-datetime-edit-hour-field:focus,
+input[type="time"]::-webkit-datetime-edit-minute-field:focus,
+input[type="date"]::-webkit-datetime-edit-text:focus,
+input[type="time"]::-webkit-datetime-edit-text:focus {
+  background: transparent;
+  color: var(--text-primary);
+  outline: none;
+}
 
 /* ===== VIEW TABS ===== */
 .view-tabs {
