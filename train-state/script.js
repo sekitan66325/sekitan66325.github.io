@@ -782,7 +782,7 @@ function renderTimetable() {
         td.innerHTML = `<span class="tt-cancel">運休</span>`;
       } else {
         let a = st.arr;
-        const d = st.dep;
+        let d = st.dep;
 
         if (t.direction === "down" && s.code === "M01") a = null;
         if (t.direction === "up" && s.code === "M17") a = null;
@@ -839,7 +839,19 @@ function openTrainModal(t) {
     <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${t.operation_id}</strong></div><div class="detail-cell"><small>遅延</small><strong>${t.override.delay_minutes || 0}分</strong></div></div>
     ${formation.length ? `<div class="formation"><h4>編成</h4><div class="formation-list">${formation.map(x => `<span>${x}</span>`).join("")}</div></div>` : ""}
     ${t.override.memo ? `<div class="memo">${t.override.memo}</div>` : ""}
-    <div class="station-detail"><h4>各駅の実績</h4>${t.actual.map(s => `<div class="stop-row ${s.is_cancelled ? "cancel" : ""}"><span>${formatStationName(DATA.stations.find(x => x.code === s.code)?.name || s.code)}</span><span>${s.arr_actual != null ? formatServiceTime(s.arr_actual) : "?"}</span><span>${s.dep_actual != null ? formatServiceTime(s.dep_actual) : "?"}</span></div>`).join("")}</div>`;
+    <div class="station-detail"><h4>各駅の詳細時刻</h4>${t.stations.map(st => {
+      let a = st.arr;
+      let d = st.dep;
+      if (t.direction === "down" && st.code === "M01") a = null;
+      if (t.direction === "up" && st.code === "M17") a = null;
+      if (t.direction === "down" && st.code === "M17") d = "＝";
+      if (t.direction === "up" && st.code === "M01") d = "＝";
+      if (st.arr !== null && st.dep === null && st.code === "M07") d = "＝";
+      const arrStr = a === "pass" || a === "レ" ? "レ" : (a || "");
+      const depStr = d === "pass" || d === "レ" ? "レ" : (d || "");
+      const isCancel = t.actual.find(x => x.code === st.code)?.is_cancelled;
+      return `<div class="stop-row ${isCancel ? "cancel" : ""}"><span>${formatStationName(DATA.stations.find(x => x.code === st.code)?.name || st.code)}</span><span>${arrStr}</span><span>${depStr}</span></div>`;
+    }).join("")}</div>`;
   $("#train-modal").classList.remove("hidden");
 }
 
