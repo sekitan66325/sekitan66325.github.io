@@ -480,7 +480,7 @@ function renderPosition() {
     const label = document.createElement("div");
     label.className = "pos-station-label";
     label.innerHTML = `
-      <span class="pos-station-name">${s.name}</span>
+      <span class="pos-station-name">${formatStationName(s.name)}</span>
     `;
 
     const railArea = document.createElement("div");
@@ -657,7 +657,7 @@ function renderDiagram() {
     const y = yOf(s.code);
     svg.appendChild(svgEl("line", { x1: left, y1: y, x2: width, y2: y, stroke: isExchange ? "var(--svg-station-line)" : "var(--svg-station-line-alt)", "stroke-width": isExchange ? 1.2 : .7 }));
     const label = svgEl("text", { x: 8, y: y + 4, fill: isExchange ? "var(--svg-station-text)" : "var(--svg-station-text-alt)", "font-size": "11", "font-weight": isExchange ? 600 : 400 });
-    label.textContent = s.name; svg.appendChild(label);
+    label.textContent = formatStationName(s.name); svg.appendChild(label);
   });
 
   trains.forEach(t => {
@@ -762,7 +762,7 @@ function renderTimetable() {
   orderedStations.forEach(s => {
     const tr = document.createElement("tr");
     const stCell = document.createElement("td");
-    stCell.innerHTML = `<div class="tt-st-cell"><strong>${s.name}</strong><div class="tt-st-labels"><span>着</span><span>発</span></div></div>`;
+    stCell.innerHTML = `<div class="tt-st-cell"><strong>${formatStationName(s.name)}</strong><div class="tt-st-labels"><span>着</span><span>発</span></div></div>`;
     tr.appendChild(stCell);
 
     trains.forEach(t => {
@@ -775,8 +775,11 @@ function renderTimetable() {
       } else if (actual?.is_cancelled) {
         td.innerHTML = `<span class="tt-cancel">運休</span>`;
       } else {
-        const a = st.arr;
+        let a = st.arr;
         const d = st.dep;
+
+        if (t.direction === "down" && s.code === "M01") a = null;
+        if (t.direction === "up" && s.code === "M17") a = null;
 
         if (a === "pass" || d === "pass" || a === "レ" || d === "レ") {
           td.innerHTML = `<span class="tt-pass">レ</span>`;
@@ -827,7 +830,7 @@ function openTrainModal(t) {
     <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${t.operation_id}</strong></div><div class="detail-cell"><small>遅延</small><strong>${t.override.delay_minutes || 0}分</strong></div></div>
     ${formation.length ? `<div class="formation"><h4>編成</h4><div class="formation-list">${formation.map(x => `<span>${x}</span>`).join("")}</div></div>` : ""}
     ${t.override.memo ? `<div class="memo">${t.override.memo}</div>` : ""}
-    <div class="station-detail"><h4>停車駅・実効時刻</h4>${t.actual.map(s => `<div class="stop-row ${s.is_cancelled ? "cancel" : ""}"><span>${DATA.stations.find(x => x.code === s.code)?.name || s.code}</span><span>${s.arr_actual != null ? formatServiceTime(s.arr_actual) : "—"}</span><span>${s.dep_actual != null ? formatServiceTime(s.dep_actual) : "—"}</span></div>`).join("")}</div>`;
+    <div class="station-detail"><h4>各駅の実績</h4>${t.actual.map(s => `<div class="stop-row ${s.is_cancelled ? "cancel" : ""}"><span>${formatStationName(DATA.stations.find(x => x.code === s.code)?.name || s.code)}</span><span>${s.arr_actual != null ? formatServiceTime(s.arr_actual) : "?"}</span><span>${s.dep_actual != null ? formatServiceTime(s.dep_actual) : "?"}</span></div>`).join("")}</div>`;
   $("#train-modal").classList.remove("hidden");
 }
 
