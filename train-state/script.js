@@ -403,13 +403,19 @@ function renderNotice() {
   }
 
   if (statusCode === "unknown") {
-    title.textContent =
-      n.text ||
-      "公式運行情報を取得できませんでした。サイトをご確認ください。";
+    const fallbackText = n.text || "公式運行情報を取得できませんでした。サイトをご確認ください。";
+    if (n.link_url) {
+      title.innerHTML = `<a href="${n.link_url}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">${fallbackText}</a>`;
+    } else {
+      title.textContent = fallbackText;
+    }
   } else {
-    title.textContent =
-      n.text ||
-      "公式運行情報を取得できませんでした";
+    const text = n.text || "公式運行情報を取得できませんでした";
+    if (n.link_url) {
+      title.innerHTML = `<a href="${n.link_url}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">${text}</a>`;
+    } else {
+      title.textContent = text;
+    }
   }
 
   updated.textContent =
@@ -848,7 +854,8 @@ function updateClock() {
   if (minutesChanged) {
     const h = Math.floor(state.currentMinutes / 60) % 24;
     const m = state.currentMinutes % 60;
-    $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    const timeInputEl = $("#time-input");
+    if (timeInputEl) timeInputEl.value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     renderPosition();
     if (state.view === "diagram") renderDiagram();
   }
@@ -912,7 +919,8 @@ async function loadData() {
   $("#date-input").value = state.serviceDate;
   const h = Math.floor(state.currentMinutes / 60) % 24;
   const m = state.currentMinutes % 60;
-  $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  const timeInputEl = $("#time-input");
+  if (timeInputEl) timeInputEl.value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
   renderNotice();
   renderAll();
@@ -960,18 +968,21 @@ _resizeObs.observe(document.body);
 $("#date-input").addEventListener("change", e => { 
   state.serviceDate = e.target.value; 
   state.liveClock = false; 
-  const timeInput = $("#time-input").value || "12:00";
-  const [h, m] = timeInput.split(":").map(Number);
+  const timeInput = $("#time-input") ? $("#time-input").value : "12:00";
+  const [h, m] = (timeInput || "12:00").split(":").map(Number);
   state.currentMinutes = h * 60 + m; 
   renderNotice(); renderAll() 
 });
-$("#time-input").addEventListener("change", e => { 
-  state.liveClock = false; 
-  const timeInput = e.target.value || "12:00";
-  const [h, m] = timeInput.split(":").map(Number);
-  state.currentMinutes = h * 60 + m; 
-  renderNotice(); renderAll() 
-});
+const timeInputEl2 = $("#time-input");
+if (timeInputEl2) {
+  timeInputEl2.addEventListener("change", e => { 
+    state.liveClock = false; 
+    const timeInput = e.target.value || "12:00";
+    const [h, m] = timeInput.split(":").map(Number);
+    state.currentMinutes = h * 60 + m; 
+    renderNotice(); renderAll() 
+  });
+}
 $("#now-btn").addEventListener("click", () => { 
   state.liveClock = true; 
   const c = normalizeToServiceContext(new Date()); 
@@ -980,7 +991,7 @@ $("#now-btn").addEventListener("click", () => {
   $("#date-input").value = state.serviceDate; 
   const h = Math.floor(state.currentMinutes / 60) % 24;
   const m = state.currentMinutes % 60;
-  $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  if ($("#time-input")) $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   $("#diagram-scroll").dataset.didAutoScroll = ""; 
   renderAll() 
 });
