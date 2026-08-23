@@ -1,153 +1,503 @@
-<!doctype html>
-<html lang="ja">
-
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>真岡線 列車走行位置・ダイヤグラム</title>
-<meta name="description" content="真岡鐵道真岡線の列車走行位置、ダイヤグラム、路線時刻表を表示するSPAデモ。">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- 1. 検索用タイトル（メインキーワードを前面に配置） -->
+  <title>真岡鐵道 車両運用情報・目撃掲示板 | モオカ14形・SLもおか</title>
 
-<link rel="stylesheet" href="style.css">
-<link rel="icon" href="../assets/favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <!-- 2. 検索結果用説明文 (meta description) -->
+  <meta name="description" content="真岡鐵道の車両運用情報および目撃情報掲示板。モオカ14形、SLもおか（C12 66・50系客車）、DE10 1535の運用表や毎朝更新の運用報告書の閲覧、現地目撃情報のリアルタイム共有・検索が可能です。">
+  
+  <!-- 3. キーワード設定 (meta keywords) -->
+  <meta name="keywords" content="真岡鐵道, 真岡線, 運用表, 運用情報, モオカ14形, SLもおか, C12 66, DE10 1535, 目撃情報, 掲示板">
 
+  <!-- reCAPCHA -->
+  <script src="https://www.google.com/recaptcha/api.js?render=6Le6FootAAAAAFJXorR6fmJznnlopnZCSC_9xK8f"></script>
+
+  <!-- 4. OGPタグ（X/TwitterなどのSNSで共有された時のカード表示設定） -->
+  <meta property="og:title" content="真岡鐵道 車両運用情報・目撃掲示板">
+  <meta property="og:description" content="真岡鐵道（モオカ14形・SLもおか・DE10）の運用資料ダウンロード＆目撃情報掲示板。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sekitan66325.github.io/">
+  <meta property="og:image" content="https://sekitan66325.github.io/assets/moka14.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@sekitan66325">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
-<header class="site-header">
-  <div class="header-inner">
-    <div>
-      <div class="eyebrow">MOKA RAILWAY / MOKA LINE</div>
-      <h1 class="logo">真岡線 列車走行位置</h1>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="logo">真岡鐵道 車両運用情報</h1>
     </div>
-    <div class="header-clock">
-      <span id="service-date-label">2026年8月15日</span>
-      <strong id="clock">--:--:--</strong>
-    </div>
+  </header>
+
+  <div class="app-view-slider" id="app-slider">
+
+    <!-- 運用資料 タブ -->
+    <section class="view-panel" id="view-library">
+      <main class="container">
+        
+        <section class="notice-section">
+          <strong>閲覧にあたっての注意事項</strong>
+          <p>本情報は有志の目撃情報および調査を基に作成した非公式データです。真岡鐵道株式会社様への問い合わせはおやめください。</p>
+        </section>
+
+        <section class="content-section">
+          <h2 class="section-title">現行ダイヤ 2023年3月18日～</h2>
+          
+          <ul class="list-container">
+            
+            <li class="list-item">
+              <a href="unyou/202303/moka14.pdf" class="btn-link" target="_blank">
+                <div class="item-left-block">
+                  <div class="card-img-wrapper">
+                    <img src="assets/moka14.png" alt="モオカ14" class="train-icon">
+                    <img src="assets/moka14b.png" alt="モオカ14" class="train-icon">
+                  </div>
+                  <div class="item-text-meta">
+                    <span class="item-label">モオカ14形<span class="size-badge" data-file-size="unyou/202303/moka14.pdf">[PDF/--KB]</span></span>
+                    <span class="card-tag">定期列車 / 普通列車</span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202303/sl-pc.pdf" class="btn-link" target="_blank">
+                <div class="item-left-block">
+                  <div class="card-img-wrapper sl-composition">
+                    <img src="assets/c12mk.png" alt="C12 66" class="train-icon loco-sl">
+                    <img src="assets/moka50.png" alt="50系客車" class="train-icon coach">
+                  </div>
+                  <div class="item-text-meta">
+                    <span class="item-label">C12 66・50系<span class="size-badge" data-file-size="unyou/202303/sl-pc.pdf">[PDF/--KB]</span></span>
+                    <span class="card-tag">特定日運行 / SLもおか</span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202303/dl.pdf" class="btn-link" target="_blank">
+                <div class="item-left-block">
+                  <div class="card-img-wrapper">
+                    <img src="assets/de10j1.png" alt="DE10 1535" class="train-icon loco-dl">
+                  </div>
+                  <div class="item-text-meta">
+                    <span class="item-label">DE10 1535<span class="size-badge" data-file-size="unyou/202303/dl.pdf">[PDF/--KB]</span></span>
+                    <span class="card-tag">特定日運行 / 回送・補機</span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+            
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2 class="section-title">月別 運用報告</h2>
+          <p class="section-desc">当月分の報告書は、毎日3:40頃に前日までの記録を記入して更新します。</p>
+          
+          <ul class="list-container">
+
+            <li class="list-item">
+              <a href="unyou/202608.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年8月分 運用報告書<span class="size-badge" data-file-size="unyou/202608.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="status-badge">記入中</span>
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202607.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年7月分 運用報告書<span class="size-badge" data-file-size="unyou/202607.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202606.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年6月分 運用報告書<span class="size-badge" data-file-size="unyou/202606.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202605.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年5月分 運用報告書<span class="size-badge" data-file-size="unyou/202605.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202604.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年4月分 運用報告書<span class="size-badge" data-file-size="unyou/202604.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202603.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年3月分 運用報告書<span class="size-badge" data-file-size="unyou/202603.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202602.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年2月分 運用報告書<span class="size-badge" data-file-size="unyou/202602.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202601.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2026年1月分 運用報告書<span class="size-badge" data-file-size="unyou/202601.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <li class="list-item">
+              <a href="unyou/202512.pdf" class="report-btn" target="_blank">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">2025年12月分 運用報告書<span class="size-badge" data-file-size="unyou/202512.pdf">[PDF/--KB]</span></span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+          </ul>
+        </section>
+
+        <!-- 書籍紹介セクション -->
+        <section class="content-section">
+          <h2 class="section-title">『真岡鐵道ダイヤ全録』シリーズ</h2>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+            臨時ダイヤが施行された際、通常ダイヤのフォーマットに合わせた形で公開するよりも一冊の資料としてまとめたほうが合理的であると考え、運転時刻から運用までを体系的にまとめた運用調査の集大成です。
+          </p>
+
+          <!-- 既刊・シリーズ作品リスト -->
+          <ul class="list-container">
+
+            <!-- 1冊目（サンプル：必要に応じてタイトルやURLを打ち替えてください） -->
+            <li class="list-item">
+              <a href="https://sekitan66325.booth.pm/items/8501007" class="btn-link" target="_blank" rel="noopener">
+                <div class="item-left-block">
+                  <div class="item-text-meta">
+                    <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026年春 陶器市臨時ダイヤ編ー</span>
+                    <span class="card-tag">同人誌 / BOOTH頒布<br>初版 2026年6月12日</span>
+                  </div>
+                </div>
+                <div class="item-right-block">
+                  <span class="chevron-right"></span>
+                </div>
+              </a>
+            </li>
+
+            <!-- 2冊目（画像付きカード） -->
+            <li class="list-item">
+              <a href="https://sekitan66325.booth.pm/items/8682952" class="btn-link-card" target="_blank" rel="noopener">
+                <!-- 上段：タイトル、ステータス、矢印 -->
+                <div class="card-header-row">
+                  <div class="item-text-meta">
+                    <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー</span>
+                    <span class="card-tag">同人誌 / C108<br>初版 2026年8月16日</span>
+                  </div>
+                  <div class="item-right-block">
+                    <!-- ステータスバッジを追加 -->
+                    <span class="status-badge">予約受付中</span>
+                    <span class="chevron-right"></span>
+                  </div>
+                </div>
+                
+                <!-- 下段：解説・告知画像 -->
+                <div class="card-banner-wrapper">
+                  <img src="assets/zenroku/2026hanabi.png" alt="私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー" class="card-banner-img">
+                </div>
+              </a>
+            </li>
+
+          </ul>
+
+          <!-- BOOTH全体へのリンクボタン -->
+          <div style="margin-top: 16px; text-align: center;">
+            <a href="https://sekitan66325.booth.pm/" target="_blank" rel="noopener" class="form-submit-btn" style="display: inline-block; width: auto; padding: 10px 24px; font-size: 0.88rem; text-decoration: none;">
+              BOOTHで頒布一覧を見る
+            </a>
+          </div>
+        </section>
+
+        <section class="notice-section acknowledgement-section">
+          <strong>運用情報の収集と御礼</strong>
+          <p>Xでも「真岡鐵道」、「真岡線」、「真岡線運用」、「モオカ14」等で検索を行い、情報を運用調査に反映させていただいております。<br>個別に情報を提供していただいている方を含め、厚く御礼申し上げます。</p>
+        </section>
+
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <div class="footer-title">せきたん</div>
+          <ul class="footer-links">
+            <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X (Twitter)</a></li>
+            <li><a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank" rel="noopener noreferrer">BOOTH</a></li>
+            <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">メールでお問い合わせ</a></li>
+            <li><a href="admin.html" class="footer-link" target="_blank">管理画面</a></li>
+          </ul>
+
+        </p>
+          <p class="copyright">©せきたん All Rights Reserved 2026</p>
+        </div>
+      </footer>
+    </section>
+
+    <!-- 目撃掲示板 タブ -->
+    <section class="view-panel" id="view-board">
+      <main class="container">
+        
+        <!-- 折りたたみ式（アコーディオン）投稿フォーム -->
+        <div class="board-form-accordion" id="form-accordion">
+          <button type="button" class="form-accordion-summary" onclick="toggleFormAccordion()">
+            <span>目撃情報を投稿する</span>
+            <!-- AppleスタイルのChevron（矢印）SVG -->
+            <svg class="accordion-icon" id="accordion-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          
+          <div class="accordion-content-wrapper">
+            <div class="accordion-content-inner">
+              <div class="board-form-card">
+                <!-- 入力レギュレーション -->
+                <div class="rule-box">
+                  <strong class="rule-title">記入ルール</strong>
+                  <p class="rule-text">
+                    ・基本的に「年月日」「列車番号」「車両番号」を記入してください。<br>
+                    ・時刻表記、運用番号表記は任意です。<br>
+                    ・必要に応じて「備考 / 」を使用してください。
+                  </p>
+                  <!-- 記入例カード -->
+                  <div class="rule-example-container">
+                    <span class="rule-example-label">記入例</span>
+                    <div class="rule-example">2026/07/21 21:59
+145レ　14-2+14-6(A6+A31)
+備考 / 真岡駅で目撃</div>
+                  </div>
+                </div>
+
+                <form id="board-form" onsubmit="handlePostSubmit(event)">
+                  <div class="form-group">
+                    <label class="form-label">投稿者名</label>
+                    <!-- username として明示 -->
+                    <input type="text" id="board-name" name="username" class="form-input" autocomplete="username" placeholder="" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">目撃情報・本文</label>
+                    <textarea id="board-message" name="board_body" class="form-textarea" rows="3" placeholder="" required></textarea>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">削除・編集用暗証番号（半角英数字4桁以上）</label>
+                    <!-- current-password として明示 -->
+                    <input type="password" id="board-password" name="password" class="form-input" minlength="4" autocomplete="current-password" placeholder="" required>
+                  </div>
+                  
+                  <button type="submit" id="submit-btn" class="form-submit-btn">投稿する</button>
+                </form>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 投稿一覧 -->
+        <section class="content-section">
+          <div class="board-header-row">
+            <h2 class="section-title">最新の目撃情報</h2>
+            <!-- リアルタイム検索バー -->
+            <div class="search-box">
+              <input type="search" id="board-search" class="search-input" placeholder="検索（日付・列車番号・車両）" oninput="handleSearchInput()">
+            </div>
+          </div>
+
+          <ul id="board-list" class="list-container">
+            <li style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.875rem; list-style: none;">
+              目撃情報を読み込んでいます...
+            </li>
+          </ul>
+          <!-- ページネーションコントロール -->
+          <div id="pagination" class="pagination-container"></div>
+        </section>
+
+        <!-- 掲示板利用上の注意（画面最下部常時表示） -->
+        <section class="notice-section board-rules-notice">
+          <strong>掲示板利用にあたっての注意事項</strong>
+          <ul class="board-rules-list">
+            <li>真岡鐵道真岡線の列車の運用情報専用の掲示板です。</li>
+            <li>自分で目撃した編成のみ書き込んでください。他人からの情報、ライブカメラの映像、独自のルートで集めた情報をまとめて書き込むなど、自分で見ていないものは絶対に書き込まないでください。</li>
+            <li>自分の書き込みを修正したり削除したい場合、該当投稿の「編集」または「削除」ボタンを押し、設定した暗証番号を入力して作業を行ってください。</li>
+            <li>誤った投稿を削除せず「下は間違いです」などと続けて投稿があった場合、管理人権限で投稿を削除します。記入ミスは投稿者本人が編集・削除に努めますようお願いします。</li>
+            <li>幾度も上記を守っていただけなかったり、目撃情報を転載してトラブルを持ち込むなどした場合は、アクセス禁止の処置を施します。</li>
+            <li>投稿いただいた全ての情報が運用調査報告に反映されるとは限りません。予めご了承ください。</li>
+            <li>掲示板がメンテナンス等で利用できない場合は書き込みできません。</li>
+          </ul>
+        </section>
+
+      </main>
+
+      <!-- 必須 reCAPTCHA説明 -->
+      <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 10px; text-align: center;">
+        This site is protected by reCAPTCHA and the Google
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color: var(--text-link);">Privacy Policy</a> and
+        <a href="https://policies.google.com/terms" target="_blank" rel="noopener" style="color: var(--text-link);">Terms of Service</a> apply.
+
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <div class="footer-title">せきたん</div>
+          <ul class="footer-links">
+            <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X (Twitter)</a></li>
+            <li><a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank" rel="noopener noreferrer">BOOTH</a></li>
+            <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">メールでお問い合わせ</a></li>
+            <li><a href="admin.html" class="footer-link" target="_blank">管理画面</a></li>
+          </ul>
+          <p class="copyright">©せきたん All Rights Reserved 2026</p>
+        </div>
+      </footer>
+    </section>
+
   </div>
-</header>
 
-<div id="offline-banner" class="offline-banner hidden">オフライン運用モード（基本ダイヤのみ表示中）</div>
-<div id="irregular-banner" class="hidden" style="background:#d32f2f; color:#fff; padding:8px 16px; text-align:center; font-size:14px; font-weight:bold; position:sticky; top:0; z-index:100;">通常ダイヤとは異なる運行状況です。詳細は公式HPをご確認ください。</div>
+  <nav class="floating-tab-bar" id="tab-bar">
+    <div class="tab-glider" id="tab-glider"></div>
 
-<main class="container">
-  <section id="notice" class="notice-section status-normal">
-    <div class="notice-icon" id="notice-icon">✓</div>
-    <div class="notice-copy">
-    <strong id="notice-title">公式運行情報を取得しています</strong>
-    <span id="notice-updated">取得中…</span>
-    </div>
-    <a id="notice-link" class="notice-chevron hidden" target="_blank" rel="noopener" aria-label="公式詳細">›</a>
-  </section>
-
-  <section class="toolbar">
-    <div class="toolbar-title">
-      <span class="section-kicker">SERVICE DATE</span>
-      <h2 id="date-title">2026年8月15日（土）</h2>
-    </div>
-    <div class="toolbar-actions">
-      <button class="glass-btn" id="now-btn">現在時刻</button>
-      <label class="date-control" onclick="document.getElementById('date-input').showPicker && document.getElementById('date-input').showPicker()">
-        運行日 <input id="date-input" type="date" value="2026-08-15">
-      </label>
-      <label class="date-control" onclick="document.getElementById('time-input').showPicker && document.getElementById('time-input').showPicker()">
-        時刻 <input id="time-input" type="time" value="12:00">
-      </label>
-    </div>
-  </section>
-
-  <nav class="view-tabs" aria-label="表示切替">
-    <button class="view-tab active" data-view="position">走行位置</button>
-    <button class="view-tab" data-view="diagram">ダイヤグラム</button>
-    <button class="view-tab" data-view="timetable">時刻表</button>
+    <button class="tab-btn active" id="btn-tab-0" onclick="scrollToView(0)">
+    運用資料
+    </button>
+    <button class="tab-btn" id="btn-tab-1" onclick="scrollToView(1)">
+    目撃掲示板
+    </button>
   </nav>
 
-  <section id="view-position" class="view-panel active">
-    <div class="panel-head">
-      <div>
-        <span class="section-kicker">LIVE POSITION</span>
-        <h2>列車走行位置</h2>
+  <!-- 編集用モーダル -->
+  <div id="edit-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 style="margin-top:0; font-size: 1.1rem; color: var(--text-primary);">投稿を編集</h3>
+      
+      <input type="hidden" id="edit-post-id">
+      
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label class="form-label" style="font-size: 0.8rem;">暗証番号（半角英数字4桁以上）</label>
+        <input type="password" id="edit-password" class="form-input" minlength="4" placeholder="設定した暗証番号" required>
       </div>
-      <div class="legend">
-        <span><i class="dot local"></i>普通</span>
-        <span><i class="dot sl"></i>SL</span>
-        <span><i class="dot extra"></i>臨時</span>
-        <span><i class="dot empty"></i>回送</span>
-        <span class="legend-stopped"><span class="stopped-badge-sample">停車中</span></span>
+      
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label class="form-label" style="font-size: 0.8rem;">本文（改行可能）</label>
+        <textarea id="edit-message" class="form-textarea" rows="4" required></textarea>
       </div>
-    </div>
-    <div class="position-card">
-      <div class="position-time">
-        <span>現在</span><strong id="position-current-time">--:--</strong>
-      </div>
-      <div class="position-body" id="position-body">
-        <!-- Dynamically populated: station rows with rail line and trains -->
-      </div>
-    </div>
-    <div class="summary-grid" id="summary-grid"></div>
-  </section>
-
-  <section id="view-diagram" class="view-panel">
-    <div class="panel-head">
-      <div><span class="section-kicker">DIAGRAM</span><h2>ダイヤグラム</h2></div>
-      <div class="diagram-tools">
-        <button class="seg-btn active" data-dir="all">全列車</button>
-        <button class="seg-btn" data-dir="up">上り</button>
-        <button class="seg-btn" data-dir="down">下り</button>
+      
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button onclick="closeEditModal()" style="padding: 8px 16px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: var(--text-primary); cursor: pointer;">キャンセル</button>
+        <button onclick="submitPostEdit()" style="padding: 8px 16px; border-radius: 8px; border: none; background: #007aff; color: #fff; font-weight: bold; cursor: pointer;">更新する</button>
       </div>
     </div>
-    <div class="diagram-shell">
-      <div class="diagram-scroll" id="diagram-scroll">
-        <svg id="diagram-svg" role="img" aria-label="真岡線ダイヤグラム"></svg>
+  </div>
+
+  <!-- 削除用モーダル -->
+  <div id="delete-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 style="margin-top:0; font-size: 1.1rem; color: var(--text-primary);">投稿の削除</h3>
+      <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">
+        投稿時に設定した暗証番号を入力してください。
+      </p>
+      <input type="hidden" id="delete-post-id">
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label class="form-label" style="font-size: 0.8rem;">暗証番号</label>
+        <input type="password" id="delete-password" class="form-input" minlength="4" placeholder="暗証番号を入力" required>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button onclick="closeDeleteModal()" style="padding: 8px 16px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: var(--text-primary); cursor: pointer;">キャンセル</button>
+        <button onclick="submitPostDelete()" style="padding: 8px 16px; border-radius: 8px; border: none; background: #ff453a; color: #fff; font-weight: bold; cursor: pointer;">削除する</button>
       </div>
     </div>
-    <p class="helper">列車線をタップすると詳細を表示します。予定線と当日実績線を分離して描画します。</p>
-  </section>
+  </div>
 
-  <section id="view-timetable" class="view-panel">
-    <div class="panel-head">
-      <div><span class="section-kicker">TIMETABLE</span><h2>路線時刻表</h2></div>
-      <div class="diagram-tools">
-        <button class="seg-btn tt-dir active" data-dir="up">上り</button>
-        <button class="seg-btn tt-dir" data-dir="down">下り</button>
-      </div>
-    </div>
-    <div class="table-card">
-      <div class="table-scroll">
-        <table id="timetable-table"><thead></thead><tbody></tbody></table>
-      </div>
-    </div>
-  </section>
-</main>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0GM4B0FTW9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-<nav class="floating-tab-bar" aria-label="メインナビゲーション">
-  <div class="tab-glider" id="tab-glider"></div>
-  <button class="tab-btn active" data-view="position">走行位置</button>
-  <button class="tab-btn" data-view="diagram">ダイヤ</button>
-  <button class="tab-btn" data-view="timetable">時刻表</button>
-</nav>
+    gtag('config', 'G-0GM4B0FTW9');
+  </script>
 
-<div class="modal-overlay hidden" id="train-modal">
-  <article class="modal-content">
-    <button class="modal-close" id="modal-close" aria-label="閉じる">×</button>
-    <div id="modal-body"></div>
-  </article>
-</div>
-
-<div class="modal-overlay hidden" id="warning-modal" style="z-index: 9999;">
-  <article class="modal-content" style="text-align: center;">
-    <h3 style="color:#d32f2f; margin-bottom: 15px;">運行状況に関する注意</h3>
-    <p style="margin-bottom: 20px; line-height: 1.6;">この画面は通常ダイヤで運転している場合の状況を示すもので、現在の運行状況とは異なるものを表示している場合があります。了承の上ご覧ください。<br><br>詳細な運転状況は真岡鐵道HPからご確認ください。</p>
-    <button id="warning-confirm-btn" style="background:#2997ff; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">確認して進む</button>
-  </article>
-</div>
-
-<footer class="site-footer">
-  <strong>真岡線 列車走行位置</strong>
-  <span>仕様書準拠フロントエンド / Demo Data</span>
-</footer>
-
-<script src="config.js"></script>
-<script src="script.js?v=2"></script>
+  <script src="script.js"></script>
 </body>
 </html>
