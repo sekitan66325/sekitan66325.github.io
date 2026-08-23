@@ -2297,7 +2297,13 @@
     "destination": "茂木",
     "operation_rule": {
       "service_type": "sl",
-      "days_off": [],
+      "days_off": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
       "dates_run": [],
       "dates_off": []
     },
@@ -2396,7 +2402,7 @@
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
+      "service_type": "extra",
       "days_off": [],
       "dates_run": [],
       "dates_off": []
@@ -4776,7 +4782,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "sl",
+      "service_type": "extra",
       "days_off": [],
       "dates_run": [],
       "dates_off": []
@@ -4876,7 +4882,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "deadhead",
+      "service_type": "extra",
       "days_off": [],
       "dates_run": [],
       "dates_off": []
