@@ -388,12 +388,11 @@ input[type="time"]::-webkit-datetime-edit-text:focus {
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 5px 9px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex; flex-direction: column; gap: 1px;
   align-items: center; text-align: center;
 }
 @media (prefers-color-scheme: dark) {
-  .pos-train-info { background: #2c2c2e; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); }
+  .pos-train-info { background: #2c2c2e; }
 }
 .pos-train-no { font-size: 0.78rem; font-weight: 800; color: var(--text-primary); }
 .pos-train-dest { font-size: 0.6rem; color: var(--text-secondary); font-weight: 500; }
@@ -587,6 +586,14 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
   align-items: center;
   justify-content: center;
 }
+.pos-rail-area.rail-first {
+  top: 50%;
+  height: 50%;
+}
+.pos-rail-area.rail-last {
+  top: 0;
+  height: 50%;
+}
 .pos-station-dot {
   width: 14px;
   height: 14px;
@@ -594,7 +601,6 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
   border: 3px solid #30d158;
   border-radius: 50%;
   z-index: 2;
-  box-shadow: 0 0 0 4px var(--bg-primary);
 }
 
 .pos-trains-container {
@@ -621,5 +627,4 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
 /* Adjust card margins for flex layout */
 .pos-train-card {
   margin: 2px 0 !important;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }

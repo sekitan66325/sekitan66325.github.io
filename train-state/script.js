@@ -484,7 +484,7 @@ function renderStations() {
     stRow.innerHTML = `
       <div class="pos-station-name-col">${formatStationName(s.name)}</div>
       <div class="pos-trains-container pos-trains-down" id="pos-down-${s.code}"></div>
-      <div class="pos-rail-area"><div class="pos-station-dot"></div></div>
+      <div class="pos-rail-area ${i === 0 ? 'rail-first' : ''} ${i === stationsReversed.length - 1 ? 'rail-last' : ''}"><div class="pos-station-dot"></div></div>
       <div class="pos-trains-container pos-trains-up" id="pos-up-${s.code}"></div>
     `;
     host.appendChild(stRow);
@@ -885,10 +885,7 @@ async function loadData() {
     const [s, t, st] = await Promise.all([
       fetch("data/stations.json").then(r => r.json()),
       fetch("data/timetable.json").then(r => r.json()),
-      fetch(CONFIG.GAS_API_URL).then(r => {
-        if (!r.ok) throw new Error("GAS API HTTP " + r.status);
-        return r.json();
-      })
+      fetch("data/today_status.json").then(r => r.json())
     ]);
 
     if (!Array.isArray(s) || !Array.isArray(t) || !validateStatus(st))
