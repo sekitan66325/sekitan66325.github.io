@@ -2398,12 +2398,18 @@
   {
     "train_id": "6103",
     "train_no": "6103",
-    "operation_id": "A1",
+    "operation_id": "A601,A301",
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "extra",
-      "days_off": [],
+      "service_type": "sl",
+      "days_off": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
       "dates_run": [],
       "dates_off": []
     },
