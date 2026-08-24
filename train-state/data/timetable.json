@@ -4883,13 +4883,19 @@
   },
   {
     "train_id": "6100",
-    "train_no": "6100",
-    "operation_id": "A1",
+    "train_no": "回6100",
+    "operation_id": "A301,A601",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "extra",
-      "days_off": [],
+      "service_type": "deadhead",
+      "days_off": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
       "dates_run": [],
       "dates_off": []
     },
