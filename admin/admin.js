@@ -112,20 +112,21 @@ function showDashboard() {
  * タブ切り替え
  */
 function switchAdminTab(tab) {
-  document.getElementById('panel-posts').style.display = tab === 'posts' ? 'block' : 'none';
-  document.getElementById('panel-logs').style.display = tab === 'logs' ? 'block' : 'none';
-  document.getElementById('panel-trains').style.display = tab === 'trains' ? 'block' : 'none';
-
-  ['posts', 'logs', 'trains'].forEach(t => {
-    const btn = document.getElementById('tab-btn-' + t);
-    if (!btn) return;
-    const isActive = (tab === t);
-    btn.style.background = isActive ? 'var(--text-link)' : 'rgba(255, 255, 255, 0.08)';
-    btn.style.color = isActive ? '#fff' : 'var(--text-primary)';
+  const views = ['posts', 'logs', 'trains', 'operations'];
+  views.forEach(v => {
+    const el = document.getElementById(v + '-view');
+    if(el) el.style.display = tab === v ? 'block' : 'none';
+    const btn = document.getElementById('tab-btn-' + v);
+    if(btn) btn.classList.toggle('active', tab === v);
   });
-
-  if (tab === 'logs') fetchAdminLogs();
-  if (tab === 'trains' && timetableData.length === 0) loadTimetableFromRepo(true);
+  if (tab === 'operations') {
+    renderOperationsView();
+  } else if (tab === 'trains') {
+    renderTrainList();
+    if (timetableData.length === 0) loadTimetableFromRepo(true);
+  } else if (tab === 'logs') {
+    fetchAdminLogs();
+  }
 }
 
 /**
@@ -395,7 +396,7 @@ function editTrain(trainId) {
 
   let html = `
     <h3 style="margin-top:0;">列車編集: ${t.train_no} (${t.train_id})</h3>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+    <div class="train-editor-grid" style="margin-top: 16px;">
       <div class="form-group">
         <label class="form-label">列車番号 (train_no)</label>
         <input type="text" id="edit-train-no" class="form-input" value="${t.train_no || ''}">
@@ -441,7 +442,7 @@ function editTrain(trainId) {
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+    <div class="train-editor-grid" style="margin-top: 16px;">
       <div class="form-group">
         <label class="form-label">運転日 (dates_run)</label>
         <div style="display: flex; gap: 8px; align-items: center;">
@@ -694,3 +695,101 @@ async function exportTimetable() {
     btn.disabled = false;
   }
 }
+
+
+
+// --- 運用ベース管理機能 ---
+const DAYS_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'holiday'];
+const DAYS_LABELS = { sun:'日', mon:'月', tue:'火', wed:'水', thu:'木', fri:'金', sat:'土', holiday:'祝' };
+
+function renderOperationsView() {
+  const opList = document.getElementById('op-list');
+  if(!opList) return;
+  
+  // 1. Collect all unique operations from current timetable
+  const ops = new Set();
+  timetableData.forEach(t => {
+    if(t.operation_dict) {
+      Object.values(t.operation_dict).forEach(opstr => {
+        opstr.split(',').map(s=>s.trim()).filter(s=>s).forEach(o => ops.add(o));
+      });
+    } else if (t.operation_id) {
+      t.operation_id.toString().split(',').map(s=>s.trim()).filter(s=>s).forEach(o => ops.add(o));
+    }
+  });
+  
+  let html = '';
+  // 2. Render each operation card
+  Array.from(ops).sort().forEach(op => {
+    html += `<div class="op-card">
+      <h3 style="margin-top:0; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:8px;">運用 ${op}</h3>
+      <div style="margin-top:12px;">`;
+      
+    DAYS_KEYS.forEach(dayKey => {
+      // Find trains assigned to this operation on this day
+      const trainsAssigned = timetableData.filter(t => {
+        let val = '';
+        if (t.operation_dict && t.operation_dict[dayKey] !== undefined) {
+          val = t.operation_dict[dayKey];
+        } else {
+          val = t.operation_id || '';
+        }
+        return val.split(',').map(s=>s.trim()).includes(op);
+      }).map(t => t.train_no);
+      
+      html += `
+        <div class="op-day-row">
+          <span style="color:var(--text-secondary); width:40px;">${DAYS_LABELS[dayKey]}</span>
+          <input type="text" class="form-input op-edit-input" style="flex:1; padding:2px 6px;" 
+            data-op="${op}" data-day="${dayKey}" value="${trainsAssigned.join(', ')}" placeholder="列車番号をカンマ区切りで入力">
+        </div>`;
+    });
+    
+    html += `</div></div>`;
+  });
+  
+  html += `
+    <div style="grid-column: 1 / -1; margin-top: 16px;">
+      <button class="btn-admin btn-success" onclick="saveOperationsToMemory()">変更を適用 (メモリ)</button>
+      <button class="btn-admin" onclick="renderOperationsView()" style="margin-left:8px;">リセット</button>
+      <p style="font-size:0.8rem; margin-top:8px; color:var(--text-secondary);">※変更を適用後、「列車データ管理」タブから「変更をダウンロード(またはプッシュ)」してください。</p>
+    </div>
+  `;
+  opList.innerHTML = html;
+}
+
+window.saveOperationsToMemory = function() {
+  const inputs = document.querySelectorAll('.op-edit-input');
+  // Initialize operation_dict for all trains if not present
+  timetableData.forEach(t => {
+    if(!t.operation_dict) {
+      t.operation_dict = {};
+      DAYS_KEYS.forEach(d => t.operation_dict[d] = t.operation_id || "");
+    }
+  });
+
+  // Rebuild operation_dict from inputs
+  DAYS_KEYS.forEach(dayKey => {
+    timetableData.forEach(t => { t.operation_dict[dayKey] = ""; });
+  });
+
+  inputs.forEach(input => {
+    const op = input.getAttribute('data-op');
+    const dayKey = input.getAttribute('data-day');
+    const trainNos = input.value.split(',').map(s=>s.trim()).filter(s=>s);
+    
+    trainNos.forEach(tNo => {
+      const targetTrain = timetableData.find(t => t.train_no === tNo);
+      if(targetTrain) {
+        let current = targetTrain.operation_dict[dayKey];
+        if(current) {
+          targetTrain.operation_dict[dayKey] = current + ", " + op;
+        } else {
+          targetTrain.operation_dict[dayKey] = op;
+        }
+      }
+    });
+  });
+  
+  alert('運用の変更をメモリに適用しました。保存するにはデータ書き出しを行ってください。');
+};
