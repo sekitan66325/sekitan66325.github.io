@@ -4784,12 +4784,18 @@
   {
     "train_id": "6002",
     "train_no": "6002",
-    "operation_id": "A1",
+    "operation_id": "A601",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "extra",
-      "days_off": [],
+      "service_type": "sl",
+      "days_off": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
       "dates_run": [],
       "dates_off": []
     },
