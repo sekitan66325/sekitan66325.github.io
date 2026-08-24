@@ -542,3 +542,70 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
   .pos-train-no { font-size: 0.7rem; }
   .pos-train-shield { width: 22px; height: 22px; }
 }
+
+
+/* --- Updated Position View Styles --- */
+.pos-station-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: 48px;
+  background: rgba(255, 255, 255, 0.05); /* Station row is slightly darker/different */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 0;
+}
+.pos-between-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: 48px;
+  background: transparent; /* Between row is transparent or lighter */
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+  padding: 4px 0;
+}
+
+.pos-rail-area {
+  width: 14px;
+  height: 100%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pos-station-dot {
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 0 0 4px var(--bg-primary);
+}
+
+.pos-trains-container {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  padding: 0 8px;
+  flex-wrap: wrap;
+}
+.pos-trains-down {
+  justify-content: flex-end;
+}
+.pos-trains-up {
+  justify-content: flex-start;
+}
+
+/* Override existing pos-between-train since it's no longer absolute */
+.pos-between-train {
+  position: static !important;
+  transform: none !important;
+}
+
+/* Adjust card margins for flex layout */
+.pos-train-card {
+  margin: 2px 0 !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
