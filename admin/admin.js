@@ -1,4 +1,4 @@
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxPqljPklmIPQlJhIU16ppYRn689gCNUau5i_h_mmRZVmoPvqOBlinaWmEQ3-G63asz/exec';
+const GAS_URL = typeof CONFIG !== 'undefined' ? CONFIG.GAS_API_URL : '';
 
 let adminToken = sessionStorage.getItem('admin_token') || '';
 let allAdminPosts = [];
