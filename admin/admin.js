@@ -125,6 +125,7 @@ function switchAdminTab(tab) {
   });
 
   if (tab === 'logs') fetchAdminLogs();
+  if (tab === 'trains' && timetableData.length === 0) loadTimetableFromRepo(true);
 }
 
 /**

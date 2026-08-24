@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -76,7 +76,7 @@
             <button class="btn-admin" onclick="loadTimetableFromRepo()">リポジトリから読込</button>
             <input type="file" id="timetable-upload" accept=".json" style="display:none;" onchange="handleTimetableUpload(event)">
             <button class="btn-admin" onclick="document.getElementById('timetable-upload').click()">ファイルから読込</button>
-            <button class="btn-admin btn-success" onclick="exportTimetable()">変更をダウンロード</button>
+            <button class="btn-admin btn-success" onclick="exportTimetable()">GitHubへ反映 (プッシュ)</button>
           </div>
         </div>
         
@@ -141,6 +141,6 @@
     gtag('config', 'G-0GM4B0FTW9');
   </script>
 
-  <script src="admin.js"></script>
+  <script src="admin.js?v=639231599055514103"></script>
 </body>
 </html>
