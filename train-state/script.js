@@ -284,7 +284,8 @@ function serviceRuns(train, date) {
   if (r.service_type === "extra") return false;
   const day = new Date(`${date}T12:00:00+09:00`).getDay();
   const key = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][day];
-  return !(r.days_off || []).includes(key);
+  const daysOff = r.days_off || [];
+  return !daysOff.includes(key) && !daysOff.includes(day);
 }
 
 function getTrainType(train) {
@@ -464,129 +465,82 @@ function shieldSVG(fillColor, direction) {
   </svg>`;
 }
 
-function renderStations() { }
+function renderStations() {
+  const host = $("#position-body");
+  if (!host) return;
+  host.innerHTML = "";
+  host.style.position = "relative";
+  host.style.display = "flex";
+  host.style.flexDirection = "column";
+
+  const stationsReversed = [...DATA.stations].reverse();
+
+  stationsReversed.forEach((s, i) => {
+    // 1. Station Row
+    const stRow = document.createElement("div");
+    stRow.className = "pos-station-row";
+    stRow.dataset.station = s.code;
+    
+    stRow.innerHTML = `
+      <div class="pos-trains-container pos-trains-down" id="pos-down-${s.code}"></div>
+      <div class="pos-rail-area"><div class="pos-station-dot"></div></div>
+      <div class="pos-trains-container pos-trains-up" id="pos-up-${s.code}">
+        <span class="pos-station-name" style="width: 80px;">${formatStationName(s.name)}</span>
+      </div>
+    `;
+    host.appendChild(stRow);
+
+    // 2. Between Row (if not the last station)
+    if (i < stationsReversed.length - 1) {
+      const nextS = stationsReversed[i+1];
+      const bwRow = document.createElement("div");
+      bwRow.className = "pos-between-row";
+      bwRow.dataset.from = s.code;
+      bwRow.dataset.to = nextS.code;
+      
+      bwRow.innerHTML = `
+        <div class="pos-trains-container pos-trains-down" id="pos-bw-down-${s.code}-${nextS.code}"></div>
+        <div class="pos-rail-area"></div>
+        <div class="pos-trains-container pos-trains-up" id="pos-bw-up-${s.code}-${nextS.code}"></div>
+      `;
+      host.appendChild(bwRow);
+    }
+  });
+}
 
 function renderPosition() {
-  const host = $("#position-body"); host.innerHTML = "";
+  renderStations(); // Re-build DOM layout first
+  
+  const host = $("#position-body");
   const trains = effectiveTrains();
 
   const stationsReversed = [...DATA.stations].reverse();
 
-  const stationTrains = {};
-  stationsReversed.forEach(s => { stationTrains[s.code] = { up: [], down: [] } });
-
-  const betweenTrains = [];
-
   trains.filter(t => t.position).forEach(t => {
+    const card = createTrainCard(t);
+    
     if (t.result.state === "STOPPED" || t.result.state === "ARRIVED" || t.result.state === "PRE_DEPARTURE") {
       const code = t.result.station_code;
-      if (stationTrains[code]) {
-        stationTrains[code][t.direction].push(t);
-      }
+      const container = document.getElementById(`pos-${t.direction}-${code}`);
+      if (container) container.appendChild(card);
     } else if (t.result.state === "RUNNING") {
-      betweenTrains.push(t);
+      // Find the correct between row based on stationsReversed order
+      let fromIdx = stationsReversed.findIndex(s => s.code === t.result.from_station);
+      let toIdx = stationsReversed.findIndex(s => s.code === t.result.to_station);
+      
+      if (fromIdx !== -1 && toIdx !== -1) {
+        // The between row ID is based on the top station to bottom station
+        const topCode = stationsReversed[Math.min(fromIdx, toIdx)].code;
+        const bottomCode = stationsReversed[Math.max(fromIdx, toIdx)].code;
+        const container = document.getElementById(`pos-bw-${t.direction}-${topCode}-${bottomCode}`);
+        if (container) container.appendChild(card);
+      }
     }
   });
 
-  stationsReversed.forEach((s, i) => {
-    const isTerminal = i === 0 || i === stationsReversed.length - 1;
-    const isExchange = s.can_exchange || isTerminal;
-    const row = document.createElement("div");
-    row.className = "pos-station-row" + (isExchange ? " exchange" : "");
-
-    const label = document.createElement("div");
-    label.className = "pos-station-label";
-    label.innerHTML = `
-      <span class="pos-station-name">${formatStationName(s.name)}</span>
-    `;
-
-    const railArea = document.createElement("div");
-    railArea.className = "pos-rail-area";
-
-    const dot = document.createElement("div");
-    dot.className = "pos-rail-dot";
-    dot.style.top = "50%";
-    railArea.appendChild(dot);
-
-    const downTrains = stationTrains[s.code].down;
-    if (downTrains.length > 0) {
-      const downContainer = document.createElement("div");
-      downContainer.className = "pos-trains-down";
-      downTrains.forEach(t => {
-        downContainer.appendChild(createTrainCard(t));
-      });
-      railArea.appendChild(downContainer);
-    }
-
-    const upTrains = stationTrains[s.code].up;
-    if (upTrains.length > 0) {
-      const upContainer = document.createElement("div");
-      upContainer.className = "pos-trains-up";
-      upTrains.forEach(t => {
-        upContainer.appendChild(createTrainCard(t));
-      });
-      railArea.appendChild(upContainer);
-    }
-
-    row.appendChild(label);
-    row.appendChild(railArea);
-    host.appendChild(row);
-  });
-
-  const railLine = document.createElement("div");
-  railLine.className = "pos-rail-column";
-  const dots = host.querySelectorAll(".pos-rail-dot");
-  if (dots.length >= 2) {
-    const firstDot = dots[0].getBoundingClientRect();
-    const lastDot = dots[dots.length - 1].getBoundingClientRect();
-    const hostRect = host.getBoundingClientRect();
-    const topY = firstDot.top + firstDot.height / 2 - hostRect.top;
-    const bottomY = lastDot.top + lastDot.height / 2 - hostRect.top;
-    const railLeft = firstDot.left + firstDot.width / 2 - hostRect.left;
-
-    railLine.style.left = railLeft + "px";
-    railLine.style.top = topY + "px";
-    railLine.style.height = (bottomY - topY) + "px";
-    host.style.position = "relative";
-    host.appendChild(railLine);
-  }
-
-  betweenTrains.forEach(t => {
-    const fromIdx = stationsReversed.findIndex(s => s.code === t.result.from_station);
-    const toIdx = stationsReversed.findIndex(s => s.code === t.result.to_station);
-    if (fromIdx === -1 || toIdx === -1) return;
-    const rows = host.querySelectorAll(".pos-station-row");
-    if (!rows[fromIdx] || !rows[toIdx]) return;
-
-    const fromRect = rows[fromIdx].getBoundingClientRect();
-    const toRect = rows[toIdx].getBoundingClientRect();
-    const hostRect = host.getBoundingClientRect();
-    const fromY = fromRect.top - hostRect.top + fromRect.height / 2;
-    const toY = toRect.top - hostRect.top + toRect.height / 2;
-    const y = fromY + (toY - fromY) * t.result.progress;
-
-    const railArea = rows[0]?.querySelector(".pos-rail-area");
-    if (!railArea) return;
-    const railAreaRect = railArea.getBoundingClientRect();
-    const railCenterX = railAreaRect.left - hostRect.left + railAreaRect.width / 2;
-
-    const marker = document.createElement("div");
-    marker.className = "pos-between-train";
-    marker.style.top = y + "px";
-
-    if (t.direction === "down") {
-      marker.style.right = (host.offsetWidth - railCenterX + 18) + "px";
-      marker.style.flexDirection = "row-reverse";
-    } else {
-      marker.style.left = (railCenterX + 18) + "px";
-    }
-
-    marker.appendChild(createTrainCard(t));
-    marker.onclick = () => openTrainModal(t);
-    host.appendChild(marker);
-  });
-
-  const running = trains.filter(t => t.result.state === "RUNNING").length, stopped = trains.filter(t => t.result.state === "STOPPED").length, arrived = trains.filter(t => t.result.state === "ARRIVED").length;
+  const running = trains.filter(t => t.result.state === "RUNNING").length;
+  const stopped = trains.filter(t => t.result.state === "STOPPED").length;
+  const arrived = trains.filter(t => t.result.state === "ARRIVED").length;
   $("#summary-grid").innerHTML = `<div class="summary-card"><span>運転中</span><strong>${running}本</strong></div><div class="summary-card"><span>駅停車中</span><strong>${stopped}本</strong></div><div class="summary-card"><span>到着保持</span><strong>${arrived}本</strong></div>`;
   $("#position-current-time").textContent = formatServiceTime(state.currentMinutes);
 }
@@ -856,12 +810,26 @@ function openTrainModal(t) {
     }[t.result.state] || "不明";
     statusHTML=`<span>${stateText}</span>`;
   }
-  const formation = DATA.status.operations[t.operation_id]?.formation || [];
+  let formation = [];
+  let currentOpIdStr = t.operation_id || "";
+  if (t.operation_dict) {
+    const day = new Date(`${state.serviceDate}T12:00:00+09:00`).getDay();
+    const key = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][day];
+    if (t.operation_dict[key]) currentOpIdStr = t.operation_dict[key];
+  }
+  const opIds = currentOpIdStr.toString().split(',').map(s => s.trim()).filter(s => s);
+  opIds.forEach(id => {
+    if (DATA.status.operations[id] && DATA.status.operations[id].formation) {
+      formation = formation.concat(DATA.status.operations[id].formation);
+    }
+  });
+  const displayOpId = opIds.join('＋');
+
   $("#modal-body").innerHTML = `
     <span class="modal-kicker">TRAIN DETAIL / ${t.train_id}</span>
     <h3 class="modal-title">${t.train_no}</h3>
     <div class="modal-badges"><span class="badge ${t.direction === "up" ? "blue" : ""}">${t.direction === "up" ? "上り" : "下り"}</span><span class="badge">${formatStationName(t.destination)}行</span><span class="badge ${t.result.state === "STOPPED" ? "orange" : ""}">${statusHTML}</span></div>
-    <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${t.operation_id}</strong></div><div class="detail-cell"><small>遅延</small><strong>${t.override.delay_minutes || 0}分</strong></div></div>
+    <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${displayOpId}</strong></div><div class="detail-cell"><small>遅延</small><strong>${t.override.delay_minutes || 0}分</strong></div></div>
     ${formation.length ? `<div class="formation"><h4>編成</h4><div class="formation-list">${formation.map(x => `<span>${x}</span>`).join("")}</div></div>` : ""}
     ${t.override.memo ? `<div class="memo">${t.override.memo}</div>` : ""}
     <div class="station-detail"><h4>各駅の詳細時刻</h4>${t.stations.map(st => {
