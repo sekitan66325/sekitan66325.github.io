@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -47,6 +47,7 @@
         <button id="tab-btn-posts" class="btn-admin active" onclick="switchAdminTab('posts')" style="background: var(--text-link); color: #fff;">投稿管理</button>
         <button id="tab-btn-logs" class="btn-admin" onclick="switchAdminTab('logs')">操作・編集ログ</button>
         <button id="tab-btn-trains" class="btn-admin" onclick="switchAdminTab('trains')">運行データ管理</button>
+        <button id="tab-btn-operations" class="btn-admin" onclick="switchAdminTab('operations')">運用ベース管理</button>
       </div>
 
       <div id="panel-posts">
@@ -93,6 +94,17 @@
           <div id="train-editor-container" style="flex: 2; background: var(--bg-card); border-radius: 8px; padding: 16px; display: none; max-height: 70vh; overflow-y: auto;">
             <!-- ここにJavaScriptでフォームを生成 -->
           </div>
+        </div>
+      </div>
+
+      <div id="panel-operations" style="display: none;">
+        <h2 class="section-title">運用ベース管理</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 16px;">
+          曜日ごとにどの列車をどの運用に入れるか設定します。<br>
+          ※設定したデータは、列車ベースのデータと同じ timetable.json に保存されます。
+        </p>
+        <div id="op-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+          <!-- JS will render operations here -->
         </div>
       </div>
 

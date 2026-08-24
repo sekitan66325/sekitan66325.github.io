@@ -114,7 +114,7 @@ function showDashboard() {
 function switchAdminTab(tab) {
   const views = ['posts', 'logs', 'trains', 'operations'];
   views.forEach(v => {
-    const el = document.getElementById(v + '-view');
+    const el = document.getElementById('panel-' + v);
     if(el) el.style.display = tab === v ? 'block' : 'none';
     const btn = document.getElementById('tab-btn-' + v);
     if(btn) btn.classList.toggle('active', tab === v);
