@@ -420,20 +420,29 @@ function renderNotice() {
     btn.onclick = () => { warningModal.classList.add("hidden"); };
   }
 
-  if (statusCode === "unknown") {
-    const fallbackText = n.text || "公式運行情報を取得できませんでした。サイトをご確認ください。";
-    if (n.link_url) {
-      title.innerHTML = `<a href="${n.link_url}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">${fallbackText}</a>`;
-    } else {
-      title.textContent = fallbackText;
-    }
+  let fallbackText = n.text || "公式運行情報を取得できませんでした。";
+  if (fallbackText.startsWith("公式: ")) fallbackText = fallbackText.substring(4).trim();
+  else if (fallbackText.startsWith("公式：")) fallbackText = fallbackText.substring(3).trim();
+
+  if (n.link_url) {
+    title.innerHTML = `<a href="${n.link_url}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">${fallbackText}</a>`;
   } else {
-    const text = n.text || "公式運行情報を取得できませんでした";
-    if (n.link_url) {
-      title.innerHTML = `<a href="${n.link_url}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">${text}</a>`;
-    } else {
-      title.textContent = text;
-    }
+    title.textContent = fallbackText;
+  }
+
+  box.title =
+    `更新: ${n.fetched_at
+      ? new Date(n.fetched_at).toLocaleString(
+        "ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }
+      )
+      : "不明"
+    }\n${fallbackText}`;
+
+  if (n.link_url) {
+    link.href = n.link_url;
+    link.classList.remove("hidden");
+  } else {
+    link.classList.add("hidden");
   }
 
   updated.textContent =
@@ -447,11 +456,6 @@ function renderNotice() {
       )
       : "—"
     }`;
-
-  if (n.link_url) {
-    link.href = n.link_url;
-    link.classList.remove("hidden");
-  } else {
     link.classList.add("hidden");
   }
 }
@@ -540,8 +544,7 @@ function renderPosition() {
 
   const running = trains.filter(t => t.result.state === "RUNNING").length;
   const stopped = trains.filter(t => t.result.state === "STOPPED").length;
-  const arrived = trains.filter(t => t.result.state === "ARRIVED").length;
-  $("#summary-grid").innerHTML = `<div class="summary-card"><span>運転中</span><strong>${running}本</strong></div><div class="summary-card"><span>駅停車中</span><strong>${stopped}本</strong></div><div class="summary-card"><span>到着保持</span><strong>${arrived}本</strong></div>`;
+  $("#summary-grid").innerHTML = `<div class="summary-card"><span>運転中</span><strong>${running}本</strong></div><div class="summary-card"><span>駅停車中</span><strong>${stopped}本</strong></div>`;
   $("#position-current-time").textContent = formatServiceTime(state.currentMinutes);
 }
 

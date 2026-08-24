@@ -601,6 +601,7 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
   border: 3px solid #30d158;
   border-radius: 50%;
   z-index: 2;
+  flex-shrink: 0;
 }
 
 .pos-trains-container {
