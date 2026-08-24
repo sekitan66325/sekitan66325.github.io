@@ -462,7 +462,7 @@ function editTrain(trainId) {
       </div>
     </div>
 
-    <h4 style="margin-top: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">日付指定の区間運休 (partial_cancellations)</h4>
+    <h4 style="margin-top: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">日付指定の区間運休・区間運転 (partial_cancellations)</h4>
     <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px; margin-top: 12px;">
       <table style="width: 100%; text-align: left; border-collapse: collapse;">
         <thead>
