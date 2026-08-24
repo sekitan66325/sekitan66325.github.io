@@ -910,6 +910,8 @@ function updateClock() {
   }
 }
 
+
+
 async function loadData() {
   try {
     const [s, t, st] = await Promise.all([
@@ -926,6 +928,8 @@ async function loadData() {
 
     DATA.stations = s;
     DATA.timetable = t;
+
+
     DATA.status = st;
 
   } catch (e) {
