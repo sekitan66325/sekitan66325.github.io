@@ -82,3 +82,9 @@
   font-family: inherit;
   white-space: pre-wrap;
 }
+
+/* セレクトボックスのオプションが見えない問題の修正 */
+select.form-input option {
+  background-color: #2b2b2b;
+  color: #ffffff;
+}

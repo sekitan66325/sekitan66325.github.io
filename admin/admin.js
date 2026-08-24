@@ -1,4 +1,4 @@
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyA_836JV_xFiWXXaVqbifUDkjIxxvY6Bv-CdunB8Jsj3kcMzmBbJIRuKtMJiYEPIrz/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxPqljPklmIPQlJhIU16ppYRn689gCNUau5i_h_mmRZVmoPvqOBlinaWmEQ3-G63asz/exec';
 
 let adminToken = sessionStorage.getItem('admin_token') || '';
 let allAdminPosts = [];
@@ -644,16 +644,52 @@ function saveTrainData() {
   renderTrainList();
 }
 
-function exportTimetable() {
+
+
+async function exportTimetable() {
   if (timetableData.length === 0) {
     alert('データがありません');
     return;
   }
-  const blob = new Blob([JSON.stringify(timetableData, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'timetable.json';
-  a.click();
-  URL.revokeObjectURL(url);
+  
+  if (!adminToken) {
+    alert('管理者としてログインしていません。');
+    return;
+  }
+
+  const btn = document.querySelector('button[onclick="exportTimetable()"]');
+  const originalText = btn.textContent;
+  btn.textContent = 'GitHubへ反映中...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'save_timetable_github',
+        token: adminToken,
+        data: timetableData
+      })
+    });
+    const result = await res.json();
+    if (result.status === 'success') {
+      alert('GitHubへの直接反映（プッシュ）が成功しました！\n反映には約1〜2分かかります。数分後にページをリロードして確認してください。');
+    } else {
+      throw new Error(result.message || '保存に失敗しました');
+    }
+  } catch (err) {
+    alert('GitHubプッシュエラー: ' + err.message + '\\n(安全のため、ファイルのダウンロードを実行します。)');
+    // Fallback download
+    const blob = new Blob([JSON.stringify(timetableData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'timetable.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
 }
