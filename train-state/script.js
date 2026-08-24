@@ -482,11 +482,10 @@ function renderStations() {
     stRow.dataset.station = s.code;
     
     stRow.innerHTML = `
+      <div class="pos-station-name-col">${formatStationName(s.name)}</div>
       <div class="pos-trains-container pos-trains-down" id="pos-down-${s.code}"></div>
       <div class="pos-rail-area"><div class="pos-station-dot"></div></div>
-      <div class="pos-trains-container pos-trains-up" id="pos-up-${s.code}">
-        <span class="pos-station-name" style="width: 80px;">${formatStationName(s.name)}</span>
-      </div>
+      <div class="pos-trains-container pos-trains-up" id="pos-up-${s.code}"></div>
     `;
     host.appendChild(stRow);
 
@@ -499,6 +498,7 @@ function renderStations() {
       bwRow.dataset.to = nextS.code;
       
       bwRow.innerHTML = `
+        <div class="pos-station-name-col"></div>
         <div class="pos-trains-container pos-trains-down" id="pos-bw-down-${s.code}-${nextS.code}"></div>
         <div class="pos-rail-area"></div>
         <div class="pos-trains-container pos-trains-up" id="pos-bw-up-${s.code}-${nextS.code}"></div>
