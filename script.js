@@ -80,9 +80,9 @@ function updateGliderPosition(index) {
 
 function scrollToView(index) {
   if (!slider) return;
-  
+
   isAnimating = true;
-  
+
   const width = slider.clientWidth;
   slider.scrollTo({
     left: width * index,
@@ -102,7 +102,7 @@ function scrollToView(index) {
 if (slider) {
   slider.addEventListener('scroll', () => {
     if (isDragging || isAnimating) return;
-    
+
     const scrollLeft = slider.scrollLeft;
     const width = slider.clientWidth;
     const index = scrollLeft > width * 0.5 ? 1 : 0;
@@ -136,7 +136,7 @@ if (tabBar) {
 
   const endDrag = (e) => {
     if (!isDragging) return;
-    
+
     isDragging = false;
     isAnimating = true;
     glider.classList.remove('dragging');
@@ -208,7 +208,7 @@ function formatTimestamp(timestampStr) {
   if (!timestampStr) return '';
   const str = String(timestampStr);
   if (str.includes('/') || str.includes('-')) return str;
-  
+
   const d = new Date(str);
   if (isNaN(d.getTime())) return str;
 
@@ -224,7 +224,7 @@ function formatTimestamp(timestampStr) {
 
 function escapeHTML(str) {
   if (!str) return '';
-  return String(str).replace(/[&<>'"]/g, 
+  return String(str).replace(/[&<>'"]/g,
     tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
   );
 }
@@ -237,7 +237,7 @@ async function fetchBoardData() {
     const response = await fetch(GAS_URL);
     allPosts = await response.json();
     filteredPosts = [...allPosts];
-    
+
     renderBoardPosts();
   } catch (error) {
     console.error('データ取得エラー:', error);
@@ -381,12 +381,12 @@ async function handlePostSubmit(event) {
       alert('投稿が完了しました！');
       if (messageInput) messageInput.value = '';
       if (passwordInput) passwordInput.value = '';
-      
+
       const accordion = document.getElementById('form-accordion');
       if (accordion && accordion.classList.contains('open')) {
         toggleFormAccordion();
       }
-      
+
       currentPage = 1;
       fetchBoardData();
     } else {
