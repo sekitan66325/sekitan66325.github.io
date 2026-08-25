@@ -456,8 +456,6 @@ function renderNotice() {
       )
       : "—"
     }`;
-    link.classList.add("hidden");
-  }
 }
 
 function shieldSVG(fillColor, direction) {
