@@ -1,4 +1,4 @@
-﻿var $ = (s, root = document) => root.querySelector(s);
+var $ = (s, root = document) => root.querySelector(s);
 var $$ = (s, root = document) => [...root.querySelectorAll(s)];
 var DATA = { stations: [], timetable: [], prevTimetable: [], status: null };
 var state = { view: "position", serviceDate: "2026-08-15", currentMinutes: null, liveClock: true, diagramDir: "all", timetableDir: "up" };
@@ -514,11 +514,63 @@ function renderStations() {
   });
 }
 
+/**
+ * 上下列車の交換が行われている駅コードの Set を返す
+ * 「先に到着する列車が到着したとき」から「先に発車する列車が出発したとき」まで
+ */
+function computeExchangingStations(trains, currentMinutes) {
+  const exchanging = new Set();
+
+  // Station codes that could be exchange stations (all stations with both up+down trains stopping)
+  const stationCodes = DATA.stations.map(s => s.code);
+
+  stationCodes.forEach(code => {
+    // Find up and down trains stopping at this station
+    const upTrains = trains.filter(t => t.direction === 'up');
+    const downTrains = trains.filter(t => t.direction === 'down');
+
+    const getStopWindow = (trainList, stCode) => {
+      let windows = [];
+      trainList.forEach(t => {
+        if (!t.actual) return;
+        const st = t.actual.find(s => s.code === stCode && !s.is_cancelled);
+        if (!st) return;
+        const arr = st.arr_actual;
+        const dep = st.dep_actual;
+        if (arr == null || dep == null) return;
+        windows.push({ arr, dep });
+      });
+      return windows;
+    };
+
+    const upWindows = getStopWindow(upTrains, code);
+    const downWindows = getStopWindow(downTrains, code);
+
+    // Check if any up↔down pair has an overlapping window that includes currentMinutes
+    for (const uw of upWindows) {
+      for (const dw of downWindows) {
+        // The exchange window: from earliest arrival to earliest departure
+        const exchangeStart = Math.min(uw.arr, dw.arr);
+        const exchangeEnd = Math.min(uw.dep, dw.dep);
+        // An exchange occurs if both trains are involved and time window overlaps now
+        if (exchangeEnd > exchangeStart &&
+            currentMinutes >= exchangeStart &&
+            currentMinutes < exchangeEnd) {
+          exchanging.add(code);
+        }
+      }
+    }
+  });
+
+  return exchanging;
+}
+
 function renderPosition() {
   renderStations(); // Re-build DOM layout first
 
   const host = $("#position-body");
   const trains = effectiveTrains();
+  const cur = state.currentMinutes ?? 720;
 
   const stationsReversed = [...DATA.stations].reverse();
 
@@ -542,6 +594,13 @@ function renderPosition() {
         if (container) container.appendChild(card);
       }
     }
+  });
+
+  // Mark exchanging stations
+  const exchangingCodes = computeExchangingStations(trains, cur);
+  document.querySelectorAll('.pos-station-row').forEach(row => {
+    const code = row.dataset.station;
+    row.classList.toggle('is-exchanging', exchangingCodes.has(code));
   });
 
   const running = trains.filter(t => t.result.state === "RUNNING").length;

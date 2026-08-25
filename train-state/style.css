@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   /* Apple Design Light Theme */
   --bg-system: #f2f2f7;
   --bg-secondary: #ffffff;
@@ -367,9 +367,12 @@ input[type="time"]::-webkit-datetime-edit-text:focus {
   border: 2px solid var(--rail-color);
   border-radius: 50%;
   opacity: 0;
-  animation: ripple 2s infinite ease-out;
+  animation: none; /* off by default — enabled by .is-exchanging */
 }
-@keyframes ripple {
+.pos-station-row.is-exchanging .pos-rail-dot::before {
+  animation: ripple-rail 1.6s infinite ease-out;
+}
+@keyframes ripple-rail {
   0% { transform: scale(0.6); opacity: 1; }
   100% { transform: scale(1.8); opacity: 0; }
 }
@@ -647,7 +650,22 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
   border: 2px solid #30d158;
   border-radius: 50%;
   opacity: 0;
-  animation: ripple 2s infinite ease-out;
+  /* Ripple animation is OFF by default — only on .is-exchanging */
+  animation: none;
+}
+
+/* Active train exchange at this station → show ripple */
+.pos-station-row.is-exchanging .pos-station-dot {
+  border-color: #30d158;
+  box-shadow: 0 0 10px rgba(48, 209, 88, 0.6);
+}
+.pos-station-row.is-exchanging .pos-station-dot::before {
+  animation: ripple 1.6s infinite ease-out;
+  border-color: #30d158;
+}
+@keyframes ripple {
+  0%   { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.9); opacity: 0; }
 }
 
 .pos-trains-container {
