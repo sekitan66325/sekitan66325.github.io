@@ -1,4 +1,4 @@
-var $ = (s, root = document) => root.querySelector(s);
+﻿var $ = (s, root = document) => root.querySelector(s);
 var $$ = (s, root = document) => [...root.querySelectorAll(s)];
 var DATA = { stations: [], timetable: [], prevTimetable: [], status: null };
 var state = { view: "position", serviceDate: "2026-08-15", currentMinutes: null, liveClock: true, diagramDir: "all", timetableDir: "up" };
@@ -20,11 +20,11 @@ function timeStringToMinutes(timeStr) {
   if (!timeStr) return null;
   const parts = timeStr.split(':');
   if (parts.length !== 2) return null;
-  
+
   const hours = parseInt(parts[0], 10);
   const minutes = parseInt(parts[1], 10);
   if (isNaN(hours) || isNaN(minutes)) return null;
-  
+
   return hours * 60 + minutes;
 }
 
@@ -97,7 +97,7 @@ function calculateActualTimetable(train, override) {
 
   return train.stations.map((st) => {
     if (st.code === actualStart) isWithinActiveSegment = true;
-    
+
     const isCancelled = !isWithinActiveSegment;
     const currentDelay = stationDelays[st.code] !== undefined ? stationDelays[st.code] : baseDelay;
 
@@ -140,9 +140,9 @@ function evaluateTrainState(actualStations, currentMinutes) {
   // 1. 蟋狗匱逋ｺ霁E��燕繝�Eぉ繝�EぁE
   if (currentMinutes < firstStation.dep_actual) {
     if (currentMinutes >= firstStation.dep_actual - DEPARTURE_HOLD_MINUTES) {
-      return { 
-        state: 'PRE_DEPARTURE', 
-        station_code: firstStation.code 
+      return {
+        state: 'PRE_DEPARTURE',
+        station_code: firstStation.code
       };
     }
     return { state: 'OUT_OF_SERVICE' };
@@ -151,9 +151,9 @@ function evaluateTrainState(actualStations, currentMinutes) {
   // 2. 邨ら捩鬧・芦逹蠕後�E菫晁E�� (5蛻・俣) 縺翫�E�縺�E�蝨丞､夜�E遘ｻ
   if (currentMinutes >= lastStation.arr_actual) {
     if (currentMinutes < lastStation.arr_actual + ARRIVED_HOLD_MINUTES) {
-      return { 
-        state: 'ARRIVED', 
-        station_code: lastStation.code 
+      return {
+        state: 'ARRIVED',
+        station_code: lastStation.code
       };
     }
     return { state: 'OUT_OF_SERVICE' };
@@ -165,17 +165,17 @@ function evaluateTrainState(actualStations, currentMinutes) {
     if (st.arr_actual !== null && st.dep_actual !== null) {
       // 逋ｺ逹譎ょ綾縺悟�E荳・域治譎る�E�・〒縺�E�縺・夐℃/荳迸�E�蛛懆�E�奁E��峨・1蛻・俣蟁E��蠢・
       if (st.arr_actual === st.dep_actual && currentMinutes === st.arr_actual) {
-        return { 
-          state: 'STOPPED', 
-          station_code: st.code, 
-          is_instant_stop: true 
+        return {
+          state: 'STOPPED',
+          station_code: st.code,
+          is_instant_stop: true
         };
       }
       if (st.arr_actual <= currentMinutes && currentMinutes < st.dep_actual) {
-        return { 
-          state: 'STOPPED', 
-          station_code: st.code, 
-          is_instant_stop: false 
+        return {
+          state: 'STOPPED',
+          station_code: st.code,
+          is_instant_stop: false
         };
       }
     }
@@ -185,7 +185,7 @@ function evaluateTrainState(actualStations, currentMinutes) {
   for (let i = 0; i < activeStations.length - 1; i++) {
     const fromSt = activeStations[i];
     const toSt = activeStations[i + 1];
-    
+
     if (fromSt.dep_actual !== null && toSt.arr_actual !== null) {
       if (fromSt.dep_actual <= currentMinutes && currentMinutes < toSt.arr_actual) {
         // 謁E�隕∵凾髢薙′繧�E�繝ｭ縺�E�縺溘�E雋�縺�E�縺�E�繧句屓蠕ｩ驕玖�E��E�荳肴紛蜷医∈縺�E�繧�E�繝ｼ繝会ｼ域怙蟆乗園隕∵凾髢薙ａE蛻・↓蝗�E�螳夲�E�・
@@ -263,12 +263,12 @@ function normalizeToServiceContext(d) {
   let h = Number(p.hour);
   let base = new Date(Number(p.year), Number(p.month) - 1, Number(p.day));
   let mins = h * 60 + Number(p.minute);
-  
+
   if (h < 4) {
     base.setDate(base.getDate() - 1);
     mins += 1440;
   }
-  
+
   return { service_date: formatYMD(base), service_minutes: mins };
 }
 function formatServiceTime(m) {
@@ -311,10 +311,10 @@ function validateStatus(s) {
 
 function stationPos(code) { return DATA.stations.findIndex(s => s.code === code) }
 function positionForState(train, actual, result) {
-  if(result.state==="OUT_OF_SERVICE") return null;
-  if(result.state==="STOPPED"||result.state==="ARRIVED"||result.state==="PRE_DEPARTURE") {
-    const idx = actual.findIndex(s=>s.code===result.station_code);
-    return {station:idx, progress:0};
+  if (result.state === "OUT_OF_SERVICE") return null;
+  if (result.state === "STOPPED" || result.state === "ARRIVED" || result.state === "PRE_DEPARTURE") {
+    const idx = actual.findIndex(s => s.code === result.station_code);
+    return { station: idx, progress: 0 };
   }
   if (result.state === "RUNNING") {
     const from = stationPos(result.from_station), to = stationPos(result.to_station);
@@ -329,7 +329,7 @@ function getPrevDate(dateStr) {
 }
 function buildTrainEntry(train, currentMins) {
   let ov = DATA.status.train_overrides[train.train_id] || {};
-  
+
   // Inject static partial_cancellations if applicable for today
   if (train.partial_cancellations) {
     const pc = train.partial_cancellations.find(p => p.date === state.serviceDate);
@@ -339,7 +339,7 @@ function buildTrainEntry(train, currentMins) {
       if (!ov.actual_end) ov.actual_end = pc.actual_end;
     }
   }
-  
+
   const actual = calculateActualTimetable(train, ov);
   const result = evaluateTrainState(actual, currentMins ?? 720);
   return { ...train, override: ov, actual, result, position: positionForState(train, actual, result) };
@@ -362,7 +362,7 @@ function effectiveTrains() {
 
   const allTrains = [...crossover, ...today];
 
-  return allTrains.sort((a,b)=>{
+  return allTrains.sort((a, b) => {
     const aTime = a.actual[0]?.dep_actual ?? 9999;
     const bTime = b.actual[0]?.dep_actual ?? 9999;
     return aTime - bTime;
@@ -485,7 +485,7 @@ function renderStations() {
     stRow.className = "pos-station-row";
     stRow.dataset.station = s.code;
     stRow.style.animationDelay = `${i * 0.05}s`;
-    
+
     stRow.innerHTML = `
       <div class="pos-station-name-col">${formatStationName(s.name)}</div>
       <div class="pos-trains-container pos-trains-down" id="pos-down-${s.code}"></div>
@@ -496,13 +496,13 @@ function renderStations() {
 
     // 2. Between Row (if not the last station)
     if (i < stationsReversed.length - 1) {
-      const nextS = stationsReversed[i+1];
+      const nextS = stationsReversed[i + 1];
       const bwRow = document.createElement("div");
       bwRow.className = "pos-between-row";
       bwRow.style.animationDelay = `${i * 0.05 + 0.025}s`;
       bwRow.dataset.from = s.code;
       bwRow.dataset.to = nextS.code;
-      
+
       bwRow.innerHTML = `
         <div class="pos-station-name-col"></div>
         <div class="pos-trains-container pos-trains-down" id="pos-bw-down-${s.code}-${nextS.code}"></div>
@@ -516,7 +516,7 @@ function renderStations() {
 
 function renderPosition() {
   renderStations(); // Re-build DOM layout first
-  
+
   const host = $("#position-body");
   const trains = effectiveTrains();
 
@@ -524,7 +524,7 @@ function renderPosition() {
 
   trains.filter(t => t.position).forEach(t => {
     const card = createTrainCard(t);
-    
+
     if (t.result.state === "STOPPED" || t.result.state === "ARRIVED" || t.result.state === "PRE_DEPARTURE") {
       const code = t.result.station_code;
       const container = document.getElementById(`pos-${t.direction}-${code}`);
@@ -533,7 +533,7 @@ function renderPosition() {
       // Find the correct between row based on stationsReversed order
       let fromIdx = stationsReversed.findIndex(s => s.code === t.result.from_station);
       let toIdx = stationsReversed.findIndex(s => s.code === t.result.to_station);
-      
+
       if (fromIdx !== -1 && toIdx !== -1) {
         // The between row ID is based on the top station to bottom station
         const topCode = stationsReversed[Math.min(fromIdx, toIdx)].code;
@@ -739,7 +739,7 @@ function renderTimetable() {
     const tr = document.createElement("tr");
     tr.style.animationDelay = `${i * 0.03}s`;
     const stCell = document.createElement("td");
-    
+
     let isStart = false;
     let isEnd = false;
     if (state.timetableDir === "up") {
@@ -803,18 +803,18 @@ function renderTimetable() {
 }
 
 function openTrainModal(t) {
-  let statusHTML="";
-  if(t.actual.some(s=>s.is_cancelled)){
-    statusHTML=`<span style="color:#d32f2f;font-weight:bold;">区間運休</span>`;
-  }else{
-    const stateText={
-      RUNNING:"駅間走行中",
-      STOPPED:"駅停車中",
-      ARRIVED:"終着駅到着",
-      PRE_DEPARTURE:"始発駅停車中",
-      OUT_OF_SERVICE:"運転時間外"
+  let statusHTML = "";
+  if (t.actual.some(s => s.is_cancelled)) {
+    statusHTML = `<span style="color:#d32f2f;font-weight:bold;">区間運休</span>`;
+  } else {
+    const stateText = {
+      RUNNING: "駅間走行中",
+      STOPPED: "駅停車中",
+      ARRIVED: "終着駅到着",
+      PRE_DEPARTURE: "始発駅停車中",
+      OUT_OF_SERVICE: "運転時間外"
     }[t.result.state] || "不明";
-    statusHTML=`<span>${stateText}</span>`;
+    statusHTML = `<span>${stateText}</span>`;
   }
   let formation = [];
   let currentOpIdStr = t.operation_id || "";
@@ -839,18 +839,18 @@ function openTrainModal(t) {
     ${formation.length ? `<div class="formation"><h4>編成</h4><div class="formation-list">${formation.map(x => `<span>${x}</span>`).join("")}</div></div>` : ""}
     ${t.override.memo ? `<div class="memo">${t.override.memo}</div>` : ""}
     <div class="station-detail"><h4>各駅の詳細時刻</h4>${t.stations.map(st => {
-      let a = st.arr;
-      let d = st.dep;
-      if (t.direction === "down" && st.code === "M01") a = null;
-      if (t.direction === "up" && st.code === "M17") a = null;
-      if (t.direction === "down" && st.code === "M17") d = "＝";
-      if (t.direction === "up" && st.code === "M01") d = "＝";
-      if (st.arr !== null && st.dep === null && st.code === "M07") d = "＝";
-      const arrStr = a === "pass" || a === "レ" ? "レ" : (a || "");
-      const depStr = d === "pass" || d === "レ" ? "レ" : (d || "");
-      const isCancel = t.actual.find(x => x.code === st.code)?.is_cancelled;
-      return `<div class="stop-row ${isCancel ? "cancel" : ""}"><span>${formatStationName(DATA.stations.find(x => x.code === st.code)?.name || st.code)}</span><span>${arrStr}</span><span>${depStr}</span></div>`;
-    }).join("")}</div>`;
+    let a = st.arr;
+    let d = st.dep;
+    if (t.direction === "down" && st.code === "M01") a = null;
+    if (t.direction === "up" && st.code === "M17") a = null;
+    if (t.direction === "down" && st.code === "M17") d = "＝";
+    if (t.direction === "up" && st.code === "M01") d = "＝";
+    if (st.arr !== null && st.dep === null && st.code === "M07") d = "＝";
+    const arrStr = a === "pass" || a === "レ" ? "レ" : (a || "");
+    const depStr = d === "pass" || d === "レ" ? "レ" : (d || "");
+    const isCancel = t.actual.find(x => x.code === st.code)?.is_cancelled;
+    return `<div class="stop-row ${isCancel ? "cancel" : ""}"><span>${formatStationName(DATA.stations.find(x => x.code === st.code)?.name || st.code)}</span><span>${arrStr}</span><span>${depStr}</span></div>`;
+  }).join("")}</div>`;
   $("#train-modal").classList.remove("hidden");
 }
 
@@ -859,8 +859,8 @@ function updateClock() {
   const ctx = normalizeToServiceContext(new Date());
 
   if (ctx.service_date !== state.serviceDate) {
-        DATA.prevTimetable = [...DATA.timetable]; // 前日ダイヤを日またぎ列車用に保存
-        state.serviceDate = ctx.service_date;
+    DATA.prevTimetable = [...DATA.timetable]; // 前日ダイヤを日またぎ列車用に保存
+    state.serviceDate = ctx.service_date;
     state.currentMinutes = ctx.service_minutes;
     $("#date-input").value = state.serviceDate;
     loadData();
@@ -888,10 +888,16 @@ function updateClock() {
 
 async function loadData() {
   try {
-    const [s, t, st] = await Promise.all([
+    const statusApiUrl = (typeof CONFIG !== 'undefined' && CONFIG.STATUS_API_URL) ? CONFIG.STATUS_API_URL : "";
+    const fetchStatusPromise = statusApiUrl 
+      ? fetch(statusApiUrl).then(r => r.json()).catch(e => { console.error("GAS Status fetch failed", e); return null; })
+      : Promise.resolve(null);
+
+    const [s, t, st, live] = await Promise.all([
       fetch("data/stations.json").then(r => r.json()),
       fetch("data/timetable.json").then(r => r.json()),
-      fetch("data/today_status.json").then(r => r.json())
+      fetch("data/today_status.json").then(r => r.json()),
+      fetchStatusPromise
     ]);
 
     if (!Array.isArray(s) || !Array.isArray(t) || !validateStatus(st))
@@ -900,6 +906,12 @@ async function loadData() {
     DATA.stations = s;
     DATA.timetable = t;
 
+    DATA.status = st;
+    if (live && live.official_info) {
+      DATA.status.official_info = live.official_info;
+      if (live.service_date) DATA.status.service_date = live.service_date;
+      if (live.updated_at) DATA.status.updated_at = live.updated_at;
+    }
 
     DATA.status = st;
 
@@ -989,35 +1001,35 @@ var _resizeObs = new ResizeObserver(() => {
 });
 _resizeObs.observe(document.body);
 
-$("#date-input").addEventListener("change", e => { 
-  state.serviceDate = e.target.value; 
-  state.liveClock = false; 
+$("#date-input").addEventListener("change", e => {
+  state.serviceDate = e.target.value;
+  state.liveClock = false;
   const timeInput = $("#time-input") ? $("#time-input").value : "12:00";
   const [h, m] = (timeInput || "12:00").split(":").map(Number);
-  state.currentMinutes = h * 60 + m; 
-  renderNotice(); renderAll() 
+  state.currentMinutes = h * 60 + m;
+  renderNotice(); renderAll()
 });
 const timeInputEl2 = $("#time-input");
 if (timeInputEl2) {
-  timeInputEl2.addEventListener("change", e => { 
-    state.liveClock = false; 
+  timeInputEl2.addEventListener("change", e => {
+    state.liveClock = false;
     const timeInput = e.target.value || "12:00";
     const [h, m] = timeInput.split(":").map(Number);
-    state.currentMinutes = h * 60 + m; 
-    renderNotice(); renderAll() 
+    state.currentMinutes = h * 60 + m;
+    renderNotice(); renderAll()
   });
 }
-$("#now-btn").addEventListener("click", () => { 
-  state.liveClock = true; 
-  const c = normalizeToServiceContext(new Date()); 
-  state.serviceDate = c.service_date; 
-  state.currentMinutes = c.service_minutes; 
-  $("#date-input").value = state.serviceDate; 
+$("#now-btn").addEventListener("click", () => {
+  state.liveClock = true;
+  const c = normalizeToServiceContext(new Date());
+  state.serviceDate = c.service_date;
+  state.currentMinutes = c.service_minutes;
+  $("#date-input").value = state.serviceDate;
   const h = Math.floor(state.currentMinutes / 60) % 24;
   const m = state.currentMinutes % 60;
   if ($("#time-input")) $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-  $("#diagram-scroll").dataset.didAutoScroll = ""; 
-  renderAll() 
+  $("#diagram-scroll").dataset.didAutoScroll = "";
+  renderAll()
 });
 $$(".seg-btn").forEach(b => b.addEventListener("click", () => { const d = b.dataset.dir; if (b.classList.contains("tt-dir")) { state.timetableDir = d; $$(".tt-dir").forEach(x => x.classList.toggle("active", x === b)); renderTimetable() } else { state.diagramDir = d; $$(".diagram-tools .seg-btn:not(.tt-dir)").forEach(x => x.classList.toggle("active", x === b)); renderDiagram() } }));
 $("#modal-close").onclick = () => $("#train-modal").classList.add("hidden"); $("#train-modal").addEventListener("click", e => { if (e.target.id === "train-modal") $("#train-modal").classList.add("hidden") });
@@ -1101,3 +1113,4 @@ if (tabBar && glider) {
   window.addEventListener('touchmove', moveDrag, { passive: true });
   window.addEventListener('touchend', endDrag);
 }
+
