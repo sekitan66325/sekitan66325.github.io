@@ -22,6 +22,9 @@ document.body.appendChild(pickerPopup);
 
 let currentInput = null;
 let viewDate = new Date();
+let isRangeMode = false;
+let rangeStart = null;
+let rangeEnd = null;
 
 function updateHighlight(selectedBtn) {
   const highlight = pickerPopup.querySelector('.cdp-highlight');
@@ -40,6 +43,22 @@ function updateHighlight(selectedBtn) {
   highlight.style.transform = `translate(${left}px, ${top}px)`;
   highlight.style.width = `${btnRect.width}px`;
   highlight.style.height = `${btnRect.height}px`;
+}
+
+function getDatesInRange(startStr, endStr) {
+  const dates = [];
+  let curr = new Date(startStr);
+  const end = new Date(endStr);
+  if (curr > end) {
+    let temp = curr;
+    curr = end;
+    end = temp;
+  }
+  while (curr <= end) {
+    dates.push(curr.toISOString().split('T')[0]);
+    curr.setDate(curr.getDate() + 1);
+  }
+  return dates;
 }
 
 function renderPicker() {
@@ -64,7 +83,7 @@ function renderPicker() {
   }
   
   const todayStr = new Date().toISOString().split('T')[0];
-  const selectedStr = currentInput ? currentInput.value : '';
+  const selectedStrs = currentInput && currentInput.value ? currentInput.value.split(',').map(s=>s.trim()) : [];
   let selectedBtn = null;
   
   for (let i = 1; i <= daysInMonth; i++) {
@@ -75,23 +94,49 @@ function renderPicker() {
     
     const dStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
     if (dStr === todayStr) btn.classList.add('today');
-    if (dStr === selectedStr) {
-      btn.classList.add('selected');
-      selectedBtn = btn;
+    
+    if (isRangeMode) {
+      if (rangeStart === dStr) {
+        btn.classList.add('selected');
+        selectedBtn = btn;
+      }
+    } else {
+      if (selectedStrs.includes(dStr)) {
+        btn.classList.add('selected');
+        selectedBtn = btn;
+      }
     }
     
     btn.onclick = () => {
-      if(currentInput) {
-        currentInput.value = dStr;
-        currentInput.dispatchEvent(new Event('change'));
+      if (!isRangeMode) {
+        if(currentInput) {
+          currentInput.value = dStr;
+          currentInput.dispatchEvent(new Event('change'));
+        }
+        updateHighlight(btn);
+        setTimeout(() => hidePicker(), 200);
+      } else {
+        if (!rangeStart) {
+          rangeStart = dStr;
+          renderPicker();
+        } else {
+          rangeEnd = dStr;
+          const rangeDates = getDatesInRange(rangeStart, rangeEnd);
+          if (currentInput) {
+            // Append or overwrite? We should just return the comma-separated string,
+            // and the caller's addOpDateChip will process it.
+            currentInput.value = rangeDates.join(',');
+            currentInput.dispatchEvent(new Event('change'));
+          }
+          rangeStart = null;
+          rangeEnd = null;
+          setTimeout(() => hidePicker(), 200);
+        }
       }
-      updateHighlight(btn);
-      setTimeout(() => hidePicker(), 200);
     };
     gridEl.appendChild(btn);
   }
   
-  // Update fluid highlight after grid layout is done
   requestAnimationFrame(() => {
     updateHighlight(selectedBtn);
   });
@@ -101,18 +146,27 @@ pickerPopup.querySelector('.cdp-prev').onclick = () => { viewDate.setMonth(viewD
 pickerPopup.querySelector('.cdp-next').onclick = () => { viewDate.setMonth(viewDate.getMonth() + 1); renderPicker(); };
 pickerPopup.querySelector('.cdp-today').onclick = () => { 
   viewDate = new Date(); 
-  if(currentInput) {
+  if (!isRangeMode && currentInput) {
     currentInput.value = viewDate.toISOString().split('T')[0];
     currentInput.dispatchEvent(new Event('change'));
+    setTimeout(() => hidePicker(), 200);
   }
   renderPicker();
-  setTimeout(() => hidePicker(), 200);
 };
 
 function showPicker(inputEl) {
   currentInput = inputEl;
+  isRangeMode = inputEl.dataset.range === "true";
+  rangeStart = null;
+  rangeEnd = null;
+  
   if(inputEl.value) {
-    viewDate = new Date(inputEl.value);
+    const firstDate = inputEl.value.split(',')[0].trim();
+    if (firstDate && firstDate.includes('-')) {
+      viewDate = new Date(firstDate);
+    } else {
+      viewDate = new Date();
+    }
   } else {
     viewDate = new Date();
   }
@@ -123,7 +177,6 @@ function showPicker(inputEl) {
   pickerPopup.style.left = `${rect.left + window.scrollX}px`;
   pickerPopup.classList.add('show');
   
-  // Staggered entrance
   const items = pickerPopup.querySelectorAll('.stagger-item');
   items.forEach((item, index) => {
     item.style.animation = 'none';
@@ -135,25 +188,29 @@ function showPicker(inputEl) {
 function hidePicker() {
   pickerPopup.classList.remove('show');
   currentInput = null;
+  rangeStart = null;
+  rangeEnd = null;
 }
 
 document.addEventListener('click', e => {
-  if (e.target.matches('input[type="date"]')) {
-    e.target.preventDefault();
-  } else if (!pickerPopup.contains(e.target) && !e.target.matches('.form-input.pc-date, .form-input.op-date')) {
+  if (e.target.matches('input[type="date"], input[data-is-datepicker="true"]')) {
+    if (e.preventDefault) e.preventDefault();
+  } else if (!pickerPopup.contains(e.target)) {
     hidePicker();
   }
 });
 
 document.body.addEventListener('focusin', e => {
-  if (e.target.matches('input[type="date"]')) {
+  if (e.target.matches('input[type="date"], input[data-is-datepicker="true"]')) {
     e.target.type = 'text';
     e.target.readOnly = true;
+    e.target.dataset.isDatepicker = "true";
     showPicker(e.target);
   }
 });
+
 document.body.addEventListener('click', e => {
-  if (e.target.matches('input[type="text"].pc-date, input[type="text"].op-date')) {
+  if (e.target.matches('input[data-is-datepicker="true"]')) {
     showPicker(e.target);
   }
 });

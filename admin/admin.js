@@ -1,4 +1,4 @@
-﻿const GAS_URL = typeof CONFIG !== 'undefined' ? CONFIG.GAS_API_URL : '';
+const GAS_URL = typeof CONFIG !== 'undefined' ? CONFIG.GAS_API_URL : '';
 
 let adminToken = sessionStorage.getItem('admin_token') || '';
 let allAdminPosts = [];
@@ -20,7 +20,7 @@ async function handleLogin(e) {
   const btn = document.getElementById('login-submit-btn');
 
   btn.disabled = true;
-  btn.textContent = '認証中...';
+  btn.classList.add('btn-loading');
 
   try {
     const res = await fetch(GAS_URL, {
@@ -47,7 +47,7 @@ async function handleLogin(e) {
     alert('通信エラーが発生しました。');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'ログイン';
+    btn.classList.remove('btn-loading');
   }
 }
 
@@ -57,7 +57,9 @@ async function handleLogin(e) {
 async function handleChangePassword(e) {
   e.preventDefault();
   const newPass = document.getElementById('new-password').value.trim();
+  const btn = e.target.querySelector('button[type="submit"]') || e.submitter;
 
+  if (btn) { btn.disabled = true; btn.classList.add('btn-loading'); }
   try {
     const res = await fetch(GAS_URL, {
       method: 'POST',
@@ -75,6 +77,8 @@ async function handleChangePassword(e) {
     }
   } catch (err) {
     alert('通信エラーが発生しました。');
+  } finally {
+    if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
   }
 }
 
@@ -206,6 +210,9 @@ function renderAdminPosts() {
  */
 async function toggleHidePost(id, toHide) {
   const action = toHide ? 'admin_delete' : 'admin_restore';
+  // Find the clicked button — fallback to body event target not possible here, so select by id
+  const btns = document.querySelectorAll(`button[onclick*="'${id}'"]`);
+  btns.forEach(b => { b.disabled = true; b.classList.add('btn-loading'); });
   try {
     const res = await fetch(GAS_URL, {
       method: 'POST',
@@ -220,6 +227,8 @@ async function toggleHidePost(id, toHide) {
     }
   } catch (err) {
     alert('通信エラーが発生しました。');
+  } finally {
+    btns.forEach(b => { b.disabled = false; b.classList.remove('btn-loading'); });
   }
 }
 
@@ -245,7 +254,9 @@ function closeAdminEditModal() {
 async function submitAdminEdit() {
   const id = document.getElementById('admin-edit-id').value;
   const msg = document.getElementById('admin-edit-message').value.trim();
+  const btn = document.querySelector('#admin-edit-modal button[onclick="submitAdminEdit()"]');
 
+  if (btn) { btn.disabled = true; btn.classList.add('btn-loading'); }
   try {
     const res = await fetch(GAS_URL, {
       method: 'POST',
@@ -261,6 +272,8 @@ async function submitAdminEdit() {
     }
   } catch (err) {
     alert('通信エラーが発生しました。');
+  } finally {
+    if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
   }
 }
 
@@ -663,9 +676,8 @@ async function exportTimetable() {
   }
 
   const btn = document.querySelector('button[onclick="exportTimetable()"]');
-  const originalText = btn.textContent;
-  btn.textContent = 'GitHubへ反映中...';
   btn.disabled = true;
+  btn.classList.add('btn-loading');
 
   try {
     const res = await fetch(GAS_URL, {
@@ -694,8 +706,8 @@ async function exportTimetable() {
     a.click();
     URL.revokeObjectURL(url);
   } finally {
-    btn.textContent = originalText;
     btn.disabled = false;
+    btn.classList.remove('btn-loading');
   }
 }
 
@@ -705,11 +717,46 @@ async function exportTimetable() {
 const DAYS_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'holiday'];
 const DAYS_LABELS = { sun:'日', mon:'月', tue:'火', wed:'水', thu:'木', fri:'金', sat:'土', holiday:'祝' };
 
+window.addOpDateChip = function(op, type) {
+  const input = document.getElementById(`op-${type}-input-${op}`);
+  const hidden = document.getElementById(`op-${type}-hidden-${op}`);
+  const val = input.value;
+  if (!val) return;
+  
+  let current = hidden.value ? hidden.value.split(',') : [];
+  if (!current.includes(val)) {
+    current.push(val);
+    hidden.value = current.join(',');
+    window.renderOpDateChips(op, type);
+  }
+  input.value = '';
+};
+
+window.removeOpDateChip = function(op, type, val) {
+  const hidden = document.getElementById(`op-${type}-hidden-${op}`);
+  let current = hidden.value ? hidden.value.split(',') : [];
+  current = current.filter(d => d !== val);
+  hidden.value = current.join(',');
+  window.renderOpDateChips(op, type);
+};
+
+window.renderOpDateChips = function(op, type) {
+  const hidden = document.getElementById(`op-${type}-hidden-${op}`);
+  const container = document.getElementById(`op-${type}-chips-${op}`);
+  if(!hidden || !container) return;
+  const current = hidden.value ? hidden.value.split(',').filter(s=>s) : [];
+  
+  container.innerHTML = current.map(d => `
+    <div style="background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+      ${d} <span style="cursor:pointer; color: #ff6b6b; font-weight:bold;" onclick="window.removeOpDateChip('${op}', '${type}', '${d}')">×</span>
+    </div>
+  `).join('');
+};
+
 function renderOperationsView() {
   const opList = document.getElementById('op-list');
   if(!opList) return;
   
-  // 1. Collect all unique operations from current timetable
   const ops = new Set();
   timetableData.forEach(t => {
     if(t.operation_dict) {
@@ -722,14 +769,56 @@ function renderOperationsView() {
   });
   
   let html = '';
-  // 2. Render each operation card
   Array.from(ops).sort().forEach(op => {
-    html += `<div class="op-card">
+    let repTrain = null;
+    for(const t of timetableData) {
+       let matched = false;
+       if(t.operation_dict) {
+         if(Object.values(t.operation_dict).some(v => v.split(',').map(s=>s.trim()).includes(op))) matched = true;
+       } else if (t.operation_id) {
+         if(t.operation_id.toString().split(',').map(s=>s.trim()).includes(op)) matched = true;
+       }
+       if(matched) { repTrain = t; break; }
+    }
+    
+    let baseDaysOff = repTrain && repTrain.operation_rule && repTrain.operation_rule.days_off ? repTrain.operation_rule.days_off : [];
+    let extraDates = repTrain && repTrain.operation_rule && repTrain.operation_rule.dates_run ? repTrain.operation_rule.dates_run.join(',') : '';
+    let excludeDates = repTrain && repTrain.operation_rule && repTrain.operation_rule.dates_off ? repTrain.operation_rule.dates_off.join(',') : '';
+
+    html += `<div class="op-card" style="background: var(--bg-card); padding: 16px; border-radius: 8px;">
       <h3 style="margin-top:0; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:8px;">運用 ${op}</h3>
-      <div style="margin-top:12px;">`;
+      
+      <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px; margin-top: 12px; font-size: 0.85rem;">
+        <strong style="display:block; margin-bottom:8px; color: var(--text-primary);">▼ 運休曜日の設定</strong>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+          ${[1,2,3,4,5,6,0].map(d => `<label style="display:flex; align-items:center; gap:4px; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px; cursor:pointer;"><input type="checkbox" class="op-daysoff-cb" data-op="${op}" value="${d}" ${baseDaysOff.includes(d) ? 'checked' : ''}> ${['日','月','火','水','木','金','土'][d]}</label>`).join('')}
+        </div>
+        
+        <strong style="display:block; margin-bottom:8px; color: var(--text-primary);">▼ 特定運転日・特定運休日の設定</strong>
+        <div style="margin-bottom: 8px;">
+          <label style="color: var(--text-secondary); display:block; margin-bottom:4px;">特定運転日</label>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="op-datesrun-input-${op}" class="form-input" data-is-datepicker="true" data-range="true" style="flex:1;">
+            <button type="button" class="btn-admin" onclick="addOpDateChip('${op}', 'datesrun')">追加</button>
+          </div>
+          <input type="hidden" id="op-datesrun-hidden-${op}" class="op-datesrun-hidden" data-op="${op}" value="${extraDates}">
+          <div id="op-datesrun-chips-${op}" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
+        </div>
+        <div>
+          <label style="color: var(--text-secondary); display:block; margin-bottom:4px;">特定運休日</label>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="op-datesoff-input-${op}" class="form-input" data-is-datepicker="true" data-range="true" style="flex:1;">
+            <button type="button" class="btn-admin" onclick="addOpDateChip('${op}', 'datesoff')">追加</button>
+          </div>
+          <input type="hidden" id="op-datesoff-hidden-${op}" class="op-datesoff-hidden" data-op="${op}" value="${excludeDates}">
+          <div id="op-datesoff-chips-${op}" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <strong style="display:block; margin-bottom:8px; font-size:0.85rem; color: var(--text-secondary);">▼ 曜日ごとの充当列車</strong>`;
       
     DAYS_KEYS.forEach(dayKey => {
-      // Find trains assigned to this operation on this day
       const trainsAssigned = timetableData.filter(t => {
         let val = '';
         if (t.operation_dict && t.operation_dict[dayKey] !== undefined) {
@@ -741,10 +830,10 @@ function renderOperationsView() {
       }).map(t => t.train_no);
       
       html += `
-        <div class="op-day-row">
-          <span style="color:var(--text-secondary); width:40px;">${DAYS_LABELS[dayKey]}</span>
-          <input type="text" class="form-input op-edit-input" style="flex:1; padding:2px 6px;" 
-            data-op="${op}" data-day="${dayKey}" value="${trainsAssigned.join(', ')}" placeholder="列車番号をカンマ区切りで入力">
+        <div class="op-day-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+          <span style="color:var(--text-secondary); width:32px;">${DAYS_LABELS[dayKey]}</span>
+          <input type="text" class="form-input op-edit-input" style="flex:1; padding:4px 8px;" 
+            data-op="${op}" data-day="${dayKey}" value="${trainsAssigned.join(', ')}" placeholder="列車番号をカンマ区切り">
         </div>`;
     });
     
@@ -755,15 +844,20 @@ function renderOperationsView() {
     <div style="grid-column: 1 / -1; margin-top: 16px;">
       <button class="btn-admin btn-success" onclick="saveOperationsToMemory()">変更を適用 (メモリ)</button>
       <button class="btn-admin" onclick="renderOperationsView()" style="margin-left:8px;">リセット</button>
-      <p style="font-size:0.8rem; margin-top:8px; color:var(--text-secondary);">※変更を適用後、「列車データ管理」タブから「変更をダウンロード(またはプッシュ)」してください。</p>
+      <p style="font-size:0.8rem; margin-top:8px; color:var(--text-secondary);">※変更を適用後、「運行データ管理」タブから「GitHubへ反映」してください。</p>
     </div>
   `;
   opList.innerHTML = html;
+  
+  Array.from(ops).forEach(op => {
+    window.renderOpDateChips(op, 'datesrun');
+    window.renderOpDateChips(op, 'datesoff');
+  });
 }
 
 window.saveOperationsToMemory = function() {
   const inputs = document.querySelectorAll('.op-edit-input');
-  // Initialize operation_dict for all trains if not present
+  
   timetableData.forEach(t => {
     if(!t.operation_dict) {
       t.operation_dict = {};
@@ -771,7 +865,6 @@ window.saveOperationsToMemory = function() {
     }
   });
 
-  // Rebuild operation_dict from inputs
   DAYS_KEYS.forEach(dayKey => {
     timetableData.forEach(t => { t.operation_dict[dayKey] = ""; });
   });
@@ -793,8 +886,50 @@ window.saveOperationsToMemory = function() {
       }
     });
   });
+
+  const opDatesRunInputs = document.querySelectorAll('.op-datesrun-hidden');
+  const opDatesOffInputs = document.querySelectorAll('.op-datesoff-hidden');
+  const opDaysOffCbs = document.querySelectorAll('.op-daysoff-cb');
   
-  alert('運用の変更をメモリに適用しました。保存するにはデータ書き出しを行ってください。');
+  const opSettings = {};
+  opDatesRunInputs.forEach(hidden => {
+    const op = hidden.getAttribute('data-op');
+    if(!opSettings[op]) opSettings[op] = { datesRun: [], datesOff: [], daysOff: [] };
+    opSettings[op].datesRun = hidden.value.split(',').map(s=>s.trim()).filter(s=>s);
+  });
+  opDatesOffInputs.forEach(hidden => {
+    const op = hidden.getAttribute('data-op');
+    if(!opSettings[op]) opSettings[op] = { datesRun: [], datesOff: [], daysOff: [] };
+    opSettings[op].datesOff = hidden.value.split(',').map(s=>s.trim()).filter(s=>s);
+  });
+  opDaysOffCbs.forEach(cb => {
+    if (cb.checked) {
+      const op = cb.getAttribute('data-op');
+      if(!opSettings[op]) opSettings[op] = { datesRun: [], datesOff: [], daysOff: [] };
+      opSettings[op].daysOff.push(Number(cb.value));
+    }
+  });
+
+  timetableData.forEach(t => {
+    const myOps = new Set();
+    if (t.operation_dict) {
+      Object.values(t.operation_dict).forEach(opstr => opstr.split(',').map(s=>s.trim()).filter(s=>s).forEach(o => myOps.add(o)));
+    } else if (t.operation_id) {
+      t.operation_id.toString().split(',').map(s=>s.trim()).filter(s=>s).forEach(o => myOps.add(o));
+    }
+
+    if (myOps.size > 0) {
+      const primaryOp = Array.from(myOps)[0];
+      const setting = opSettings[primaryOp];
+      if (setting && t.operation_rule) {
+        t.operation_rule.dates_run = setting.datesRun.length > 0 ? setting.datesRun : undefined;
+        t.operation_rule.dates_off = setting.datesOff.length > 0 ? setting.datesOff : undefined;
+        t.operation_rule.days_off = setting.daysOff.length > 0 ? setting.daysOff : undefined;
+      }
+    }
+  });
+  
+  alert('運用のスケジュールと充当列車の変更をメモリに適用しました。\\n「運行データ管理」から「GitHubへ反映」してください。');
 };
 
 
