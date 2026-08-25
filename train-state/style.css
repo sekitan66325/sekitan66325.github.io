@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   /* Apple Design Light Theme */
   --bg-system: #f2f2f7;
   --bg-secondary: #ffffff;
@@ -408,10 +408,10 @@ input[type="time"]::-webkit-datetime-edit-text:focus {
 .pos-between-train { position: absolute; z-index: 5; display: flex; align-items: center; gap: 5px; cursor: pointer; animation: fadeInCard 0.3s ease; transform: translateY(-50%); }
 
 /* SEPARATOR between station rows */
-.pos-station-row + .pos-station-row { border-top: 1px solid var(--border-subtle); }
+
 
 /* ===== SUMMARY ===== */
-.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
 .summary-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px; }
 .summary-card span { display: block; color: var(--text-secondary); font-size: 0.65rem; }
 .summary-card strong { font-size: 1.1rem; display: block; margin-top: 4px; }
@@ -432,7 +432,7 @@ input[type="time"]::-webkit-datetime-edit-text:focus {
 /* =========================================
    TIMETABLE VIEW
    ========================================= */
-.table-scroll { overflow: auto; max-width: 100%; max-height: 80vh; }
+.table-scroll { overflow-x: auto; overflow-y: visible; max-width: 100%; }
 table { border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; width: auto; min-width: 100%; }
 th, td { padding: 6px 10px; border-bottom: 1px solid var(--border-separator); font-size: 0.72rem; white-space: nowrap; text-align: center; }
 th { position: sticky; top: 0; background: var(--bg-secondary); color: var(--text-secondary); font-weight: 650; z-index: 2; border-bottom: 2px solid var(--border-subtle); }
@@ -550,7 +550,7 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
   position: relative;
   min-height: 48px;
   background: rgba(255, 255, 255, 0.05); /* Station row is slightly darker/different */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
   padding: 4px 0;
 }
 .pos-between-row {
@@ -581,18 +581,26 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  background: #30d158;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.pos-rail-area.rail-first {
-  top: 50%;
-  height: 50%;
-}
-.pos-rail-area.rail-last {
+.pos-rail-area::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  left: 0;
   top: 0;
-  height: 50%;
+  bottom: 0;
+  background: #30d158;
+  z-index: 1;
+}
+.pos-rail-area.rail-first::before {
+  top: 50%;
+}
+.pos-rail-area.rail-last::before {
+  bottom: 50%;
 }
 .pos-station-dot {
   width: 14px;
