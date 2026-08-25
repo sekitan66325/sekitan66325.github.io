@@ -420,7 +420,7 @@ input[type="time"]::-webkit-datetime-edit-text:focus {
    DIAGRAM VIEW
    ========================================= */
 .diagram-shell, .table-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
-.diagram-scroll { overflow: auto; max-width: 100%; }
+.diagram-scroll { overflow-x: auto; overflow-y: visible; max-width: 100%; }
 .diagram-scroll::-webkit-scrollbar, .table-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
 .diagram-scroll::-webkit-scrollbar-thumb, .table-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 99px; }
 #diagram-svg { display: block; background: var(--bg-system); }
@@ -559,7 +559,7 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
   position: relative;
   min-height: 48px;
   background: transparent; /* Between row is transparent or lighter */
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+  /* border-bottom: 1px dashed rgba(255, 255, 255, 0.15); */
   padding: 4px 0;
 }
 

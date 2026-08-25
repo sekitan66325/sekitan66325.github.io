@@ -43,6 +43,7 @@ function timeStringToMinutes(timeStr) {
  * @returns {boolean} 驕玖�E�後！E��後ｋ蝣�E�蜷・true
  */
 function isTrainOperatingOnDate(train, serviceDate, isHoliday = false) {
+  if (train.partial_cancellations && train.partial_cancellations.some(p => p.date === serviceDate)) return true;
   const rule = train.operation_rule || {};
   const datesOff = rule.dates_off || [];
   const datesRun = rule.dates_run || [];
@@ -278,6 +279,7 @@ function serviceDateLabel(s) {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${"日月火水木金土"[d.getDay()]}）`;
 }
 function serviceRuns(train, date) {
+  if (train.partial_cancellations && train.partial_cancellations.some(p => p.date === date)) return true;
   const r = train.operation_rule || {};
   if ((r.dates_off || []).includes(date)) return false;
   if ((r.dates_run || []).includes(date)) return true;
