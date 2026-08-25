@@ -594,7 +594,7 @@ function renderDiagram() {
   const svg = $("#diagram-svg"); svg.innerHTML = "";
   const trains = effectiveTrains().filter(t => state.diagramDir === "all" || t.direction === state.diagramDir);
 
-  const maxDist = DATA.stations.at(-1).distance_km;
+  const maxDist = DATA.stations[DATA.stations.length - 1].distance_km;
   const width = 4500, left = 82, topPad = 38, bottomPad = 55;
 
   const container = $("#diagram-scroll");

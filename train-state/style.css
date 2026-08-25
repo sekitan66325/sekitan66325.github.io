@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   /* Apple Design Light Theme */
   --bg-system: #f2f2f7;
   --bg-secondary: #ffffff;
@@ -657,4 +657,9 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
 }
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-.pos-station-row, .pos-between-row { opacity: 0; animation: fadeUp 0.6s var(--smooth-easing) forwards; }
+.pos-station-row, .pos-between-row { animation: fadeUp 0.6s var(--smooth-easing) both; }
+
+:root {
+  --spring-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --smooth-easing: cubic-bezier(0.16, 1, 0.3, 1);
+}
