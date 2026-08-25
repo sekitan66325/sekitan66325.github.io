@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    1. 基本配色 & タイポグラフィ
    ========================================================================== */
 :root {
@@ -579,6 +579,8 @@ html, body {
 }
 
 .app-view-slider {
+  transition: height 0.3s var(--spring-smooth);
+  overflow-y: hidden;
   display: flex;
   width: 100%;
   overflow-x: auto;
@@ -708,3 +710,158 @@ button {
 button:active:not(:disabled) {
   transform: scale(0.95);
 }
+
+
+/* Custom Date Picker (Modern Glassmorphism) */
+.custom-date-picker {
+  position: absolute;
+  z-index: 1000;
+  width: 280px;
+  background: rgba(30, 30, 35, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.4s var(--spring-smooth), transform 0.4s var(--spring-bouncy), visibility 0.4s;
+}
+@media (prefers-color-scheme: light) {
+  .custom-date-picker {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+  }
+}
+.custom-date-picker.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+}
+.stagger-item {
+  opacity: 0;
+}
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.cdp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.cdp-header button {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: transform 0.2s var(--spring-bouncy), background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cdp-header button:hover { background: rgba(150, 150, 150, 0.2); }
+.cdp-header button:active { transform: scale(0.85); }
+.cdp-month { font-weight: 700; font-size: 0.95rem; }
+
+.cdp-days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.cdp-grid-wrapper {
+  position: relative;
+}
+.cdp-highlight {
+  position: absolute;
+  top: 0; left: 0;
+  background: var(--text-primary);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform 0.4s var(--spring-bouncy), width 0.4s var(--spring-bouncy), height 0.4s var(--spring-bouncy), opacity 0.2s;
+  z-index: 1;
+  opacity: 0;
+}
+@media (prefers-color-scheme: light) {
+  .cdp-highlight {
+    background: var(--text-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.cdp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  position: relative;
+  z-index: 2;
+}
+.cdp-day {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s var(--spring-bouncy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.cdp-day:not(.empty):hover {
+  background: rgba(150, 150, 150, 0.15);
+}
+.cdp-day:not(.empty):active {
+  transform: scale(0.85);
+}
+.cdp-day.today {
+  color: var(--text-link);
+  font-weight: 800;
+}
+.cdp-day.selected {
+  background: transparent !important; /* Rely on highlight */
+  color: var(--bg-system);
+  font-weight: 700;
+  transition: color 0.2s 0.1s;
+}
+
+.cdp-footer {
+  margin-top: 16px;
+  text-align: center;
+}
+.cdp-today {
+  background: rgba(150, 150, 150, 0.1);
+  border: none;
+  color: var(--text-primary);
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: transform 0.2s var(--spring-bouncy), background 0.2s;
+}
+.cdp-today:hover {
+  background: rgba(150, 150, 150, 0.2);
+}
+.cdp-today:active {
+  transform: scale(0.92);
+}
+

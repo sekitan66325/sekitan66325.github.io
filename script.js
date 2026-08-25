@@ -1,4 +1,4 @@
-// Service Workerの登録
+﻿// Service Workerの登録
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch((err) => {
@@ -64,6 +64,10 @@ let startX = 0;
 let currentX = 0;
 
 function updateGliderPosition(index) {
+  const panels = document.querySelectorAll('.app-view-slider > .view-panel');
+  if (slider && panels[index]) {
+    slider.style.height = panels[index].scrollHeight + 'px';
+  }
   const targetBtn = index === 0 ? btn0 : btn1;
   if (!targetBtn || !glider || !tabBar) return;
 
@@ -563,3 +567,4 @@ function toggleFormAccordion() {
 
   accordion.classList.toggle('open');
 }
+
