@@ -735,7 +735,7 @@ function renderTimetable() {
   destRow.innerHTML = `<th>行先</th>` + trains.map(t => `<th>${formatStationName(t.destination)}</th>`).join("");
   th.appendChild(destRow);
 
-  orderedStations.forEach(s => {
+  orderedStations.forEach((s, i) => {
     const tr = document.createElement("tr");
     tr.style.animationDelay = `${i * 0.03}s`;
     const stCell = document.createElement("td");
