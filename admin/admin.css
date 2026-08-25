@@ -129,3 +129,5 @@ select.form-input option {
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 .op-day-row:last-child { border-bottom: none; }
+
+.btn-admin.active { background: var(--text-link); color: #fff; }
