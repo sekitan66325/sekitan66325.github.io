@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -6,7 +6,7 @@
   <title>真岡線運用掲示板 - 管理者ダッシュボード</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="admin.css">
-</head>
+  <script defer src="datepicker.js"></script>`r`n</head>
 
 <body>
 
@@ -50,7 +50,7 @@
         <button id="tab-btn-operations" class="btn-admin" onclick="switchAdminTab('operations')">運用ベース管理</button>
       </div>
 
-      <div id="panel-posts">
+      <div id="panel-posts" class="view-panel show">
         <div class="board-header-row">
           <h2 class="section-title">投稿一覧（全件）</h2>
           <div class="search-box">
@@ -63,14 +63,14 @@
         </ul>
       </div>
 
-      <div id="panel-logs" style="display: none;">
+      <div id="panel-logs" class="view-panel">
         <h2 class="section-title">操作・変更履歴 (edit_log)</h2>
         <div id="admin-log-list">
           <div style="text-align: center; color: var(--text-secondary); padding: 20px;">読み込み中...</div>
         </div>
       </div>
 
-      <div id="panel-trains" style="display: none;">
+      <div id="panel-trains" class="view-panel">
         <div class="board-header-row">
           <h2 class="section-title">運行データ (timetable.json) 管理</h2>
           <div style="display: flex; gap: 8px;">
@@ -97,7 +97,7 @@
         </div>
       </div>
 
-      <div id="panel-operations" style="display: none;">
+      <div id="panel-operations" class="view-panel">
         <h2 class="section-title">運用ベース管理</h2>
         <p style="color: var(--text-secondary); margin-bottom: 16px;">
           曜日ごとにどの列車をどの運用に入れるか設定します。<br>
@@ -157,3 +157,4 @@
   <script src="admin.js?v=639231599055514103"></script>
 </body>
 </html>
+

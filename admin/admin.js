@@ -1,4 +1,4 @@
-const GAS_URL = typeof CONFIG !== 'undefined' ? CONFIG.GAS_API_URL : '';
+﻿const GAS_URL = typeof CONFIG !== 'undefined' ? CONFIG.GAS_API_URL : '';
 
 let adminToken = sessionStorage.getItem('admin_token') || '';
 let allAdminPosts = [];
@@ -796,3 +796,6 @@ window.saveOperationsToMemory = function() {
   
   alert('運用の変更をメモリに適用しました。保存するにはデータ書き出しを行ってください。');
 };
+
+
+
