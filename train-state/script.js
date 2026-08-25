@@ -529,9 +529,11 @@ function computeExchangingStations(trains, currentMinutes) {
       if (!t.actual) return;
       const st = t.actual.find(s => s.code === stCode && !s.is_cancelled);
       if (!st) return;
-      // Need both arr and dep to define a valid stop window
-      if (st.arr_actual == null || st.dep_actual == null) return;
-      windows.push({ arr: st.arr_actual, dep: st.dep_actual });
+      // Allow fallback if it's an origin or terminal station
+      const arr = st.arr_actual != null ? st.arr_actual : st.dep_actual;
+      const dep = st.dep_actual != null ? st.dep_actual : st.arr_actual;
+      if (arr == null || dep == null) return;
+      windows.push({ arr, dep });
     });
     return windows;
   };
@@ -545,7 +547,7 @@ function computeExchangingStations(trains, currentMinutes) {
         // Check if the two stop windows actually overlap
         const overlapStart = Math.max(uw.arr, dw.arr);
         const overlapEnd   = Math.min(uw.dep, dw.dep);
-        const hasOverlap   = overlapEnd > overlapStart;
+        const hasOverlap   = overlapEnd >= overlapStart;
         if (!hasOverlap) continue;
 
         // Per spec: animate from first-arriving train's arrival to first-departing train's departure
