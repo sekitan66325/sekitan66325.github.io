@@ -115,7 +115,10 @@ function switchAdminTab(tab) {
   const views = ['posts', 'logs', 'trains', 'operations'];
   views.forEach(v => {
     const el = document.getElementById('panel-' + v);
-    if(el) el.style.display = tab === v ? 'block' : 'none';
+    if(el) {
+      el.style.display = '';
+      el.classList.toggle('show', tab === v);
+    }
     const btn = document.getElementById('tab-btn-' + v);
     if(btn) btn.classList.toggle('active', tab === v);
   });
