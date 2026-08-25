@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ja">
 
 <head>
@@ -11,7 +11,8 @@
 <link rel="icon" href="../assets/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 
-  <script defer src="../admin/datepicker.js"></script>`r`n</head>
+  <script defer src="../admin/datepicker.js"></script>
+</head>
 
 <body>
 <header class="site-header">
@@ -47,8 +48,8 @@
     </div>
     <div class="toolbar-actions">
       <button class="glass-btn" id="now-btn">現在時刻</button>
-      <label class="date-control" onclick="if(event.target.tagName !== 'INPUT') { const i = document.getElementById('date-input'); i.showPicker && i.showPicker(); }">
-        運行日 <input id="date-input" type="date" value="2026-08-15">
+      <label class="date-control">
+        運行日 <input id="date-input" type="text" data-is-datepicker="true" value="2026-08-15" placeholder="YYYY-MM-DD">
       </label>
       <label class="date-control" onclick="if(event.target.tagName !== 'INPUT') { const i = document.getElementById('time-input'); i.showPicker && i.showPicker(); }">
         時刻 <input id="time-input" type="time" value="12:00">

@@ -520,42 +520,39 @@ function renderStations() {
  */
 function computeExchangingStations(trains, currentMinutes) {
   const exchanging = new Set();
-
-  // Station codes that could be exchange stations (all stations with both up+down trains stopping)
   const stationCodes = DATA.stations.map(s => s.code);
 
+  // Get all stop windows (arr_actual to dep_actual) for trains at a given station code
+  const getStopWindows = (trainList, stCode) => {
+    const windows = [];
+    trainList.forEach(t => {
+      if (!t.actual) return;
+      const st = t.actual.find(s => s.code === stCode && !s.is_cancelled);
+      if (!st) return;
+      // Need both arr and dep to define a valid stop window
+      if (st.arr_actual == null || st.dep_actual == null) return;
+      windows.push({ arr: st.arr_actual, dep: st.dep_actual });
+    });
+    return windows;
+  };
+
   stationCodes.forEach(code => {
-    // Find up and down trains stopping at this station
-    const upTrains = trains.filter(t => t.direction === 'up');
-    const downTrains = trains.filter(t => t.direction === 'down');
+    const upWindows  = getStopWindows(trains.filter(t => t.direction === 'up'),   code);
+    const downWindows = getStopWindows(trains.filter(t => t.direction === 'down'), code);
 
-    const getStopWindow = (trainList, stCode) => {
-      let windows = [];
-      trainList.forEach(t => {
-        if (!t.actual) return;
-        const st = t.actual.find(s => s.code === stCode && !s.is_cancelled);
-        if (!st) return;
-        const arr = st.arr_actual;
-        const dep = st.dep_actual;
-        if (arr == null || dep == null) return;
-        windows.push({ arr, dep });
-      });
-      return windows;
-    };
-
-    const upWindows = getStopWindow(upTrains, code);
-    const downWindows = getStopWindow(downTrains, code);
-
-    // Check if any up↔down pair has an overlapping window that includes currentMinutes
     for (const uw of upWindows) {
       for (const dw of downWindows) {
-        // The exchange window: from earliest arrival to earliest departure
+        // Check if the two stop windows actually overlap
+        const overlapStart = Math.max(uw.arr, dw.arr);
+        const overlapEnd   = Math.min(uw.dep, dw.dep);
+        const hasOverlap   = overlapEnd > overlapStart;
+        if (!hasOverlap) continue;
+
+        // Per spec: animate from first-arriving train's arrival to first-departing train's departure
         const exchangeStart = Math.min(uw.arr, dw.arr);
-        const exchangeEnd = Math.min(uw.dep, dw.dep);
-        // An exchange occurs if both trains are involved and time window overlaps now
-        if (exchangeEnd > exchangeStart &&
-            currentMinutes >= exchangeStart &&
-            currentMinutes < exchangeEnd) {
+        const exchangeEnd   = Math.min(uw.dep, dw.dep);
+
+        if (currentMinutes >= exchangeStart && currentMinutes < exchangeEnd) {
           exchanging.add(code);
         }
       }
