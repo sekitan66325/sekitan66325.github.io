@@ -637,3 +637,24 @@ th:first-child { background: var(--bg-secondary); z-index: 4; }
 .pos-train-card {
   margin: 2px 0 !important;
 }
+
+/* Train position smooth movement */
+.pos-train-card {
+  transition: top 0.6s var(--spring-easing), opacity 0.5s ease;
+}
+.pos-rail-area::before {
+  transition: height 0.6s var(--spring-easing), top 0.6s var(--spring-easing), bottom 0.6s var(--spring-easing);
+}
+
+/* Table row fade-ins */
+#timetable-table tbody tr {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: tableRowFade 0.5s var(--smooth-easing) forwards;
+}
+@keyframes tableRowFade {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+.pos-station-row, .pos-between-row { opacity: 0; animation: fadeUp 0.6s var(--smooth-easing) forwards; }

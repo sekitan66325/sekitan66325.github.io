@@ -484,6 +484,7 @@ function renderStations() {
     const stRow = document.createElement("div");
     stRow.className = "pos-station-row";
     stRow.dataset.station = s.code;
+    stRow.style.animationDelay = `${i * 0.05}s`;
     
     stRow.innerHTML = `
       <div class="pos-station-name-col">${formatStationName(s.name)}</div>
@@ -498,6 +499,7 @@ function renderStations() {
       const nextS = stationsReversed[i+1];
       const bwRow = document.createElement("div");
       bwRow.className = "pos-between-row";
+      bwRow.style.animationDelay = `${i * 0.05 + 0.025}s`;
       bwRow.dataset.from = s.code;
       bwRow.dataset.to = nextS.code;
       
@@ -735,6 +737,7 @@ function renderTimetable() {
 
   orderedStations.forEach(s => {
     const tr = document.createElement("tr");
+    tr.style.animationDelay = `${i * 0.03}s`;
     const stCell = document.createElement("td");
     
     let isStart = false;
