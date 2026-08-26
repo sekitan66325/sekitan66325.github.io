@@ -131,14 +131,23 @@ a {
 
 /* ===== HEADER ===== */
 .site-header {
-  background-color: var(--bg-system);
+  /* background-color removed to share body style */
+  background: rgba(0,0,0,0.15);
+  backdrop-filter: blur(24px) saturate(160%) url(#liquid-glass-filter);
+  -webkit-backdrop-filter: blur(24px) saturate(160%) url(#liquid-glass-filter);
+  
   padding: 28px 0 16px 0;
 }
 
 .header-inner, .container, .site-footer {
   width: min(1100px, 100%);
   margin: auto;
-  padding: 0 20px;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(24px) saturate(160%) url(#liquid-glass-filter);
+  -webkit-backdrop-filter: blur(24px) saturate(160%) url(#liquid-glass-filter);
+  
+  text-align: center;
 }
 .header-inner {
   display: flex;

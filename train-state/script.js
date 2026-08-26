@@ -28,47 +28,97 @@ function timeStringToMinutes(timeStr) {
   return hours * 60 + minutes;
 }
 
+// Evaluate a single date rule (e.g., '2026-08-15', 'mon', 'train:103', 'op:A1')
+function evaluateDateRule(rule, serviceDate, isHoliday, evaluatedTrains = new Set()) {
+  rule = rule.trim().toLowerCase();
+  
+  // Specific Date
+  if (/^\d{4}-\d{2}-\d{2}$/.test(rule)) {
+    return rule === serviceDate;
+  }
+  
+  // Day of Week
+  const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  if (days.includes(rule)) {
+    const d = new Date(serviceDate + 'T00:00:00');
+    return days[d.getDay()] === rule;
+  }
+  
+  // Link to another Train
+  if (rule.startsWith('train:')) {
+    const targetId = rule.split(':')[1];
+    if (!targetId || evaluatedTrains.has(targetId)) return false; // Prevent infinite loop
+    const targetTrain = DATA.timetable.find(t => t.train_id === targetId || t.train_no === targetId);
+    if (targetTrain) {
+      evaluatedTrains.add(targetId);
+      return isTrainOperatingOnDate(targetTrain, serviceDate, isHoliday, evaluatedTrains);
+    }
+  }
+
+  // Link to an Operation ID
+  if (rule.startsWith('op:')) {
+    const targetOp = rule.split(':')[1];
+    if (!targetOp || evaluatedTrains.has('op:' + targetOp)) return false;
+    // Assume if ANY train in that operation runs, the operation runs.
+    const opTrains = DATA.timetable.filter(t => t.operation_id === targetOp);
+    if (opTrains.length > 0) {
+      evaluatedTrains.add('op:' + targetOp);
+      return opTrains.some(t => isTrainOperatingOnDate(t, serviceDate, isHoliday, evaluatedTrains));
+    }
+  }
+
+  return false;
+}
+
 /**
- * 1. 驕玖�E�梧律蛻�E�螳壹Ο繧�E�繝�EぁE
- * 謖�E�E�壽征EserviceDate)縺�E�蟁E��縺励※蟁E��雎｡蛻苓ｻ翫′驕玖�E�後！E��後ｋ縺玖ｩ穂ｾ�E�
- * * 蜁E��蜈磯�E�・�E�・
- * 1. dates_off・育音螳夐°莨第律�E俁E��Efalse
- * 2. dates_run・育音螳夐°霁E��譌･・俁E��Etrue
- * 3. service_type === "extra"・郁�E譎ょ・霁E��E��俁E��Efalse
- * 4. days_off・域屁E��･繝ｻ逾晁E��驕倶�E�題ｨ�E�螳夲�E�俁E��Efalse
- * 5. 縺昴�E�莉�E�螟�E筐�Etrue
- * * @param {Object} train - 蝓ｺ譛ｬ繝繧�E�繝､縺�E�蛻苓ｻ翫が繝悶ず繧�E�繧�E�繝�E
- * @param {string} serviceDate - "YYYY-MM-DD"
- * @param {boolean} isHoliday - 蠖捺律縺悟悄譌･逾晁E��縺九�E縺・°
- * @returns {boolean} 驕玖�E�後！E��後ｋ蝣�E�蜷・true
+ * 1. 運行日判定ロジック
  */
-function isTrainOperatingOnDate(train, serviceDate, isHoliday = false) {
+function isTrainOperatingOnDate(train, serviceDate, isHoliday = false, evaluatedTrains = new Set()) {
+  // If we are evaluating this train as a root, add it to prevent self-reference loops
+  if (!evaluatedTrains.has(train.train_id)) {
+    evaluatedTrains.add(train.train_id);
+  }
+
   if (train.partial_cancellations && train.partial_cancellations.some(p => p.date === serviceDate)) return true;
   const rule = train.operation_rule || {};
   const datesOff = rule.dates_off || [];
   const datesRun = rule.dates_run || [];
   const daysOff = rule.days_off || [];
 
-  // 1. 迚ｹ螳夐°莨第律繝�Eぉ繝�EぁE
-  if (datesOff.includes(serviceDate)) return false;
 
-  // 2. 迚ｹ螳夐°霁E��譌･繝�Eぉ繝�EぁE
-  if (datesRun.includes(serviceDate)) return true;
-
-  // 3. 閾�E�譎ょ・霁E��メ繧�E�繝�Eけ�E・ates_run 縺�E�髱櫁E���E�蠖薙・閾�E�譎ょ・霁E��・驕倶�E�托ｼ・
-  if (rule.service_type === 'extra') return false;
-
-  // 4. 譖懈律繝ｻ逾晁E��驕倶�E�代メ繧�E�繝�EぁE
-  if (isHoliday && (daysOff.includes('sat') || daysOff.includes('sun') || daysOff.includes('holiday'))) {
+  // 1. 特定運休日（またはルール）チェック
+  if (datesOff.some(r => evaluateDateRule(r, serviceDate, isHoliday, evaluatedTrains))) {
     return false;
   }
 
-  // 5. 繝�Eヵ繧�E�繝ｫ繝磯°霁E��
+  // 2. 特定運転日（またはルール）チェック
+  if (datesRun.some(r => evaluateDateRule(r, serviceDate, isHoliday, evaluatedTrains))) {
+    return true;
+  }
+
+  // 3. 臨時列車チェック (datesRunに入っていなければ運休)
+  if (rule.service_type === 'extra' || rule.service_type === 'sl') {
+    return false;
+  }
+
+  // 4. 曜日・祝日運休チェック
+  const d = new Date(serviceDate + 'T00:00:00');
+  const dayIdx = d.getDay();
+  // daysOff は [0, 1, 2, 3, 4, 5, 6] の数値が含まれる
+  if (daysOff.includes(dayIdx)) {
+    return false;
+  }
+
+  // 祝日運休 (もし holidays 判定などの特別対応が必要ならここ。今回は簡略化)
+  if (isHoliday && daysOff.includes('holiday')) {
+    return false;
+  }
+
+  // 5. デフォルト運行
   return true;
 }
 
 /**
- * 2. 螳溷柑譎ょ綾縺�E�邂怜�E・磯≦蟒ｶ蝗槫�E��E�繝ｻ蛹�E�髢馴°莨代・驕ｩ逕ｨ・・
  * * @param {Object} train - 蝓ｺ譛ｬ繝繧�E�繝､縺�E�蛻苓ｻ翫が繝悶ず繧�E�繧�E�繝�E
  * @param {Object} override - 蠖捺律繧�E�繝ｼ繝�E・繝ｩ繧�E�繝峨ョ繝ｼ繧�E� (train_overrides[train_id])
  * @returns {Array<Object>} 蜷・�E�・・螳溷柑譎ょ綾繝ｻ驕�E�E��E�繝ｻ驕倶�E�代ヵ繝ｩ繧�E�驟榊�E
