@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,84 +9,8 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  
-  <style>
-    .portal-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: calc(100vh - 120px);
-      padding: 20px;
-    }
-    
-    .portal-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      width: 100%;
-      max-width: 900px;
-      margin-top: 40px;
-    }
-    
-    .portal-card {
-      background: rgba(28, 28, 30, 0.4);
-      backdrop-filter: blur(24px) saturate(150%);
-      -webkit-backdrop-filter: blur(24px) saturate(150%);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
-      padding: 24px;
-      text-decoration: none;
-      color: var(--text-primary);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08);
-      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-    
-    .portal-card:hover {
-      transform: translateY(-4px);
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    }
-    
-    .portal-card h2 {
-      margin: 16px 0 8px 0;
-      font-size: 1.25rem;
-      color: var(--text-primary);
-    }
-    
-    .portal-card p {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-      margin: 0;
-    }
-    
-    .portal-icon {
-      font-size: 2.5rem;
-      margin-bottom: 8px;
-    }
-    
-    .hero-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 12px;
-      background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .hero-subtitle {
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 1.1rem;
-    }
-  </style>
 </head>
+
 <body class="theme-dark">
   <header class="site-header">
     <div class="header-inner">
@@ -98,7 +23,7 @@
       <h1 class="hero-title">ACTIVITY SUMMARY</h1>
       <p class="hero-subtitle">真岡鐵道 関連ツール・情報ポータル</p>
     </div>
-    
+
     <div class="portal-grid">
       <a href="database/unyou/index.html" class="portal-card">
         <div class="portal-icon">📄</div>
@@ -111,87 +36,114 @@
         <h2>目撃掲示板</h2>
         <p>現地での車両目撃情報のリアルタイム共有・検索ページ。</p>
       </a>
-      
+
       <a href="train-state/index.html" class="portal-card">
         <div class="portal-icon">🚂</div>
         <h2>列車走行位置</h2>
         <p>ダイヤ情報に基づいた列車の現在位置・運行状況をリアルタイムで確認できるページ。</p>
       </a>
-      
+
       <a href="admin/index.html" class="portal-card">
         <div class="portal-icon">⚙️</div>
         <h2>運行データ管理パネル</h2>
         <p>時刻表データ、編成、曜日に応じた運用データの編集・管理を行う管理者専用ページ。</p>
       </a>
     </div>
-  
+
 
     <!-- 書籍紹介セクション -->
-<!-- 書籍紹介セクション -->
+    <section class="content-section">
+      <h2 class="section-title">『真岡鐵道ダイヤ全録』シリーズ</h2>
+      <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+        臨時ダイヤが施行された際、通常ダイヤのフォーマットに合わせた形で公開するよりも一冊の資料としてまとめたほうが合理的であると考え、運転時刻から運用までを体系的にまとめた運用調査の集大成です。
+      </p>
 
-        <section class="content-section">
-          <h2 class="section-title">『真岡鐵道ダイヤ全録』シリーズ</h2>
-          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
-            臨時ダイヤが施行された際、通常ダイヤのフォーマットに合わせた形で公開するよりも一冊の資料としてまとめたほうが合理的であると考え、運転時刻から運用までを体系的にまとめた運用調査の集大成です。
-          </p>
+      <!-- 既刊・シリーズ作品リスト -->
+      <ul class="list-container">
 
-          <!-- 既刊・シリーズ作品リスト -->
-          <ul class="list-container">
+        <!-- 1冊目（サンプル：必要に応じてタイトルやURLを打ち替えてください） -->
+        <li class="list-item">
+          <a href="https://sekitan66325.booth.pm/items/8501007" class="btn-link" target="_blank" rel="noopener">
+            <div class="item-left-block">
+              <div class="item-text-meta">
+                <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026年春 陶器市臨時ダイヤ編ー</span>
+                <span class="card-tag">BOOTH<br>初版 2026年6月12日</span>
+              </div>
+            </div>
+            <div class="item-right-block">
+              <span class="chevron-right"></span>
+            </div>
+          </a>
+        </li>
 
-            <!-- 1冊目（サンプル：必要に応じてタイトルやURLを打ち替えてください） -->
-            <li class="list-item">
-              <a href="https://sekitan66325.booth.pm/items/8501007" class="btn-link" target="_blank" rel="noopener">
-                <div class="item-left-block">
-                  <div class="item-text-meta">
-                    <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026年春 陶器市臨時ダイヤ編ー</span>
-                    <span class="card-tag">同人誌 / BOOTH頒布<br>初版 2026年6月12日</span>
-                  </div>
-                </div>
-                <div class="item-right-block">
-                  <span class="chevron-right"></span>
-                </div>
-              </a>
-            </li>
+        <!-- 2冊目（画像付きカード） -->
+        <li class="list-item">
+          <a href="https://sekitan66325.booth.pm/items/8682952" class="btn-link-card" target="_blank" rel="noopener">
+            <!-- 上段：タイトル、ステータス、矢印 -->
+            <div class="card-header-row">
+              <div class="item-text-meta">
+                <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー</span>
+                <span class="card-tag">C108 / BOOTH<br>初版 2026年8月16日</span>
+              </div>
+              <div class="item-right-block">
+                <!-- ステータスバッジを追加 -->
+                <span class="status-badge">予約受付中</span>
+                <span class="chevron-right"></span>
+              </div>
+            </div>
 
-            <!-- 2冊目（画像付きカード） -->
-            <li class="list-item">
-              <a href="https://sekitan66325.booth.pm/items/8682952" class="btn-link-card" target="_blank" rel="noopener">
-                <!-- 上段：タイトル、ステータス、矢印 -->
-                <div class="card-header-row">
-                  <div class="item-text-meta">
-                    <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー</span>
-                    <span class="card-tag">同人誌 / C108<br>初版 2026年8月16日</span>
-                  </div>
-                  <div class="item-right-block">
-                    <!-- ステータスバッジを追加 -->
-                    <span class="status-badge">予約受付中</span>
-                    <span class="chevron-right"></span>
-                  </div>
-                </div>
-                
-                <!-- 下段：解説・告知画像 -->
-                <div class="card-banner-wrapper">
-                  <img src="assets/zenroku/2026hanabi.png" alt="私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー" class="card-banner-img">
-                </div>
-              </a>
-            </li>
+            <!-- 下段：解説・告知画像 -->
+            <div class="card-banner-wrapper">
+              <img src="assets/zenroku/2026hanabi.png" alt="私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー" class="card-banner-img">
+            </div>
+          </a>
+        </li>
 
-          </ul>
+        <!-- 3冊目 -->
+        <li class="list-item">
+          <a href="https://note.com/sekitan66325/n/ndb16fc170dab" class="btn-link" target="_blank" rel="noopener">
+            <div class="item-left-block">
+              <div class="item-text-meta">
+                <span class="item-label">私家版 真岡鐵道ダイヤ全録Short note版 ー2026年8月23日編ー</span>
+                <span class="card-tag">note<br>初版 2026年8月25日</span>
+              </div>
+            </div>
+            <div class="item-right-block">
+              <span class="chevron-right"></span>
+            </div>
+          </a>
+        </li>
 
-          <!-- BOOTH全体へのリンクボタン -->
-          <div style="margin-top: 16px; text-align: center;">
-            <a href="https://sekitan66325.booth.pm/" target="_blank" rel="noopener" class="form-submit-btn" style="display: inline-block; width: auto; padding: 10px 24px; font-size: 0.88rem; text-decoration: none;">
-              BOOTHで頒布一覧を見る
-            </a>
-          </div>
-        </section>
-</main>
+      </ul>
+
+      <!-- BOOTH全体へのリンクボタン -->
+      <div style="margin-top: 16px; text-align: center;">
+        <a href="https://sekitan66325.booth.pm/" target="_blank" rel="noopener" class="form-submit-btn"
+          style="display: inline-block; width: auto; padding: 10px 24px; font-size: 0.88rem; text-decoration: none;">
+          BOOTHで頒布一覧を見る
+        </a>
+      </div>
+    </section>
+  </main>
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <div class="footer-title">真岡鐵道 ポータル</div>
-      <p class="copyright">&copy; 2026 Moka Railway Unofficial Portal</p>
+      <div class="footer-title">せきたん</div>
+      <ul class="footer-links">
+        <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X</a>
+        </li>
+        <li><a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank"
+            rel="noopener noreferrer">BOOTH</a></li>
+        <li><a href="../../index.html" class="footer-link">ポータル</a></li>
+        <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">メールでお問い合わせ</a></li>
+        <li><a href="../../admin/index.html" class="footer-link" target="_blank">管理画面</a></li>
+      </ul>
+
+      </p>
+      <p class="copyright">©せきたん All Rights Reserved 2026</p>
     </div>
   </footer>
+
 </body>
+
 </html>
