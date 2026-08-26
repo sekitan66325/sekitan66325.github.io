@@ -31,6 +31,19 @@
 </head>
 
 <body>
+  <!-- Liquid Glass SVG Filter -->
+  <svg style="width:0; height:0; position:absolute;" aria-hidden="true" focusable="false">
+    <filter id="liquid-glass-filter" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.8" result="blurred" />
+      <!-- We use a fractal noise base to act as our "glass bumps/ripples" -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="1" result="noise" />
+      <!-- Displace the blurred background using the noise -->
+      <feDisplacementMap in="blurred" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+      <!-- A slight color matrix to increase saturation (glass often saturates colors underneath) -->
+      <feColorMatrix in="displaced" type="saturate" values="1.3" result="saturated" />
+      <feBlend in="SourceGraphic" in2="saturated" mode="overlay" />
+    </filter>
+  </svg>
 
   <header class="site-header">
     <div class="header-inner">
