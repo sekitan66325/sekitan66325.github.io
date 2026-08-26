@@ -203,11 +203,25 @@ select.form-input option {
 }
 .op-day-row:last-child { border-bottom: none; }
 
+/* Root & Body Scrollbar Normalization */
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  overflow: visible;
+}
+
 .btn-admin.active { background: var(--text-link); color: #fff; }
 
 /* Admin Tab Transitions */
 #main-container { position: relative; }
 .view-panel {
+  min-height: auto;
+  padding-bottom: 40px;
+  flex: none;
+  width: 100%;
   opacity: 0;
   transform: translateY(10px);
   pointer-events: none;
@@ -237,9 +251,6 @@ select.form-input option {
   box-shadow: 0 0 0 2px rgba(9, 132, 227, 0.3) !important;
 }
 
-
-
-
 /* ===== Train List & Editor Layout ===== */
 .train-list-sidebar {
   flex: 1;
@@ -247,9 +258,7 @@ select.form-input option {
   background: var(--bg-card);
   border-radius: 8px;
   padding: 16px;
-  /* Removed sticky to prevent scroll tracking issues */
-  max-height: calc(100vh - 140px);
-  overflow-y: auto;
+  height: fit-content;
 }
 
 .train-editor-container {
@@ -257,14 +266,12 @@ select.form-input option {
   background: var(--bg-card);
   border-radius: 8px;
   padding: 16px;
-  /* No fixed height, let it scroll with the page naturally */
 }
 
 .editor-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* Removed sticky */
   background: var(--bg-card);
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border-subtle);
