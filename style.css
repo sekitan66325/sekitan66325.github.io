@@ -389,23 +389,26 @@ body {
 .content-section {
   margin-bottom: 24px;
 }
-
 #board-list {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  list-style: none !important;
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }
 
 .board-post-card {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+  background-color: transparent;
   padding: 14px 20px;
-  margin-bottom: 12px;
   list-style: none;
+  position: relative;
+}
+.board-post-card:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 0;
+  height: 1px;
+  background-color: var(--border-subtle);
 }
 
 .post-header {
