@@ -631,13 +631,13 @@ html, body {
 .app-view-slider::-webkit-scrollbar { display: none; }
 
 .view-panel {
+  min-height: calc(100vh - 90px);
   flex: 0 0 100%;
   width: 100%;
   max-width: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   padding-bottom: 110px;
-  min-height: calc(100vh - 90px);
 }
 
 .floating-tab-bar {
@@ -651,11 +651,11 @@ html, body {
   padding: 4px;
   width: max-content;
   background: rgba(25, 25, 28, 0.75);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(24px) saturate(180%) url(#liquid-glass-filter);
+  -webkit-backdrop-filter: blur(24px) saturate(180%) url(#liquid-glass-filter);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 32px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
   user-select: none;
   touch-action: none;
 }
@@ -718,7 +718,8 @@ html, body {
 }
 
 .site-footer {
-  background-color: var(--bg-system);
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: 48px 0 32px 0;
   text-align: center;
 }
