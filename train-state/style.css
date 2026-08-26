@@ -258,8 +258,6 @@ input[type="time"]::-webkit-datetime-edit-text:focus {
 
 /* ===== VIEW TABS ===== */
 
-@media (prefers-color-scheme: light) {
-  
 .view-tab {
   flex: 1;
   border: 0;
