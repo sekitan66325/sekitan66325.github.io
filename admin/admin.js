@@ -446,7 +446,7 @@ function editTrain(trainId) {
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">運休曜日 (days_off)</label>
+        <label class="form-label">運転曜日 (days_on)</label>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
           ${[1,2,3,4,5,6,0].map(d => `
             <label style="display:flex; align-items:center; gap:4px; font-size:0.9rem; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px; cursor:pointer;">
@@ -513,7 +513,7 @@ function editTrain(trainId) {
     </div>
 
     <h4 style="margin-top: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">各駅時刻データ</h4>
-    <div style="max-height: 400px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px;">
+    <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px;">
       <table style="width: 100%; text-align: left; border-collapse: collapse;">
         <thead>
           <tr>
@@ -626,8 +626,8 @@ function saveTrainData() {
   const parseArray = (str) => str.split(',').map(s => s.trim()).filter(s => s !== '');
   t.operation_rule.service_type = document.getElementById('edit-svc-type').value;
   
-  const daysOffCbs = document.querySelectorAll('.edit-days-off-cb:checked');
-  t.operation_rule.days_off = Array.from(daysOffCbs).map(cb => Number(cb.value));
+  const daysOffCbs = document.querySelectorAll('.edit-days-off-cb');
+  t.operation_rule.days_off = Array.from(daysOffCbs).filter(cb => !cb.checked).map(cb => Number(cb.value));
   
   t.operation_rule.dates_run = parseArray(document.getElementById('edit-dates-run').value);
   t.operation_rule.dates_off = parseArray(document.getElementById('edit-dates-off').value);
@@ -789,9 +789,9 @@ function renderOperationsView() {
       <h3 style="margin-top:0; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:8px;">運用 ${op}</h3>
       
       <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px; margin-top: 12px; font-size: 0.85rem;">
-        <strong style="display:block; margin-bottom:8px; color: var(--text-primary);">▼ 運休曜日の設定</strong>
+        <strong style="display:block; margin-bottom:8px; color: var(--text-primary);">▼ 運転曜日の設定</strong>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
-          ${[1,2,3,4,5,6,0].map(d => `<label style="display:flex; align-items:center; gap:4px; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px; cursor:pointer;"><input type="checkbox" class="op-daysoff-cb" data-op="${op}" value="${d}" ${baseDaysOff.includes(d) ? 'checked' : ''}> ${['日','月','火','水','木','金','土'][d]}</label>`).join('')}
+          ${[1,2,3,4,5,6,0].map(d => `<label style="display:flex; align-items:center; gap:4px; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px; cursor:pointer;"><input type="checkbox" class="op-daysoff-cb" data-op="${op}" value="${d}" ${!baseDaysOff.includes(d) ? 'checked' : ''}> ${['日','月','火','水','木','金','土'][d]}</label>`).join('')}
         </div>
         
         <strong style="display:block; margin-bottom:8px; color: var(--text-primary);">▼ 特定運転日・特定運休日の設定</strong>
@@ -903,7 +903,7 @@ window.saveOperationsToMemory = function() {
     opSettings[op].datesOff = hidden.value.split(',').map(s=>s.trim()).filter(s=>s);
   });
   opDaysOffCbs.forEach(cb => {
-    if (cb.checked) {
+    if (!cb.checked) {
       const op = cb.getAttribute('data-op');
       if(!opSettings[op]) opSettings[op] = { datesRun: [], datesOff: [], daysOff: [] };
       opSettings[op].daysOff.push(Number(cb.value));

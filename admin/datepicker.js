@@ -1,7 +1,7 @@
 // Custom Vanilla JS Date Picker
 const pickerPopup = document.createElement('div');
 pickerPopup.className = 'custom-date-picker';
-pickerPopup.innerHTML = `
+pickerPopup.innerHTML = '' + `
   <div class="cdp-header stagger-item">
     <button type="button" class="cdp-prev">&lt;</button>
     <div class="cdp-month"></div>
@@ -28,21 +28,7 @@ let rangeStart = null;
 let rangeEnd = null;
 let _pickerJustOpened = false;
 
-function updateHighlight(selectedBtn) {
-  const highlight = pickerPopup.querySelector('.cdp-highlight');
-  if (!selectedBtn) { highlight.style.opacity = '0'; return; }
-  const grid = pickerPopup.querySelector('.cdp-grid');
-  const gridRect = grid.getBoundingClientRect();
-  const btnRect = selectedBtn.getBoundingClientRect();
-  highlight.style.opacity = '1';
-  const size = 32;
-  const dx = btnRect.left - gridRect.left + (btnRect.width - size) / 2;
-  const dy = btnRect.top - gridRect.top + (btnRect.height - size) / 2;
-  highlight.style.transform = `translate(${dx}px, ${dy}px)`;
-  highlight.style.width = `${size}px`;
-  highlight.style.height = `${size}px`;
-  highlight.style.borderRadius = '50%';
-}
+// updateHighlight removed in favor of pure CSS classes
 
 function getDatesInRange(startStr, endStr) {
   const dates = [];
@@ -98,23 +84,61 @@ function renderPicker() {
     : [];
   let selectedBtn = null;
 
+  const isHoverRange = isRangeMode && rangeStart && !rangeEnd;
+  const rangeStartDate = rangeStart ? new Date(rangeStart + 'T00:00:00') : null;
+
   for (let i = 1; i <= daysInMonth; i++) {
     const btn  = document.createElement('button');
     btn.type   = 'button';
     btn.className = 'cdp-day';
     btn.textContent = i;
 
-    const dStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+    const dStr = ${year}--;
+    const btnDate = new Date(dStr + 'T00:00:00');
+    btn.dataset.date = dStr;
+
     if (dStr === todayStr) btn.classList.add('today');
 
     if (isRangeMode) {
       if (rangeStart) {
-        if (rangeStart === dStr) { btn.classList.add('selected'); selectedBtn = btn; }
+        if (rangeStart === dStr) { btn.classList.add('selected', 'range-start'); }
       } else {
-        if (selectedStrs.includes(dStr)) { btn.classList.add('selected'); selectedBtn = btn; }
+        if (selectedStrs.length > 0) {
+          const first = selectedStrs[0];
+          const last = selectedStrs[selectedStrs.length - 1];
+          if (dStr === first) btn.classList.add('selected', 'range-start');
+          if (dStr === last) btn.classList.add('selected', 'range-end');
+          if (selectedStrs.includes(dStr) && dStr !== first && dStr !== last) {
+            btn.classList.add('range-between');
+          }
+        }
       }
     } else {
-      if (selectedStrs.includes(dStr)) { btn.classList.add('selected'); selectedBtn = btn; }
+      if (selectedStrs.includes(dStr)) { btn.classList.add('selected'); }
+    }
+
+    if (isHoverRange) {
+      btn.addEventListener('mouseover', () => {
+        const hoverDate = btnDate;
+        const start = rangeStartDate < hoverDate ? rangeStartDate : hoverDate;
+        const end = rangeStartDate > hoverDate ? rangeStartDate : hoverDate;
+        
+        Array.from(gridEl.children).forEach(child => {
+          if (!child.dataset.date) return;
+          const childDate = new Date(child.dataset.date + 'T00:00:00');
+          child.classList.remove('range-between', 'range-end', 'range-start');
+          if (child.dataset.date === rangeStart) {
+             child.classList.add('selected', rangeStartDate <= hoverDate ? 'range-start' : 'range-end');
+          } else if (child.dataset.date === dStr) {
+             child.classList.add('selected', rangeStartDate <= hoverDate ? 'range-end' : 'range-start');
+          } else if (childDate > start && childDate < end) {
+             child.classList.remove('selected');
+             child.classList.add('range-between');
+          } else {
+             child.classList.remove('selected');
+          }
+        });
+      });
     }
 
     btn.addEventListener('mousedown', e => {
@@ -124,7 +148,7 @@ function renderPicker() {
           currentInput.value = dStr;
           currentInput.dispatchEvent(new Event('change', { bubbles: true }));
         }
-        updateHighlight(btn);
+        
         setTimeout(() => hidePicker(), 150);
       } else {
         if (!rangeStart) {
@@ -148,7 +172,7 @@ function renderPicker() {
     gridEl.appendChild(btn);
   }
 
-  requestAnimationFrame(() => updateHighlight(selectedBtn));
+  
   updateRangeHint();
 }
 
@@ -224,15 +248,19 @@ function hidePicker() {
 // Open on click/focus for datepicker inputs
 document.body.addEventListener('mousedown', e => {
   const target = e.target;
-  const isPickerInput = target.matches('input[data-is-datepicker="true"]');
+  let pickerInput = target.matches('input[data-is-datepicker="true"]') ? target : null;
+  if (!pickerInput) {
+    const label = target.closest('label');
+    if (label) pickerInput = label.querySelector('input[data-is-datepicker="true"]');
+  }
   const isInsidePicker = pickerPopup.contains(target);
 
-  if (isPickerInput) {
+  if (pickerInput) {
     // Prevent native picker, keep focus
-    if (target !== currentInput) {
-      showPicker(target);
+    if (pickerInput !== currentInput) {
+      showPicker(pickerInput);
     } else if (!pickerPopup.classList.contains('show')) {
-      showPicker(target);
+      showPicker(pickerInput);
     }
     e.preventDefault(); // prevent blur then re-focus loop
     return;

@@ -56,7 +56,7 @@
 }
 
 /* --- Checkbox Animations --- */
-.op-daysoff-cb {
+.op-daysoff-cb, .edit-days-off-cb {
   appearance: none;
   -webkit-appearance: none;
   width: 18px;
@@ -73,7 +73,7 @@
   flex-shrink: 0;
 }
 
-.op-daysoff-cb::after {
+.op-daysoff-cb::after, .edit-days-off-cb::after {
   content: '';
   position: absolute;
   width: 5px;
@@ -86,12 +86,12 @@
   top: 1px;
 }
 
-.op-daysoff-cb:checked {
+.op-daysoff-cb:checked, .edit-days-off-cb:checked {
   background: #007aff;
   border-color: #007aff;
 }
 
-.op-daysoff-cb:checked::after {
+.op-daysoff-cb:checked::after, .edit-days-off-cb:checked::after {
   transform: scale(1) rotate(45deg);
   opacity: 1;
 }
