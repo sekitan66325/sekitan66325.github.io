@@ -94,18 +94,18 @@
 }
 
 html {
-  background: var(--bg-system);
+  background: #0a0a0f;
   overflow-x: hidden;
 }
 
 body {
-  /* Provide a deep, vibrant background for refraction */
-  background-color: #000000;
+  /* Vibrant background matching admin/main pages */
+  background-color: #0a0a0f;
   background-image: 
     radial-gradient(circle at 15% 20%, rgba(85, 30, 110, 0.35) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(30, 80, 110, 0.3) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 1) 100%, transparent 100%);
+    radial-gradient(circle at 85% 80%, rgba(30, 80, 110, 0.3) 0%, transparent 40%);
   background-attachment: fixed;
+  min-height: 100vh;
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -131,11 +131,8 @@ a {
 
 /* ===== HEADER ===== */
 .site-header {
-  /* background-color removed to share body style */
-  background: rgba(0,0,0,0.15);
-  backdrop-filter: blur(24px) saturate(160%) url(#liquid-glass-filter);
-  -webkit-backdrop-filter: blur(24px) saturate(160%) url(#liquid-glass-filter);
-  
+  /* Seamless with body — transparent glass */
+  background: transparent;
   padding: 28px 0 16px 0;
 }
 
@@ -143,10 +140,8 @@ a {
   width: min(1100px, 100%);
   margin: auto;
   padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(24px) saturate(160%) url(#liquid-glass-filter);
-  -webkit-backdrop-filter: blur(24px) saturate(160%) url(#liquid-glass-filter);
-  
+  /* No separate background — seamless with body gradient */
+  background: transparent;
   text-align: center;
 }
 .header-inner {
