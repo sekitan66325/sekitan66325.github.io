@@ -34,13 +34,13 @@ button:active, a.btn:active, a.nav-link:active {
 }
 
 body {
-  /* Provide a deep, vibrant background for refraction */
-  background-color: #000000;
+  /* Vibrant background for refraction */
+  background-color: #0a0a0f;
   background-image: 
     radial-gradient(circle at 15% 20%, rgba(85, 30, 110, 0.35) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(30, 80, 110, 0.3) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 1) 100%, transparent 100%);
+    radial-gradient(circle at 85% 80%, rgba(30, 80, 110, 0.3) 0%, transparent 40%);
   background-attachment: fixed;
+  min-height: 100vh;
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
   -webkit-font-smoothing: antialiased;
