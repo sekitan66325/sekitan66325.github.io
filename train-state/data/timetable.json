@@ -2475,14 +2475,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "sl",
-      "days_off": [
-        1,
-        2,
-        3,
-        4,
-        5
-      ]
+      "service_type": "sl"
     },
     "stations": [
       {
@@ -2572,14 +2565,14 @@
       }
     ],
     "operation_dict": {
-      "sun": "A601",
+      "sun": "",
       "mon": "",
       "tue": "",
       "wed": "",
       "thu": "",
       "fri": "",
       "sat": "",
-      "holiday": "A601"
+      "holiday": ""
     }
   },
   {
@@ -5165,14 +5158,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "extra",
-      "days_off": [
-        1,
-        2,
-        3,
-        4,
-        5
-      ]
+      "service_type": "extra"
     },
     "stations": [
       {
@@ -5262,14 +5248,14 @@
       }
     ],
     "operation_dict": {
-      "sun": "A601",
+      "sun": "",
       "mon": "",
       "tue": "",
       "wed": "",
       "thu": "",
       "fri": "",
       "sat": "",
-      "holiday": "A601"
+      "holiday": ""
     }
   },
   {
