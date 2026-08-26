@@ -411,7 +411,10 @@ function editTrain(trainId) {
   const partialCancellations = t.partial_cancellations || [];
 
   let html = `
-    <h3 style="margin-top:0;">列車編集: ${t.train_no} (${t.train_id})</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; position: sticky; top: 100px; z-index: 10; background: var(--bg-card); padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle);">
+      <h3 style="margin:0;">列車編集: ${t.train_no} (${t.train_id})</h3>
+      <button class="btn-admin btn-success" onclick="saveTrainData()">変更を適用 (メモリ上)</button>
+    </div>
     <div class="train-editor-grid" style="margin-top: 16px;">
       <div class="form-group">
         <label class="form-label">列車番号 (train_no)</label>
@@ -419,6 +422,7 @@ function editTrain(trainId) {
       </div>
       <div class="form-group">
         <label class="form-label">運用番号 (operation_id)</label>
+        ${t.operation_dict ? '<div style="font-size:0.8rem; color:#ff9500; margin-bottom:4px;">※曜日別運用が設定されています。変更は「運用ベース管理」タブで行うか、下記を直接編集して上書きしてください。</div>' : ''}
         <input type="text" id="edit-op-id" class="form-input" value="${t.operation_id || ''}">
       </div>
       <div class="form-group">
@@ -648,7 +652,13 @@ function saveTrainData() {
   if (!t) return;
 
   t.train_no = document.getElementById('edit-train-no').value.trim();
-  t.operation_id = document.getElementById('edit-op-id').value.trim();
+  const newOpId = document.getElementById('edit-op-id').value.trim();
+  if (t.operation_id !== newOpId) {
+    t.operation_id = newOpId;
+    if (t.operation_dict) {
+      delete t.operation_dict; // Override complex daily rules if user manually changed op id here
+    }
+  }
   t.direction = document.getElementById('edit-dir').value;
   t.destination = document.getElementById('edit-dest').value.trim();
 
@@ -954,6 +964,24 @@ window.saveOperationsToMemory = function() {
         t.operation_rule.dates_run = setting.datesRun.length > 0 ? setting.datesRun : undefined;
         t.operation_rule.dates_off = setting.datesOff.length > 0 ? setting.datesOff : undefined;
         t.operation_rule.days_off = setting.daysOff.length > 0 ? setting.daysOff : undefined;
+      }
+    }
+    
+    // Cleanup operation_dict to prevent overriding operation_id with empty/redundant data
+    if (t.operation_dict) {
+      let allEmpty = true;
+      let allSame = true;
+      let firstVal = t.operation_dict[DAYS_KEYS[0]];
+      DAYS_KEYS.forEach(d => {
+        if (t.operation_dict[d] !== "") allEmpty = false;
+        if (t.operation_dict[d] !== firstVal) allSame = false;
+      });
+      if (allEmpty) {
+        delete t.operation_dict;
+        t.operation_id = "";
+      } else if (allSame) {
+        t.operation_id = firstVal;
+        delete t.operation_dict;
       }
     }
   });
