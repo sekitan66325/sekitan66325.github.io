@@ -216,9 +216,9 @@ a {
 .status-normal .notice-icon { background: var(--green); color: #fff; }
 .status-delay .notice-icon { background: var(--orange); color: #fff; }
 .status-unknown .notice-icon { background: #ffcc00; color: #fff; }
-.notice-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.notice-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; }
 .notice-copy strong { font-size: 0.84rem; }
-.notice-copy span { font-size: 0.7rem; color: var(--text-secondary); }
+.notice-copy span { font-size: 0.7rem; color: var(--text-secondary); text-align: left; }
 .notice-chevron { margin-left: auto; font-size: 1.5rem; text-decoration: none; color: var(--text-secondary); }
 
 /* ===== TOOLBAR ===== */
@@ -229,7 +229,7 @@ a {
   border: 1px solid var(--border-subtle);
   background: var(--bg-secondary);
   border-radius: 8px;
-  padding: 7px 12px;
+  padding: 7px 10px;
   color: var(--text-primary);
   font-size: 0.76rem;
   transition: transform 0.2s var(--spring-bouncy), background 0.15s;
@@ -239,6 +239,10 @@ a {
 .glass-btn:hover, .seg-btn:hover { background: rgba(255, 255, 255, 0.1); }
 .date-control { display: flex; align-items: center; gap: 7px; color: var(--text-secondary); white-space: nowrap; }
 input[type=date], input[type=time], input[type=text][data-is-datepicker] { border: 0; background: transparent; color: var(--text-primary); outline: 0; font-size: 0.76rem; font-family: inherit; }
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator { display: none; -webkit-appearance: none; }
+input[type="time"] { width: 45px; padding: 0; margin: 0; }
+input[type="date"], input[type="text"][data-is-datepicker] { width: 85px; padding: 0; margin: 0; }
 
 input[type="date"]::-webkit-datetime-edit-year-field:focus,
 input[type="date"]::-webkit-datetime-edit-month-field:focus,
@@ -253,24 +257,9 @@ input[type="time"]::-webkit-datetime-edit-text:focus {
 }
 
 /* ===== VIEW TABS ===== */
-.view-tabs {
-  display: flex;
-  gap: 2px;
-  padding: 3px;
-  background: rgba(28, 28, 30, 0.65);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  margin-bottom: 16px;
-  position: sticky;
-  top: 8px;
-  z-index: 30;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
+
 @media (prefers-color-scheme: light) {
-  .view-tabs { background: rgba(255, 255, 255, 0.65); }
-}
+  
 .view-tab {
   flex: 1;
   border: 0;

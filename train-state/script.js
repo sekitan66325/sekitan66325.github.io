@@ -623,7 +623,24 @@ function renderPosition() {
 
   const stationsReversed = [...DATA.stations].reverse();
 
-  trains.filter(t => t.position).forEach(t => {
+  const trainsWithPos = trains.filter(t => t.position);
+
+  // Remove ARRIVED trains if there is a PRE_DEPARTURE train at the same station with a matching operation_id
+  const filteredTrains = trainsWithPos.filter(t => {
+    if (t.result.state === "ARRIVED") {
+      const ops = (t.operation_id || "").split(',').map(o => o.trim());
+      const matchingPreDep = trainsWithPos.some(t2 => {
+        if (t2.result.state !== "PRE_DEPARTURE") return false;
+        if (t2.result.station_code !== t.result.station_code) return false;
+        const ops2 = (t2.operation_id || "").split(',').map(o => o.trim());
+        return ops.some(op => ops2.includes(op));
+      });
+      if (matchingPreDep) return false;
+    }
+    return true;
+  });
+
+  filteredTrains.forEach(t => {
     const card = createTrainCard(t);
 
     if (t.result.state === "STOPPED" || t.result.state === "ARRIVED" || t.result.state === "PRE_DEPARTURE") {
@@ -652,9 +669,7 @@ function renderPosition() {
     row.classList.toggle('is-exchanging', exchangingCodes.has(code));
   });
 
-  const running = trains.filter(t => t.result.state === "RUNNING").length;
-  const stopped = trains.filter(t => t.result.state === "STOPPED").length;
-  $("#summary-grid").innerHTML = `<div class="summary-card"><span>運転中</span><strong>${running}本</strong></div><div class="summary-card"><span>駅停車中</span><strong>${stopped}本</strong></div>`;
+  $("#summary-grid").innerHTML = "";
   $("#position-current-time").textContent = formatServiceTime(state.currentMinutes);
 }
 
