@@ -461,22 +461,42 @@ function editTrain(trainId) {
     <div class="train-editor-grid" style="margin-top: 16px;">
       <div class="form-group">
         <label class="form-label">運転日 (dates_run)</label>
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+          <div class="date-control" style="flex:1;">
+            <input type="text" id="date-run-input" class="form-input" data-is-datepicker="true" placeholder="日付を指定 (例: 2026-08-15)" style="width:100%;">
+          </div>
+          <button type="button" class="btn-admin" onclick="addDateChip('dates_run', 'date-run-input')">追加</button>
+        </div>
         <div style="display: flex; gap: 8px; align-items: center;">
-          <input type="date" id="date-run-input" class="form-input" style="flex:1;">
-          <button type="button" class="btn-admin" onclick="addDateChip('dates_run')">追加</button>
+          <input type="text" id="rule-run-input" class="form-input" placeholder="連動条件を指定 (例: train:103, op:A1, mon)" style="flex:1;">
+          <button type="button" class="btn-admin" onclick="addDateChip('dates_run', 'rule-run-input')">追加</button>
         </div>
         <input type="hidden" id="edit-dates-run" value="${datesRunStr}">
         <div id="dates-run-chips" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
       </div>
       <div class="form-group">
         <label class="form-label">運休日 (dates_off)</label>
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+          <div class="date-control" style="flex:1;">
+            <input type="text" id="date-off-input" class="form-input" data-is-datepicker="true" placeholder="日付を指定 (例: 2026-08-15)" style="width:100%;">
+          </div>
+          <button type="button" class="btn-admin" onclick="addDateChip('dates_off', 'date-off-input')">追加</button>
+        </div>
         <div style="display: flex; gap: 8px; align-items: center;">
-          <input type="date" id="date-off-input" class="form-input" style="flex:1;">
-          <button type="button" class="btn-admin" onclick="addDateChip('dates_off')">追加</button>
+          <input type="text" id="rule-off-input" class="form-input" placeholder="連動条件を指定 (例: train:103, op:A1, mon)" style="flex:1;">
+          <button type="button" class="btn-admin" onclick="addDateChip('dates_off', 'rule-off-input')">追加</button>
         </div>
         <input type="hidden" id="edit-dates-off" value="${datesOffStr}">
         <div id="dates-off-chips" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
       </div>
+    </div>
+
+    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px; line-height: 1.4;">
+      <b>入力ルール（カンマ区切りで複数指定可能）:</b><br>
+      ・特定の日付: <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">2026-08-15</code><br>
+      ・特定の曜日: <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">sun</code>, <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">mon</code>, <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">tue</code>, <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">wed</code>, <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">thu</code>, <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">fri</code>, <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">sat</code><br>
+      ・他列車の運転日に連動: <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">train:103</code> (列車番号103が運転する日)<br>
+      ・他運用の運転日に連動: <code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:3px;">op:A1</code> (運用A1が運転する日)
     </div>
 
     <h4 style="margin-top: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">日付指定の区間運休・区間運転 (partial_cancellations)</h4>
@@ -493,7 +513,11 @@ function editTrain(trainId) {
         <tbody id="edit-pc-body">
           ${partialCancellations.map(pc => `
             <tr>
-              <td style="padding: 4px;"><input type="date" class="form-input pc-date" value="${pc.date}"></td>
+              <td style="padding: 4px;">
+                <div class="date-control">
+                  <input type="text" class="form-input pc-date" data-is-datepicker="true" value="${pc.date}" placeholder="YYYY-MM-DD, mon..." style="width:100%;">
+                </div>
+              </td>
               <td style="padding: 4px;">
                 <select class="form-input pc-start">
                   ${stationsData.map(s => `<option value="${s.code}" ${s.code === pc.actual_start ? 'selected' : ''}>${s.name}</option>`).join('')}
@@ -556,7 +580,11 @@ window.addPCRow = function() {
   const tr = document.createElement('tr');
   const stOptions = stationsData.map(s => `<option value="${s.code}">${s.name}</option>`).join('');
   tr.innerHTML = `
-    <td style="padding: 4px;"><input type="date" class="form-input pc-date"></td>
+    <td style="padding: 4px;">
+      <div class="date-control">
+        <input type="text" class="form-input pc-date" data-is-datepicker="true" placeholder="YYYY-MM-DD, mon..." style="width:100%;">
+      </div>
+    </td>
     <td style="padding: 4px;"><select class="form-input pc-start">${stOptions}</select></td>
     <td style="padding: 4px;"><select class="form-input pc-end">${stOptions}</select></td>
     <td style="padding: 4px;"><button type="button" class="btn-admin btn-danger" style="padding: 4px 8px; font-size: 0.7rem;" onclick="this.closest('tr').remove()">削除</button></td>
@@ -564,8 +592,9 @@ window.addPCRow = function() {
   tbody.appendChild(tr);
 };
 
-window.addDateChip = function(type) {
-  const input = document.getElementById(type === 'dates_run' ? 'date-run-input' : 'date-off-input');
+window.addDateChip = function(type, inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
   const hidden = document.getElementById(type === 'dates_run' ? 'edit-dates-run' : 'edit-dates-off');
   const val = input.value;
   if (!val) return;

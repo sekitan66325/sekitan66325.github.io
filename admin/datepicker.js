@@ -93,7 +93,7 @@ function renderPicker() {
     btn.className = 'cdp-day';
     btn.textContent = i;
 
-    const dStr = ${year}--;
+    const dStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
     const btnDate = new Date(dStr + 'T00:00:00');
     btn.dataset.date = dStr;
 
