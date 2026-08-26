@@ -2249,11 +2249,22 @@
   {
     "train_id": "2101",
     "train_no": "2101",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular"
+      "service_type": "regular",
+      "days_off": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "dates_run": [],
+      "dates_off": []
     },
     "stations": [
       {
