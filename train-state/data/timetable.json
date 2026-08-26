@@ -323,7 +323,7 @@
   {
     "train_id": "109",
     "train_no": "109",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -417,14 +417,14 @@
       }
     ],
     "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
+      "sun": "A3",
+      "mon": "A3",
+      "tue": "A3",
+      "wed": "A3",
+      "thu": "A3",
+      "fri": "A3",
+      "sat": "A3",
+      "holiday": "A3"
     }
   },
   {
