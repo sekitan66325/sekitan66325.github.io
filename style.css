@@ -872,3 +872,82 @@ button {
 button:active:not(:disabled) {
   transform: scale(0.95);
 }
+
+/* ==========================================================================
+   Portal Styles (migrated from index.html)
+   ========================================================================== */
+.portal-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 120px);
+      padding: 20px;
+    }
+
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 900px;
+      margin-top: 40px;
+    }
+
+    .portal-card {
+      background: rgba(28, 28, 30, 0.4);
+      backdrop-filter: blur(24px) saturate(150%);
+      -webkit-backdrop-filter: blur(24px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 24px;
+      text-decoration: none;
+      color: var(--text-primary);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .portal-card:hover {
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .portal-card h2 {
+      margin: 16px 0 8px 0;
+      font-size: 1.25rem;
+      color: var(--text-primary);
+    }
+
+    .portal-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .portal-icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
