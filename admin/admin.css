@@ -238,3 +238,34 @@ select.form-input option {
 }
 
 
+
+
+/* ===== Train List & Editor Layout ===== */
+.train-list-sidebar {
+  flex: 1;
+  max-width: 300px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 16px;
+  /* Removed sticky to prevent scroll tracking issues */
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+.train-editor-container {
+  flex: 2;
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 16px;
+  /* No fixed height, let it scroll with the page naturally */
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Removed sticky */
+  background: var(--bg-card);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+}

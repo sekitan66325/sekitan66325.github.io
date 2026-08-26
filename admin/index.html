@@ -85,7 +85,7 @@
         
         <div id="trains-workspace" style="display: flex; gap: 20px; margin-top: 16px;">
           <!-- 列車リスト -->
-          <div style="flex: 1; max-width: 300px; background: var(--bg-card); border-radius: 8px; padding: 16px;">
+          <div class="train-list-sidebar">
             <input type="search" id="train-search" class="search-input" placeholder="列車検索 (例: 103)..." oninput="renderTrainList()">
             <ul id="train-list" style="list-style: none; padding: 0; margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
               <li style="color: var(--text-secondary); text-align: center;">データを読み込んでください</li>
@@ -93,7 +93,7 @@
           </div>
           
           <!-- エディタ -->
-          <div id="train-editor-container" style="flex: 2; background: var(--bg-card); border-radius: 8px; padding: 16px; display: none;">
+          <div id="train-editor-container" class="train-editor-container" style="display: none;">
             <!-- ここにJavaScriptでフォームを生成 -->
           </div>
         </div>

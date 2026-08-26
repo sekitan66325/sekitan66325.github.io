@@ -411,10 +411,11 @@ function editTrain(trainId) {
   const partialCancellations = t.partial_cancellations || [];
 
   let html = `
-    <div style="display: flex; justify-content: space-between; align-items: center; position: sticky; top: 100px; z-index: 10; background: var(--bg-card); padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle);">
-      <h3 style="margin:0;">列車編集: ${t.train_no} (${t.train_id})</h3>
-      <button class="btn-admin btn-success" onclick="saveTrainData()">変更を適用 (メモリ上)</button>
-    </div>
+    <form id="train-form" style="display:flex; flex-direction:column; gap:16px;">
+      <div class="editor-header">
+        <h3 style="margin: 0;">列車編集: ${t.train_no} (${t.train_id})</h3>
+        <button class="btn-admin btn-success" onclick="saveTrainData()">変更を適用 (メモリ上)</button>
+      </div>
     <div class="train-editor-grid" style="margin-top: 16px;">
       <div class="form-group">
         <label class="form-label">列車番号 (train_no)</label>
@@ -699,6 +700,7 @@ function saveTrainData() {
 
   alert('変更をメモリに適用しました。「変更をダウンロード」で保存してください。');
   renderTrainList();
+  renderOperationsView();
 }
 
 
