@@ -2337,11 +2337,14 @@
   {
     "train_id": "2123",
     "train_no": "2123",
-    "operation_id": "A1",
+    "operation_id": "A5",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular"
+      "service_type": "regular",
+      "days_off": [],
+      "dates_run": [],
+      "dates_off": []
     },
     "stations": [
       {
@@ -2471,7 +2474,7 @@
   {
     "train_id": "6001",
     "train_no": "6001",
-    "operation_id": "A1",
+    "operation_id": "A601",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -2482,7 +2485,9 @@
         3,
         4,
         5
-      ]
+      ],
+      "dates_run": [],
+      "dates_off": []
     },
     "stations": [
       {
@@ -4873,16 +4878,11 @@
   {
     "train_id": "2130",
     "train_no": "2130",
-    "operation_id": "A6",
+    "operation_id": "A1",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": [
-        "train:6103"
-      ]
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -5166,18 +5166,20 @@
   {
     "train_id": "6002",
     "train_no": "6002",
-    "operation_id": "A1",
+    "operation_id": "A601",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "extra",
+      "service_type": "sl",
       "days_off": [
         1,
         2,
         3,
         4,
         5
-      ]
+      ],
+      "dates_run": [],
+      "dates_off": []
     },
     "stations": [
       {
