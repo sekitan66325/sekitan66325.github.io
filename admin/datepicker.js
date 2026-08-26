@@ -35,9 +35,13 @@ function updateHighlight(selectedBtn) {
   const gridRect = grid.getBoundingClientRect();
   const btnRect = selectedBtn.getBoundingClientRect();
   highlight.style.opacity = '1';
-  highlight.style.transform = `translate(${btnRect.left - gridRect.left}px, ${btnRect.top - gridRect.top}px)`;
-  highlight.style.width = `${btnRect.width}px`;
-  highlight.style.height = `${btnRect.height}px`;
+  const size = 32;
+  const dx = btnRect.left - gridRect.left + (btnRect.width - size) / 2;
+  const dy = btnRect.top - gridRect.top + (btnRect.height - size) / 2;
+  highlight.style.transform = `translate(${dx}px, ${dy}px)`;
+  highlight.style.width = `${size}px`;
+  highlight.style.height = `${size}px`;
+  highlight.style.borderRadius = '50%';
 }
 
 function getDatesInRange(startStr, endStr) {
@@ -46,7 +50,10 @@ function getDatesInRange(startStr, endStr) {
   let end = new Date(endStr + 'T00:00:00');
   if (curr > end) { let tmp = curr; curr = end; end = tmp; }
   while (curr <= end) {
-    dates.push(curr.toISOString().split('T')[0]);
+    const y = curr.getFullYear();
+    const m = String(curr.getMonth() + 1).padStart(2, '0');
+    const d = String(curr.getDate()).padStart(2, '0');
+    dates.push(`${y}-${m}-${d}`);
     curr.setDate(curr.getDate() + 1);
   }
   return dates;
@@ -56,7 +63,7 @@ function updateRangeHint() {
   const hint = pickerPopup.querySelector('.cdp-range-hint');
   if (!hint) return;
   if (isRangeMode) {
-    hint.textContent = rangeStart ? `開始: ${rangeStart} → 終了を選択` : '開始日を選択';
+    hint.textContent = rangeStart ? `開始: ${rangeStart} → 終了を選択` : '期間を選択';
   } else {
     hint.textContent = '';
   }
@@ -101,7 +108,11 @@ function renderPicker() {
     if (dStr === todayStr) btn.classList.add('today');
 
     if (isRangeMode) {
-      if (rangeStart === dStr) { btn.classList.add('selected'); selectedBtn = btn; }
+      if (rangeStart) {
+        if (rangeStart === dStr) { btn.classList.add('selected'); selectedBtn = btn; }
+      } else {
+        if (selectedStrs.includes(dStr)) { btn.classList.add('selected'); selectedBtn = btn; }
+      }
     } else {
       if (selectedStrs.includes(dStr)) { btn.classList.add('selected'); selectedBtn = btn; }
     }
