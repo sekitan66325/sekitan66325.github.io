@@ -6,10 +6,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -97,7 +94,17 @@
         "arr": "07:17",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A2",
+      "mon": "A2",
+      "tue": "A2",
+      "wed": "A2",
+      "thu": "A2",
+      "fri": "A2",
+      "sat": "A2",
+      "holiday": "A2"
+    }
   },
   {
     "train_id": "105",
@@ -106,10 +113,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -197,19 +201,26 @@
         "arr": "08:05",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "107",
     "train_no": "107",
-    "operation_id": "A1",
+    "operation_id": "A4",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -297,7 +308,17 @@
         "arr": "08:39",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A4",
+      "mon": "A4",
+      "tue": "A4",
+      "wed": "A4",
+      "thu": "A4",
+      "fri": "A4",
+      "sat": "A4",
+      "holiday": "A4"
+    }
   },
   {
     "train_id": "109",
@@ -306,10 +327,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -397,7 +415,17 @@
         "arr": "09:20",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "111",
@@ -406,10 +434,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -497,7 +522,17 @@
         "arr": "10:01",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "113",
@@ -506,10 +541,7 @@
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -597,7 +629,17 @@
         "arr": "10:48",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "115",
@@ -606,10 +648,7 @@
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -697,7 +736,17 @@
         "arr": "11:34",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1, A4",
+      "mon": "A1, A4",
+      "tue": "A1, A4",
+      "wed": "A1, A4",
+      "thu": "A1, A4",
+      "fri": "A1, A4",
+      "sat": "A1, A4",
+      "holiday": "A1, A4"
+    }
   },
   {
     "train_id": "117",
@@ -706,10 +755,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -797,7 +843,17 @@
         "arr": "12:23",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "119",
@@ -806,10 +862,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -897,7 +950,17 @@
         "arr": "13:10",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "121",
@@ -906,10 +969,7 @@
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -997,7 +1057,17 @@
         "arr": "14:07",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1, A4",
+      "mon": "A1, A4",
+      "tue": "A1, A4",
+      "wed": "A1, A4",
+      "thu": "A1, A4",
+      "fri": "A1, A4",
+      "sat": "A1, A4",
+      "holiday": "A1, A4"
+    }
   },
   {
     "train_id": "125",
@@ -1006,10 +1076,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1097,7 +1164,17 @@
         "arr": "15:44",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "127",
@@ -1106,10 +1183,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1197,7 +1271,17 @@
         "arr": "16:14",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "129",
@@ -1206,10 +1290,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1297,7 +1378,17 @@
         "arr": "16:53",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1, A4",
+      "mon": "A1, A4",
+      "tue": "A1, A4",
+      "wed": "A1, A4",
+      "thu": "A1, A4",
+      "fri": "A1, A4",
+      "sat": "A1, A4",
+      "holiday": "A1, A4"
+    }
   },
   {
     "train_id": "131",
@@ -1306,10 +1397,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1397,7 +1485,17 @@
         "arr": "17:23",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "133",
@@ -1406,10 +1504,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1497,7 +1592,17 @@
         "arr": "18:03",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "135",
@@ -1506,10 +1611,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1597,7 +1699,17 @@
         "arr": "18:35",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "137",
@@ -1606,10 +1718,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1697,7 +1806,17 @@
         "arr": "19:31",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "139",
@@ -1706,10 +1825,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1797,7 +1913,17 @@
         "arr": "20:08",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "141",
@@ -1806,10 +1932,7 @@
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1897,7 +2020,17 @@
         "arr": "20:53",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "143",
@@ -1906,10 +2039,7 @@
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1997,7 +2127,17 @@
         "arr": "21:52",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "145",
@@ -2006,10 +2146,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2097,7 +2234,17 @@
         "arr": "22:40",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "2101",
@@ -2106,10 +2253,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2167,7 +2311,17 @@
         "arr": "06:25",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "2123",
@@ -2176,10 +2330,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2237,7 +2388,17 @@
         "arr": "14:55",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "2147",
@@ -2246,10 +2407,7 @@
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2287,7 +2445,17 @@
         "arr": "23:01",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "6001",
@@ -2296,16 +2464,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "sl",
-      "days_off": [
-        1,
-        2,
-        3,
-        4,
-        5
-      ],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "sl"
     },
     "stations": [
       {
@@ -2393,7 +2552,17 @@
         "arr": "12:06",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "6103",
@@ -2409,9 +2578,7 @@
         3,
         4,
         5
-      ],
-      "dates_run": [],
-      "dates_off": []
+      ]
     },
     "stations": [
       {
@@ -2449,7 +2616,17 @@
         "arr": "16:33",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A301, A601",
+      "mon": "A301, A601",
+      "tue": "A301, A601",
+      "wed": "A301, A601",
+      "thu": "A301, A601",
+      "fri": "A301, A601",
+      "sat": "A301, A601",
+      "holiday": "A301, A601"
+    }
   },
   {
     "train_id": "104",
@@ -2458,10 +2635,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2549,7 +2723,17 @@
         "arr": "06:31",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "108",
@@ -2558,10 +2742,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2649,7 +2830,17 @@
         "arr": "07:45",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "110",
@@ -2658,10 +2849,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2749,7 +2937,17 @@
         "arr": "08:37",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "112",
@@ -2758,10 +2956,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2849,7 +3044,17 @@
         "arr": "09:22",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "114",
@@ -2858,10 +3063,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2949,7 +3151,17 @@
         "arr": "10:09",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1, A4",
+      "mon": "A1, A4",
+      "tue": "A1, A4",
+      "wed": "A1, A4",
+      "thu": "A1, A4",
+      "fri": "A1, A4",
+      "sat": "A1, A4",
+      "holiday": "A1, A4"
+    }
   },
   {
     "train_id": "116",
@@ -2958,10 +3170,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3049,7 +3258,17 @@
         "arr": "10:49",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "118",
@@ -3058,10 +3277,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3149,7 +3365,17 @@
         "arr": "11:26",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "122",
@@ -3158,10 +3384,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3249,7 +3472,17 @@
         "arr": "12:51",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1, A4",
+      "mon": "A1, A4",
+      "tue": "A1, A4",
+      "wed": "A1, A4",
+      "thu": "A1, A4",
+      "fri": "A1, A4",
+      "sat": "A1, A4",
+      "holiday": "A1, A4"
+    }
   },
   {
     "train_id": "124",
@@ -3258,10 +3491,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3349,7 +3579,17 @@
         "arr": "13:51",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "126",
@@ -3358,10 +3598,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3449,7 +3686,17 @@
         "arr": "14:47",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "128",
@@ -3458,10 +3705,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3549,7 +3793,17 @@
         "arr": "15:21",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1, A4",
+      "mon": "A1, A4",
+      "tue": "A1, A4",
+      "wed": "A1, A4",
+      "thu": "A1, A4",
+      "fri": "A1, A4",
+      "sat": "A1, A4",
+      "holiday": "A1, A4"
+    }
   },
   {
     "train_id": "132",
@@ -3558,10 +3812,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3649,7 +3900,17 @@
         "arr": "16:36",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "134",
@@ -3658,10 +3919,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3749,7 +4007,17 @@
         "arr": "16:59",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "136",
@@ -3758,10 +4026,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3849,7 +4114,17 @@
         "arr": "17:48",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "140",
@@ -3858,10 +4133,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3949,7 +4221,17 @@
         "arr": "18:51",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "142",
@@ -3958,10 +4240,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4049,7 +4328,17 @@
         "arr": "19:17",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "144",
@@ -4058,10 +4347,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4149,7 +4435,17 @@
         "arr": "20:02",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "148",
@@ -4158,10 +4454,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4249,7 +4542,17 @@
         "arr": "21:16",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "150",
@@ -4258,10 +4561,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4349,7 +4649,17 @@
         "arr": "22:18",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "2102",
@@ -4358,10 +4668,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4399,7 +4706,17 @@
         "arr": "05:36",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1, A2",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "2106",
@@ -4408,10 +4725,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4449,7 +4763,17 @@
         "arr": "07:21",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1, A4",
+      "mon": "A1, A4",
+      "tue": "A1, A4",
+      "wed": "A1, A4",
+      "thu": "A1, A4",
+      "fri": "A1, A4",
+      "sat": "A1, A4",
+      "holiday": "A1, A4"
+    }
   },
   {
     "train_id": "2120",
@@ -4458,10 +4782,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4519,7 +4840,17 @@
         "arr": "11:32",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "2130",
@@ -4528,10 +4859,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4569,7 +4897,17 @@
         "arr": "15:55",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "2138",
@@ -4578,10 +4916,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4639,7 +4974,17 @@
         "arr": "17:38",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1, A4",
+      "mon": "A1, A4",
+      "tue": "A1, A4",
+      "wed": "A1, A4",
+      "thu": "A1, A4",
+      "fri": "A1, A4",
+      "sat": "A1, A4",
+      "holiday": "A1, A4"
+    }
   },
   {
     "train_id": "2146",
@@ -4648,10 +4993,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4709,7 +5051,17 @@
         "arr": "20:25",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "2152",
@@ -4718,10 +5070,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4779,7 +5128,17 @@
         "arr": "22:38",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "6002",
@@ -4788,10 +5147,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "extra",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "extra"
     },
     "stations": [
       {
@@ -4879,7 +5235,17 @@
         "arr": "15:58",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A1",
+      "mon": "A1",
+      "tue": "A1",
+      "wed": "A1",
+      "thu": "A1",
+      "fri": "A1",
+      "sat": "A1",
+      "holiday": "A1"
+    }
   },
   {
     "train_id": "6100",
@@ -4895,9 +5261,7 @@
         3,
         4,
         5
-      ],
-      "dates_run": [],
-      "dates_off": []
+      ]
     },
     "stations": [
       {
@@ -4935,6 +5299,16 @@
         "arr": "09:57",
         "dep": null
       }
-    ]
+    ],
+    "operation_dict": {
+      "sun": "A301, A601",
+      "mon": "A301, A601",
+      "tue": "A301, A601",
+      "wed": "A301, A601",
+      "thu": "A301, A601",
+      "fri": "A301, A601",
+      "sat": "A301, A601",
+      "holiday": "A301, A601"
+    }
   }
 ]
