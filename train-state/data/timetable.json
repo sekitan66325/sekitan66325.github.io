@@ -2337,14 +2337,11 @@
   {
     "train_id": "2123",
     "train_no": "2123",
-    "operation_id": "A5",
+    "operation_id": "A1",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4876,11 +4873,16 @@
   {
     "train_id": "2130",
     "train_no": "2130",
-    "operation_id": "A1",
+    "operation_id": "A6",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular"
+      "service_type": "regular",
+      "days_off": [],
+      "dates_run": [],
+      "dates_off": [
+        "train:6103"
+      ]
     },
     "stations": [
       {
@@ -5164,7 +5166,7 @@
   {
     "train_id": "6002",
     "train_no": "6002",
-    "operation_id": "A601",
+    "operation_id": "A1",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
