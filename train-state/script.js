@@ -993,7 +993,7 @@ function openTrainModal(t) {
     <span class="modal-kicker">TRAIN DETAIL / ${t.train_id}</span>
     <h3 class="modal-title">${t.train_no}</h3>
     <div class="modal-badges"><span class="badge ${t.direction === "up" ? "blue" : ""}">${t.direction === "up" ? "上り" : "下り"}</span><span class="badge">${formatStationName(t.destination)}行</span><span class="badge ${t.result.state === "STOPPED" ? "orange" : ""}">${statusHTML}</span></div>
-    <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${displayOpId}</strong></div><div class="detail-cell"><small>遅延</small><strong>${t.override.delay_minutes || 0}分</strong></div></div>
+    <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${displayOpId}</strong></div><!-- <div class="detail-cell"><small>遅延</small><strong>${t.override.delay_minutes || 0}分</strong></div> --></div>
     ${formation.length ? `<div class="formation"><h4>編成</h4><div class="formation-list">${formation.map(x => `<span>${x}</span>`).join("")}</div></div>` : ""}
     ${t.override.memo ? `<div class="memo">${t.override.memo}</div>` : ""}
     <div class="station-detail"><h4>各駅の詳細時刻</h4>${t.stations.map(st => {
