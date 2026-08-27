@@ -94,17 +94,7 @@
         "arr": "07:17",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "105",
@@ -201,17 +191,7 @@
         "arr": "08:05",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A1",
-      "mon": "A1",
-      "tue": "A1",
-      "wed": "A1",
-      "thu": "A1",
-      "fri": "A1",
-      "sat": "A1",
-      "holiday": "A1"
-    }
+    ]
   },
   {
     "train_id": "107",
@@ -308,17 +288,7 @@
         "arr": "08:39",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A4",
-      "mon": "A4",
-      "tue": "A4",
-      "wed": "A4",
-      "thu": "A4",
-      "fri": "A4",
-      "sat": "A4",
-      "holiday": "A4"
-    }
+    ]
   },
   {
     "train_id": "109",
@@ -415,22 +385,12 @@
         "arr": "09:20",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A3",
-      "mon": "A3",
-      "tue": "A3",
-      "wed": "A3",
-      "thu": "A3",
-      "fri": "A3",
-      "sat": "A3",
-      "holiday": "A3"
-    }
+    ]
   },
   {
     "train_id": "111",
     "train_no": "111",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -522,17 +482,7 @@
         "arr": "10:01",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "113",
@@ -629,22 +579,12 @@
         "arr": "10:48",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A1",
-      "mon": "A1",
-      "tue": "A1",
-      "wed": "A1",
-      "thu": "A1",
-      "fri": "A1",
-      "sat": "A1",
-      "holiday": "A1"
-    }
+    ]
   },
   {
     "train_id": "115",
     "train_no": "115",
-    "operation_id": "A1",
+    "operation_id": "A4",
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
@@ -736,22 +676,12 @@
         "arr": "11:34",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A4",
-      "mon": "A4",
-      "tue": "A4",
-      "wed": "A4",
-      "thu": "A4",
-      "fri": "A4",
-      "sat": "A4",
-      "holiday": "A4"
-    }
+    ]
   },
   {
     "train_id": "117",
     "train_no": "117",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -843,22 +773,12 @@
         "arr": "12:23",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "119",
     "train_no": "119",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -950,22 +870,12 @@
         "arr": "13:10",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "121",
     "train_no": "121",
-    "operation_id": "A1",
+    "operation_id": "A4",
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
@@ -1057,22 +967,12 @@
         "arr": "14:07",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A4",
-      "mon": "A4",
-      "tue": "A4",
-      "wed": "A4",
-      "thu": "A4",
-      "fri": "A4",
-      "sat": "A4",
-      "holiday": "A4"
-    }
+    ]
   },
   {
     "train_id": "125",
     "train_no": "125",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1164,22 +1064,12 @@
         "arr": "15:44",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "127",
     "train_no": "127",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1271,22 +1161,12 @@
         "arr": "16:14",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "129",
     "train_no": "129",
-    "operation_id": "A1",
+    "operation_id": "A4",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1378,22 +1258,12 @@
         "arr": "16:53",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A4",
-      "mon": "A4",
-      "tue": "A4",
-      "wed": "A4",
-      "thu": "A4",
-      "fri": "A4",
-      "sat": "A4",
-      "holiday": "A4"
-    }
+    ]
   },
   {
     "train_id": "131",
     "train_no": "131",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1485,22 +1355,12 @@
         "arr": "17:23",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "133",
     "train_no": "133",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1592,22 +1452,12 @@
         "arr": "18:03",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "135",
     "train_no": "135",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1699,22 +1549,12 @@
         "arr": "18:35",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "137",
     "train_no": "137",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1806,22 +1646,12 @@
         "arr": "19:31",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "139",
     "train_no": "139",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1913,22 +1743,12 @@
         "arr": "20:08",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "141",
     "train_no": "141",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
@@ -2020,22 +1840,12 @@
         "arr": "20:53",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "143",
     "train_no": "143",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
@@ -2127,22 +1937,12 @@
         "arr": "21:52",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "145",
     "train_no": "145",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -2234,17 +2034,7 @@
         "arr": "22:40",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "2101",
@@ -2253,18 +2043,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -2322,22 +2101,12 @@
         "arr": "06:25",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "2123",
     "train_no": "2123",
-    "operation_id": "A5",
+    "operation_id": "",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -2402,22 +2171,12 @@
         "arr": "14:55",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "2147",
     "train_no": "2147",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
@@ -2459,17 +2218,7 @@
         "arr": "23:01",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "6001",
@@ -2485,9 +2234,7 @@
         3,
         4,
         5
-      ],
-      "dates_run": [],
-      "dates_off": []
+      ]
     },
     "stations": [
       {
@@ -2590,7 +2337,7 @@
   {
     "train_id": "6103",
     "train_no": "6103",
-    "operation_id": "A601,A301",
+    "operation_id": "A301, A601",
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
@@ -2639,17 +2386,7 @@
         "arr": "16:33",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A301, A601",
-      "mon": "A301, A601",
-      "tue": "A301, A601",
-      "wed": "A301, A601",
-      "thu": "A301, A601",
-      "fri": "A301, A601",
-      "sat": "A301, A601",
-      "holiday": "A301, A601"
-    }
+    ]
   },
   {
     "train_id": "104",
@@ -2746,22 +2483,12 @@
         "arr": "06:31",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A1",
-      "mon": "A1",
-      "tue": "A1",
-      "wed": "A1",
-      "thu": "A1",
-      "fri": "A1",
-      "sat": "A1",
-      "holiday": "A1"
-    }
+    ]
   },
   {
     "train_id": "108",
     "train_no": "108",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -2853,22 +2580,12 @@
         "arr": "07:45",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "110",
     "train_no": "110",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -2960,17 +2677,7 @@
         "arr": "08:37",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "112",
@@ -3067,22 +2774,12 @@
         "arr": "09:22",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A1",
-      "mon": "A1",
-      "tue": "A1",
-      "wed": "A1",
-      "thu": "A1",
-      "fri": "A1",
-      "sat": "A1",
-      "holiday": "A1"
-    }
+    ]
   },
   {
     "train_id": "114",
     "train_no": "114",
-    "operation_id": "A1",
+    "operation_id": "A4",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -3174,22 +2871,12 @@
         "arr": "10:09",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A4",
-      "mon": "A4",
-      "tue": "A4",
-      "wed": "A4",
-      "thu": "A4",
-      "fri": "A4",
-      "sat": "A4",
-      "holiday": "A4"
-    }
+    ]
   },
   {
     "train_id": "116",
     "train_no": "116",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -3281,22 +2968,12 @@
         "arr": "10:49",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "118",
     "train_no": "118",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -3388,22 +3065,12 @@
         "arr": "11:26",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "122",
     "train_no": "122",
-    "operation_id": "A1",
+    "operation_id": "A4",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -3495,22 +3162,12 @@
         "arr": "12:51",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A4",
-      "mon": "A4",
-      "tue": "A4",
-      "wed": "A4",
-      "thu": "A4",
-      "fri": "A4",
-      "sat": "A4",
-      "holiday": "A4"
-    }
+    ]
   },
   {
     "train_id": "124",
     "train_no": "124",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -3602,22 +3259,12 @@
         "arr": "13:51",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "126",
     "train_no": "126",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -3709,22 +3356,12 @@
         "arr": "14:47",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "128",
     "train_no": "128",
-    "operation_id": "A1",
+    "operation_id": "A4",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -3816,22 +3453,12 @@
         "arr": "15:21",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A4",
-      "mon": "A4",
-      "tue": "A4",
-      "wed": "A4",
-      "thu": "A4",
-      "fri": "A4",
-      "sat": "A4",
-      "holiday": "A4"
-    }
+    ]
   },
   {
     "train_id": "132",
     "train_no": "132",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -3923,22 +3550,12 @@
         "arr": "16:36",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "134",
     "train_no": "134",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -4030,22 +3647,12 @@
         "arr": "16:59",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "136",
     "train_no": "136",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4137,22 +3744,12 @@
         "arr": "17:48",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "140",
     "train_no": "140",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4244,22 +3841,12 @@
         "arr": "18:51",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "142",
     "train_no": "142",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4351,22 +3938,12 @@
         "arr": "19:17",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "144",
     "train_no": "144",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4458,22 +4035,12 @@
         "arr": "20:02",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "148",
     "train_no": "148",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4565,22 +4132,12 @@
         "arr": "21:16",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "150",
     "train_no": "150",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4672,22 +4229,12 @@
         "arr": "22:18",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "2102",
     "train_no": "2102",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4729,22 +4276,12 @@
         "arr": "05:36",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "2106",
     "train_no": "2106",
-    "operation_id": "A1",
+    "operation_id": "A4",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4786,17 +4323,7 @@
         "arr": "07:21",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A4",
-      "mon": "A4",
-      "tue": "A4",
-      "wed": "A4",
-      "thu": "A4",
-      "fri": "A4",
-      "sat": "A4",
-      "holiday": "A4"
-    }
+    ]
   },
   {
     "train_id": "2120",
@@ -4863,22 +4390,12 @@
         "arr": "11:32",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A1",
-      "mon": "A1",
-      "tue": "A1",
-      "wed": "A1",
-      "thu": "A1",
-      "fri": "A1",
-      "sat": "A1",
-      "holiday": "A1"
-    }
+    ]
   },
   {
     "train_id": "2130",
     "train_no": "2130",
-    "operation_id": "A1",
+    "operation_id": "",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4920,22 +4437,12 @@
         "arr": "15:55",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "2138",
     "train_no": "2138",
-    "operation_id": "A1",
+    "operation_id": "A4",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -4997,22 +4504,12 @@
         "arr": "17:38",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A4",
-      "mon": "A4",
-      "tue": "A4",
-      "wed": "A4",
-      "thu": "A4",
-      "fri": "A4",
-      "sat": "A4",
-      "holiday": "A4"
-    }
+    ]
   },
   {
     "train_id": "2146",
     "train_no": "2146",
-    "operation_id": "A1",
+    "operation_id": "A2",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -5074,22 +4571,12 @@
         "arr": "20:25",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A2",
-      "mon": "A2",
-      "tue": "A2",
-      "wed": "A2",
-      "thu": "A2",
-      "fri": "A2",
-      "sat": "A2",
-      "holiday": "A2"
-    }
+    ]
   },
   {
     "train_id": "2152",
     "train_no": "2152",
-    "operation_id": "A1",
+    "operation_id": "A3",
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
@@ -5151,17 +4638,7 @@
         "arr": "22:38",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "",
-      "mon": "",
-      "tue": "",
-      "wed": "",
-      "thu": "",
-      "fri": "",
-      "sat": "",
-      "holiday": ""
-    }
+    ]
   },
   {
     "train_id": "6002",
@@ -5177,9 +4654,7 @@
         3,
         4,
         5
-      ],
-      "dates_run": [],
-      "dates_off": []
+      ]
     },
     "stations": [
       {
@@ -5282,7 +4757,7 @@
   {
     "train_id": "6100",
     "train_no": "回6100",
-    "operation_id": "A301,A601",
+    "operation_id": "A301, A601",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -5331,16 +4806,6 @@
         "arr": "09:57",
         "dep": null
       }
-    ],
-    "operation_dict": {
-      "sun": "A301, A601",
-      "mon": "A301, A601",
-      "tue": "A301, A601",
-      "wed": "A301, A601",
-      "thu": "A301, A601",
-      "fri": "A301, A601",
-      "sat": "A301, A601",
-      "holiday": "A301, A601"
-    }
+    ]
   }
 ]
