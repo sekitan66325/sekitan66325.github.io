@@ -110,12 +110,15 @@ function showDashboard() {
   document.getElementById('dashboard-view').style.display = 'block';
   document.getElementById('logout-btn').style.display = 'inline-block';
   fetchAdminPosts();
+  if (timetableData.length === 0) {
+    loadTimetableFromRepo(true);
+  }
 }
 
 /**
  * タブ切り替え
  */
-function switchAdminTab(tab) {
+async function switchAdminTab(tab) {
   const views = ['posts', 'logs', 'trains', 'operations'];
   views.forEach(v => {
     const el = document.getElementById('panel-' + v);
@@ -127,10 +130,17 @@ function switchAdminTab(tab) {
     if(btn) btn.classList.toggle('active', tab === v);
   });
   if (tab === 'operations') {
-    renderOperationsView();
+    if (timetableData.length === 0) {
+      await loadTimetableFromRepo(true);
+    } else {
+      renderOperationsView();
+    }
   } else if (tab === 'trains') {
-    renderTrainList();
-    if (timetableData.length === 0) loadTimetableFromRepo(true);
+    if (timetableData.length === 0) {
+      await loadTimetableFromRepo(true);
+    } else {
+      renderTrainList();
+    }
   } else if (tab === 'logs') {
     fetchAdminLogs();
   }
@@ -324,8 +334,9 @@ function escapeHTML(str) {
 let timetableData = [];
 let stationsData = [];
 let currentTrainId = null;
+let manualOperations = new Set();
 
-async function loadTimetableFromRepo() {
+async function loadTimetableFromRepo(silent = false) {
   try {
     const [stRes, ttRes] = await Promise.all([
       fetch('../train-state/data/stations.json'),
@@ -334,10 +345,11 @@ async function loadTimetableFromRepo() {
     if (!stRes.ok || !ttRes.ok) throw new Error('Failed to fetch data from repo');
     stationsData = await stRes.json();
     timetableData = await ttRes.json();
-    alert('リポジトリからデータを読み込みました。');
+    if (!silent) alert('リポジトリからデータを読み込みました。');
     renderTrainList();
+    renderOperationsView();
   } catch (err) {
-    alert('読込エラー: ' + err.message);
+    if (!silent) alert('読込エラー: ' + err.message);
   }
 }
 
@@ -752,8 +764,6 @@ async function exportTimetable() {
   }
 }
 
-
-
 // --- 運用ベース管理機能 ---
 const DAYS_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'holiday'];
 const DAYS_LABELS = { sun:'日', mon:'月', tue:'火', wed:'水', thu:'木', fri:'金', sat:'土', holiday:'祝' };
@@ -794,11 +804,58 @@ window.renderOpDateChips = function(op, type) {
   `).join('');
 };
 
+window.handleAddNewOperation = function() {
+  const input = document.getElementById('new-op-input');
+  if (!input) return;
+  const newOp = input.value.trim();
+  if (!newOp) {
+    alert('追加する運用名（ID）を入力してください (例: 14-7)');
+    return;
+  }
+  manualOperations.add(newOp);
+  input.value = '';
+  renderOperationsView();
+  
+  setTimeout(() => {
+    const cards = document.querySelectorAll('.op-card');
+    for (const c of cards) {
+      if (c.textContent.includes(`運用 ${newOp}`)) {
+        c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        c.style.boxShadow = '0 0 0 2px var(--text-link)';
+        setTimeout(() => { c.style.boxShadow = ''; }, 1500);
+        break;
+      }
+    }
+  }, 100);
+};
+
+window.handleDeleteOperation = function(op) {
+  if (!confirm(`運用「${op}」を削除しますか？\n（充当されている列車からこの運用設定が解除されます）`)) return;
+  manualOperations.delete(op);
+  timetableData.forEach(t => {
+    if (t.operation_dict) {
+      DAYS_KEYS.forEach(d => {
+        if (t.operation_dict[d]) {
+          const opsArray = t.operation_dict[d].split(',').map(s => s.trim()).filter(s => s && s !== op);
+          t.operation_dict[d] = opsArray.join(', ');
+        }
+      });
+    }
+    if (t.operation_id) {
+      const opsArray = t.operation_id.toString().split(',').map(s => s.trim()).filter(s => s && s !== op);
+      t.operation_id = opsArray.join(', ');
+    }
+  });
+  renderOperationsView();
+  renderTrainList();
+};
+
 function renderOperationsView() {
   const opList = document.getElementById('op-list');
   if(!opList) return;
   
   const ops = new Set();
+  manualOperations.forEach(o => ops.add(o));
   timetableData.forEach(t => {
     if(t.operation_dict) {
       Object.values(t.operation_dict).forEach(opstr => {
@@ -808,6 +865,15 @@ function renderOperationsView() {
       t.operation_id.toString().split(',').map(s=>s.trim()).filter(s=>s).forEach(o => ops.add(o));
     }
   });
+  
+  if (ops.size === 0) {
+    opList.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 32px 16px; background: var(--bg-card); border-radius: 8px;">
+        運用データがありません。右上の「＋ 運用を追加」から運用を作成してください。
+      </div>
+    `;
+    return;
+  }
   
   let html = '';
   Array.from(ops).sort().forEach(op => {
@@ -827,7 +893,10 @@ function renderOperationsView() {
     let excludeDates = repTrain && repTrain.operation_rule && repTrain.operation_rule.dates_off ? repTrain.operation_rule.dates_off.join(',') : '';
 
     html += `<div class="op-card" style="background: var(--bg-card); padding: 16px; border-radius: 8px;">
-      <h3 style="margin-top:0; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:8px;">運用 ${op}</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
+        <h3 style="margin:0;">運用 ${op}</h3>
+        <button type="button" class="btn-admin btn-danger" style="padding: 3px 8px; font-size: 0.75rem; min-width: auto;" onclick="window.handleDeleteOperation('${op}')">運用を削除</button>
+      </div>
       
       <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px; margin-top: 12px; font-size: 0.85rem;">
         <strong style="display:block; margin-bottom:8px; color: var(--text-primary);">▼ 運転曜日の設定</strong>
@@ -988,8 +1057,7 @@ window.saveOperationsToMemory = function() {
     }
   });
   
-  alert('運用のスケジュールと充当列車の変更をメモリに適用しました。\\n「運行データ管理」から「GitHubへ反映」してください。');
+  renderTrainList();
+  renderOperationsView();
+  alert('運用のスケジュールと充当列車の変更をメモリに適用しました。\n「運行データ管理」から「GitHubへ反映」してください。');
 };
-
-
-

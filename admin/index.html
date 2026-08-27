@@ -100,8 +100,14 @@
       </div>
 
       <div id="panel-operations" class="view-panel">
-        <h2 class="section-title">運用ベース管理</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        <div class="board-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+          <h2 class="section-title" style="margin: 0;">運用ベース管理</h2>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="new-op-input" class="form-input" placeholder="新運用名 (例: 14-7)" style="width: 140px; padding: 6px 10px; font-size: 0.82rem;" onkeydown="if(event.key==='Enter'){event.preventDefault();handleAddNewOperation();}">
+            <button class="btn-admin btn-success" type="button" onclick="handleAddNewOperation()">+ 運用を追加</button>
+          </div>
+        </div>
+        <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5;">
           曜日ごとにどの列車をどの運用に入れるか設定します。<br>
           ※設定したデータは、列車ベースのデータと同じ timetable.json に保存されます。
         </p>
