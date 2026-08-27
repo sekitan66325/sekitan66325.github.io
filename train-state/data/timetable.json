@@ -1263,7 +1263,7 @@
   {
     "train_id": "131",
     "train_no": "131",
-    "operation_id": "",
+    "operation_id": "A6",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1360,7 +1360,7 @@
   {
     "train_id": "133",
     "train_no": "133",
-    "operation_id": "",
+    "operation_id": "A5",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1651,7 +1651,7 @@
   {
     "train_id": "139",
     "train_no": "139",
-    "operation_id": "",
+    "operation_id": "A6",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -1748,7 +1748,7 @@
   {
     "train_id": "141",
     "train_no": "141",
-    "operation_id": "",
+    "operation_id": "A5",
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
@@ -1942,7 +1942,7 @@
   {
     "train_id": "145",
     "train_no": "145",
-    "operation_id": "",
+    "operation_id": "A6",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -2110,10 +2110,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_run": [],
-      "dates_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -3458,7 +3455,7 @@
   {
     "train_id": "132",
     "train_no": "132",
-    "operation_id": "",
+    "operation_id": "A5",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -3749,7 +3746,7 @@
   {
     "train_id": "140",
     "train_no": "140",
-    "operation_id": "",
+    "operation_id": "A6",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -3846,7 +3843,7 @@
   {
     "train_id": "142",
     "train_no": "142",
-    "operation_id": "",
+    "operation_id": "A5",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4040,7 +4037,7 @@
   {
     "train_id": "148",
     "train_no": "148",
-    "operation_id": "",
+    "operation_id": "A6",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
@@ -4137,7 +4134,7 @@
   {
     "train_id": "150",
     "train_no": "150",
-    "operation_id": "",
+    "operation_id": "A5",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
