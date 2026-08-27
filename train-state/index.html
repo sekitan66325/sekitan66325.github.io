@@ -59,10 +59,10 @@
     </div>
     <div class="toolbar-actions">
       <button class="glass-btn" id="now-btn">現在時刻</button>
-      <label class="date-control">
+      <label class="date-control date-picker-control">
         運行日 <input id="date-input" type="text" data-is-datepicker="true" value="2026-08-15" placeholder="YYYY-MM-DD">
       </label>
-      <label class="date-control" onclick="if(event.target.tagName !== 'INPUT') { const i = document.getElementById('time-input'); i.showPicker && i.showPicker(); }">
+      <label class="date-control time-picker-control" onclick="if(event.target.tagName !== 'INPUT') { const i = document.getElementById('time-input'); i.showPicker && i.showPicker(); }">
         時刻 <input id="time-input" type="time" value="12:00">
       </label>
     </div>

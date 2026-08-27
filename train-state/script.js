@@ -359,6 +359,26 @@ function validateStatus(s) {
   return !!s && typeof s.service_date === "string" && s.official_info && s.operations && s.train_overrides;
 }
 
+function getTrainOperations(train, dateStr) {
+  if (!train) return [];
+  let opStr = train.operation_id || "";
+  if (train.operation_dict) {
+    const day = new Date(`${dateStr}T12:00:00+09:00`).getDay();
+    const key = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][day];
+    if (train.operation_dict[key] !== undefined) {
+      opStr = train.operation_dict[key];
+    }
+  }
+  return opStr.toString().split(',').map(s => s.trim()).filter(s => s);
+}
+
+function hasMatchingOperation(trainA, trainB, dateStr) {
+  const opsA = getTrainOperations(trainA, dateStr);
+  const opsB = getTrainOperations(trainB, dateStr);
+  if (opsA.length === 0 || opsB.length === 0) return false;
+  return opsA.some(op => opsB.includes(op));
+}
+
 function stationPos(code) { return DATA.stations.findIndex(s => s.code === code) }
 function positionForState(train, actual, result) {
   if (result.state === "OUT_OF_SERVICE") return null;
@@ -625,18 +645,39 @@ function renderPosition() {
 
   const trainsWithPos = trains.filter(t => t.position);
 
-  // Remove ARRIVED trains if there is a PRE_DEPARTURE train at the same station with a matching operation_id
+  // 同一運用番号を持つ列車同士の排他制御（始発保持・終着保持の重複や本線走行との矛盾を排除）
   const filteredTrains = trainsWithPos.filter(t => {
-    if (t.result.state === "ARRIVED") {
-      const ops = (t.operation_id || "").split(',').map(o => o.trim());
-      const matchingPreDep = trainsWithPos.some(t2 => {
-        if (t2.result.state !== "PRE_DEPARTURE") return false;
-        if (t2.result.station_code !== t.result.station_code) return false;
-        const ops2 = (t2.operation_id || "").split(',').map(o => o.trim());
-        return ops.some(op => ops2.includes(op));
-      });
-      if (matchingPreDep) return false;
+    const isHoldState = t.result.state === "PRE_DEPARTURE" || t.result.state === "ARRIVED";
+
+    for (const t2 of trainsWithPos) {
+      if (t2.train_id === t.train_id) continue;
+      if (!hasMatchingOperation(t, t2, state.serviceDate)) continue;
+
+      // 1. 同一運用の別列車が本線を走行中(RUNNING)または駅に停車中(STOPPED)の場合、保持状態(始発保持/終着保持)の列車tは非表示
+      if (isHoldState && (t2.result.state === "RUNNING" || t2.result.state === "STOPPED")) {
+        return false;
+      }
+
+      // 2. 列車tが終着保持(ARRIVED)で、同一運用の折り返し列車t2が始発保持(PRE_DEPARTURE)の場合、終着保持tは非表示にして始発保持t2を表示
+      if (t.result.state === "ARRIVED" && t2.result.state === "PRE_DEPARTURE") {
+        return false;
+      }
+
+      // 3. 両方とも始発保持(PRE_DEPARTURE)の場合、発車時刻が遅い方の列車を非表示
+      if (t.result.state === "PRE_DEPARTURE" && t2.result.state === "PRE_DEPARTURE") {
+        const tDep = t.actual[0]?.dep_actual ?? 9999;
+        const t2Dep = t2.actual[0]?.dep_actual ?? 9999;
+        if (tDep > t2Dep) return false;
+      }
+
+      // 4. 両方とも終着保持(ARRIVED)の場合、到着時刻が古い方の列車を非表示
+      if (t.result.state === "ARRIVED" && t2.result.state === "ARRIVED") {
+        const tArr = t.actual[t.actual.length - 1]?.arr_actual ?? 0;
+        const t2Arr = t2.actual[t2.actual.length - 1]?.arr_actual ?? 0;
+        if (tArr < t2Arr) return false;
+      }
     }
+
     return true;
   });
 
@@ -940,13 +981,7 @@ function openTrainModal(t) {
     statusHTML = `<span>${stateText}</span>`;
   }
   let formation = [];
-  let currentOpIdStr = t.operation_id || "";
-  if (t.operation_dict) {
-    const day = new Date(`${state.serviceDate}T12:00:00+09:00`).getDay();
-    const key = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][day];
-    if (t.operation_dict[key]) currentOpIdStr = t.operation_dict[key];
-  }
-  const opIds = currentOpIdStr.toString().split(',').map(s => s.trim()).filter(s => s);
+  const opIds = getTrainOperations(t, state.serviceDate);
   opIds.forEach(id => {
     if (DATA.status.operations[id] && DATA.status.operations[id].formation) {
       formation = formation.concat(DATA.status.operations[id].formation);
