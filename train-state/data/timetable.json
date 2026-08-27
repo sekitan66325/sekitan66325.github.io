@@ -1847,7 +1847,7 @@
     "train_no": "143",
     "operation_id": "A3",
     "direction": "down",
-    "destination": "真岡",
+    "destination": "茂木",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -2106,7 +2106,7 @@
   {
     "train_id": "2123",
     "train_no": "2123",
-    "operation_id": "",
+    "operation_id": "A5",
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
@@ -2176,7 +2176,7 @@
   {
     "train_id": "2147",
     "train_no": "2147",
-    "operation_id": "",
+    "operation_id": "A5",
     "direction": "down",
     "destination": "真岡",
     "operation_rule": {
@@ -3460,7 +3460,7 @@
     "train_no": "132",
     "operation_id": "",
     "direction": "up",
-    "destination": "真岡",
+    "destination": "下館",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -3557,7 +3557,7 @@
     "train_no": "134",
     "operation_id": "A3",
     "direction": "up",
-    "destination": "真岡",
+    "destination": "下館",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -4395,7 +4395,7 @@
   {
     "train_id": "2130",
     "train_no": "2130",
-    "operation_id": "",
+    "operation_id": "A6",
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
