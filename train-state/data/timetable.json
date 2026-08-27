@@ -489,7 +489,7 @@
     "train_no": "113",
     "operation_id": "A1",
     "direction": "down",
-    "destination": "真岡",
+    "destination": "茂木",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -586,7 +586,7 @@
     "train_no": "115",
     "operation_id": "A4",
     "direction": "down",
-    "destination": "真岡",
+    "destination": "茂木",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -877,7 +877,7 @@
     "train_no": "121",
     "operation_id": "A4",
     "direction": "down",
-    "destination": "真岡",
+    "destination": "茂木",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -1750,7 +1750,7 @@
     "train_no": "141",
     "operation_id": "A5",
     "direction": "down",
-    "destination": "真岡",
+    "destination": "茂木",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -2584,7 +2584,7 @@
     "train_no": "110",
     "operation_id": "A2",
     "direction": "up",
-    "destination": "真岡",
+    "destination": "下館",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -2778,7 +2778,7 @@
     "train_no": "114",
     "operation_id": "A4",
     "direction": "up",
-    "destination": "真岡",
+    "destination": "下館",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -2875,7 +2875,7 @@
     "train_no": "116",
     "operation_id": "A3",
     "direction": "up",
-    "destination": "真岡",
+    "destination": "下館",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -2972,7 +2972,7 @@
     "train_no": "118",
     "operation_id": "A2",
     "direction": "up",
-    "destination": "真岡",
+    "destination": "下館",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -3166,7 +3166,7 @@
     "train_no": "124",
     "operation_id": "A3",
     "direction": "up",
-    "destination": "真岡",
+    "destination": "下館",
     "operation_rule": {
       "service_type": "regular"
     },
@@ -3263,7 +3263,7 @@
     "train_no": "126",
     "operation_id": "A2",
     "direction": "up",
-    "destination": "真岡",
+    "destination": "下館",
     "operation_rule": {
       "service_type": "regular"
     },
