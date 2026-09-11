@@ -710,28 +710,34 @@ body {
   object-fit: contain;
 }
 
-/* 正誤表・誌面訂正PDFリンクバー */
+/* 正誤表・誌面訂正PDFリンク（カード内サブボタン） */
+.list-item:has(.card-errata-link) .btn-link-card {
+  padding-bottom: 10px;
+}
+
 .card-errata-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 20px;
-  background: rgba(255, 69, 58, 0.08);
-  border-top: 1px solid rgba(255, 69, 58, 0.22);
+  margin: 0 20px 16px 20px;
+  padding: 10px 14px;
+  background: rgba(255, 69, 58, 0.1);
+  border: 1px solid rgba(255, 69, 58, 0.3);
+  border-radius: 8px;
   text-decoration: none;
   color: var(--text-primary);
-  transition: background-color 150ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
   user-select: none;
 }
 
 .card-errata-link:hover {
-  background-color: rgba(255, 69, 58, 0.16);
+  background-color: rgba(255, 69, 58, 0.18);
+  border-color: rgba(255, 69, 58, 0.5);
 }
 
 .card-errata-link:active {
-  background-color: rgba(255, 69, 58, 0.24);
+  transform: scale(0.98);
+  background-color: rgba(255, 69, 58, 0.25);
 }
 
 .errata-left {
@@ -755,13 +761,13 @@ body {
 }
 
 .errata-title {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #ff6961;
+  color: #ff8580;
 }
 
 .card-errata-link .chevron-right::after {
-  border-color: rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* ==========================================================================
