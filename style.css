@@ -711,12 +711,12 @@ body {
 }
 
 /* 正誤表・誌面訂正PDFリンク（カード内サブボタン） */
-.list-item:has(.card-errata-link) {
+.card-errata-wrapper {
   padding-bottom: 16px;
 }
 
-.list-item:has(.card-errata-link) .btn-link-card {
-  padding-bottom: 12px;
+.btn-link-card + .card-errata-wrapper {
+  margin-top: -6px; /* バナー画像との隙間微調整 */
 }
 
 .card-errata-link {
