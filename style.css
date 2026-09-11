@@ -711,15 +711,19 @@ body {
 }
 
 /* 正誤表・誌面訂正PDFリンク（カード内サブボタン） */
+.list-item:has(.card-errata-link) {
+  padding-bottom: 16px;
+}
+
 .list-item:has(.card-errata-link) .btn-link-card {
-  padding-bottom: 10px;
+  padding-bottom: 12px;
 }
 
 .card-errata-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 20px 16px 20px;
+  margin: 0 20px;
   padding: 10px 14px;
   background: rgba(255, 69, 58, 0.1);
   border: 1px solid rgba(255, 69, 58, 0.3);
