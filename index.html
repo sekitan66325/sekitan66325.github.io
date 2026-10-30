@@ -4,8 +4,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>真岡鐵道 ポータル | 運用情報・運行データ</title>
-  <meta name="description" content="真岡鐵道に関する車両運用情報、目撃掲示板、列車走行位置、および運行データ管理パネルへのポータルサイト。">
+  <title>真岡鐵道 運用情報・列車走行位置・目撃情報ポータル | 非公式ファンサイト</title>
+  <meta name="description" content="真岡鐵道（真岡線）の車両運用情報、モオカ14形・SLもおか等の運用表、目撃情報掲示板、リアルタイム列車走行位置・運行状況をまとめた非公式情報ポータルです。">
+  <meta name="keywords" content="真岡鐵道, 真岡線, 運用, 運用表, 列車走行位置, 目撃情報, モオカ14, SLもおか, 運行状況, ダイヤ">
+  <link rel="canonical" href="https://sekitan66325.github.io/">
+
+  <!-- OGP (Open Graph / SNS共有設定) -->
+  <meta property="og:title" content="真岡鐵道 運用情報・列車走行位置・目撃情報ポータル">
+  <meta property="og:description" content="真岡鐵道（真岡線）の車両運用情報、モオカ14形・SLもおか等の運用表、目撃情報掲示板、リアルタイム列車走行位置・運行状況をまとめた非公式情報ポータルです。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sekitan66325.github.io/">
+  <meta property="og:image" content="https://sekitan66325.github.io/assets/moka14.png">
+  <meta property="og:site_name" content="真岡鐵道 車両運用・運行データポータル">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@sekitan66325">
+
+  <!-- 構造化データ (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "真岡鐵道 車両運用・運行データポータル",
+    "url": "https://sekitan66325.github.io/",
+    "description": "真岡鐵道の車両運用情報、目撃掲示板、列車走行位置をまとめた非公式ポータルサイト",
+    "author": {
+      "@type": "Person",
+      "name": "せきたん",
+      "url": "https://x.com/sekitan66325"
+    }
+  }
+  </script>
+
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -14,27 +43,38 @@
 <body class="theme-dark">
   <header class="site-header">
     <div class="header-inner">
-      <h1 class="logo">MOKA RAILWAY PORTAL</h1>
+      <div class="logo">MOKA RAILWAY PORTAL</div>
     </div>
   </header>
 
   <main class="container portal-container">
     <div>
-      <h1 class="hero-title">ACTIVITY SUMMARY</h1>
-      <p class="hero-subtitle">真岡鐵道 関連ツール・情報ポータル</p>
+      <h1 class="hero-title">真岡鐵道 車両運用・運行データポータル</h1>
+      <p class="hero-subtitle">真岡線（モオカ14形・SLもおか等）の運用調査資料、目撃情報掲示板、リアルタイム列車走行位置まとめ</p>
     </div>
+
+    <!-- サイト概要セクション (SEO・ユーザー案内) -->
+    <section class="content-section" style="margin-bottom: 24px;">
+      <h2 class="section-title">当ポータルについて</h2>
+      <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px;">
+        当サイトは、下館〜茂木間を結ぶ真岡鐵道（真岡線）の車両運用・運行状況を体系的に記録・発信する非公式情報サイトです。
+      </p>
+      <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7;">
+        普通列車で運用される「モオカ14形」の運用表や毎月の運用報告書、観光列車「SLもおか」（C12 66・50系客車・DE10 1535）の行路資料のほか、沿線・現地からの「目撃情報掲示板」、現行ダイヤに基づいた「リアルタイム列車走行位置」など、真岡鐵道の運行に関わる各種データを公開しています。
+      </p>
+    </section>
 
     <div class="portal-grid">
       <a href="database/unyou/index.html" class="portal-card">
         <div class="portal-icon">📄</div>
-        <h2>運用資料</h2>
-        <p>モオカ14形やSLもおか等の運用表・運用報告書の閲覧およびダウンロード。</p>
+        <h2>車両運用資料</h2>
+        <p>モオカ14形やSLもおか等の運用表・月別運用報告書の閲覧およびPDFダウンロード。</p>
       </a>
 
       <a href="operation-board/index.html" class="portal-card">
         <div class="portal-icon">💬</div>
-        <h2>目撃掲示板</h2>
-        <p>現地での車両目撃情報のリアルタイム共有・検索ページ。</p>
+        <h2>目撃情報掲示板</h2>
+        <p>現地での車両目撃情報のリアルタイム共有・過去ログ検索ページ。</p>
       </a>
 
       <a href="train-state/index.html" class="portal-card">
@@ -42,10 +82,7 @@
         <h2>列車走行位置</h2>
         <p>ダイヤ情報に基づいた列車の現在位置・運行状況をリアルタイムで確認できるページ。</p>
       </a>
-
-
     </div>
-
 
     <!-- 書籍紹介セクション -->
     <section class="content-section">
@@ -57,7 +94,7 @@
       <!-- 既刊・シリーズ作品リスト -->
       <ul class="list-container">
 
-        <!-- 1冊目（サンプル：必要に応じてタイトルやURLを打ち替えてください） -->
+        <!-- 1冊目 -->
         <li class="list-item">
           <a href="https://sekitan66325.booth.pm/items/8501007" class="btn-link" target="_blank" rel="noopener">
             <div class="item-left-block">
@@ -138,16 +175,6 @@
         </li>
 
       </ul>
-
-      <!-- BOOTH全体へのリンクボタン -->
-      <!--
-      <div style="margin-top: 16px; text-align: center;">
-        <a href="https://sekitan66325.booth.pm/" target="_blank" rel="noopener" class="form-submit-btn"
-          style="display: inline-block; width: auto; padding: 10px 24px; font-size: 0.88rem; text-decoration: none;">
-          BOOTHで頒布一覧を見る
-        </a>
-      </div>
-      -->
     </section>
 
     <!-- SNS・お問い合わせ セクション -->
@@ -240,15 +267,11 @@
     <div class="footer-inner">
       <div class="footer-title">せきたん</div>
       <ul class="footer-links">
-        <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X</a>
-        </li>
-        <li><a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank"
-            rel="noopener noreferrer">BOOTH</a></li>
-        <li><a href="../../index.html" class="footer-link">ポータル</a></li>
+        <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X</a></li>
+        <li><a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank" rel="noopener noreferrer">BOOTH</a></li>
+        <li><a href="index.html" class="footer-link">ポータル</a></li>
         <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">メールでお問い合わせ</a></li>
-        <li><a href="../../admin/index.html" class="footer-link" target="_blank">管理画面</a></li>
       </ul>
-
       <p class="copyright">©せきたん All Rights Reserved 2026</p>
     </div>
   </footer>
