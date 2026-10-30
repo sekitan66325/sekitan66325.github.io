@@ -106,37 +106,56 @@
       </div>
     </section>
 
-    <section id="view-position" class="view-panel show">
+    <!-- 1. 列車走行位置ビュー -->
+    <section id="view-position" class="view-panel active">
       <div class="panel-head">
-        <div><span class="section-kicker">LIVE MAP</span>
+        <div>
+          <span class="section-kicker">LIVE MAP</span>
           <h2>下館 〜 茂木 リアルタイム位置</h2>
         </div>
+        <div class="legend">
+          <span><i class="dot local"></i>普通</span>
+          <span><i class="dot sl"></i>SLもおか</span>
+          <span><i class="dot extra"></i>臨時</span>
+          <span><i class="dot empty"></i>回送</span>
+        </div>
       </div>
-      <div class="track-card">
-        <div id="track-tree"></div>
+      <div class="position-card">
+        <div class="position-time">
+          <strong id="position-current-time">--:--</strong>
+          <small>現在表示中の運行時刻</small>
+        </div>
+        <div class="position-body" id="position-body"></div>
       </div>
+      <div class="summary-grid" id="summary-grid"></div>
     </section>
 
+    <!-- 2. ダイヤグラムビュー -->
     <section id="view-diagram" class="view-panel">
       <div class="panel-head">
-        <div><span class="section-kicker">SCHEDULE</span>
+        <div>
+          <span class="section-kicker">SCHEDULE</span>
           <h2>ダイヤグラム</h2>
         </div>
         <div class="diagram-tools">
           <button class="seg-btn dir-filter active" data-dir="all">全列車</button>
           <button class="seg-btn dir-filter" data-dir="up">上り</button>
           <button class="seg-btn dir-filter" data-dir="down">下り</button>
-          <button class="glass-btn small" id="reset-zoom-btn">ズーム初期化</button>
         </div>
       </div>
-      <div class="diagram-canvas-wrap">
-        <canvas id="diagram-canvas"></canvas>
+      <div class="diagram-shell">
+        <div class="diagram-scroll" id="diagram-scroll">
+          <svg id="diagram-svg"></svg>
+        </div>
       </div>
+      <p class="helper">横スクロールで早朝〜深夜の全列車を確認できます。列車線をタップすると詳細を表示します。</p>
     </section>
 
+    <!-- 3. 路線時刻表ビュー -->
     <section id="view-timetable" class="view-panel">
       <div class="panel-head">
-        <div><span class="section-kicker">TIMETABLE</span>
+        <div>
+          <span class="section-kicker">TIMETABLE</span>
           <h2>路線時刻表</h2>
         </div>
         <div class="diagram-tools">
