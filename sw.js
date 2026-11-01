@@ -3,7 +3,11 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+      .then(() => clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (event) => {
@@ -12,6 +16,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 通常のネットワークリクエストをそのまま通過させる
-  event.respondWith(fetch(event.request));
+  // ローカル・静的アセットが古いキャッシュから返らないよう no-cache で取得
+  event.respondWith(fetch(event.request, { cache: 'no-cache' }));
 });
