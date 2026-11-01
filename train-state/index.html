@@ -39,9 +39,9 @@
   }
   </script>
 
-  <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="../admin/datepicker.css">
+  <link rel="stylesheet" href="../style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="../admin/datepicker.css?v=4">
   <link rel="icon" href="../assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 
@@ -74,9 +74,12 @@
 
   <main class="container">
     <section id="notice" class="notice-bar status-normal">
-      <div class="notice-copy">
-        <strong id="notice-title">公式運行情報を取得しています</strong>
-        <span id="notice-updated">取得中…</span>
+      <div class="notice-left">
+        <span id="notice-icon" class="notice-icon">✓</span>
+        <div class="notice-copy">
+          <strong id="notice-title">公式運行情報を取得しています</strong>
+          <span id="notice-updated">取得中…</span>
+        </div>
       </div>
       <a id="notice-link" class="notice-link hidden" target="_blank" rel="noopener">公式情報 ›</a>
     </section>
@@ -108,18 +111,24 @@
     <!-- 1. 列車走行位置ビュー -->
     <section id="view-position" class="view-panel active">
       <div class="panel-head">
-        <h2>下館 〜 茂木 走行位置</h2>
+        <h2>下館 〜 茂木 列車走行位置</h2>
         <div class="legend">
-          <span><i class="leg-mark local"></i>普通</span>
-          <span><i class="leg-mark sl"></i>SLもおか</span>
-          <span><i class="leg-mark extra"></i>臨時</span>
-          <span><i class="leg-mark empty"></i>回送</span>
+          <span><i class="dot local"></i>普通</span>
+          <span><i class="dot sl"></i>SLもおか</span>
+          <span><i class="dot extra"></i>臨時</span>
+          <span><i class="dot empty"></i>回送</span>
         </div>
       </div>
       <div class="position-card">
         <div class="position-time">
           <strong id="position-current-time">--:--</strong>
-          <small>表示基準時刻（下り：左列 ／ 上り：右列）</small>
+          <small>表示基準時刻（列車クリックで各駅時刻・編成を表示）</small>
+        </div>
+        <div class="position-track-head" aria-hidden="true">
+          <span class="pth-station">駅名</span>
+          <span class="pth-down">▲ 下り（茂木方面）</span>
+          <span class="pth-rail"></span>
+          <span class="pth-up">▼ 上り（下館方面）</span>
         </div>
         <div class="position-body" id="position-body"></div>
       </div>
@@ -133,7 +142,7 @@
         <div class="diagram-tools">
           <div class="legend diagram-legend">
             <span><i class="leg-line local"></i>普通</span>
-            <span><i class="leg-line sl"></i>SL</span>
+            <span><i class="leg-line sl"></i>SLもおか</span>
             <span><i class="leg-line extra"></i>臨時</span>
             <span><i class="leg-line empty"></i>回送</span>
           </div>
@@ -145,6 +154,7 @@
         </div>
       </div>
       <div class="diagram-shell">
+        <svg id="diagram-axis" aria-hidden="true"></svg>
         <div class="diagram-scroll" id="diagram-scroll">
           <svg id="diagram-svg"></svg>
         </div>
@@ -216,7 +226,7 @@
   </script>
 
   <script src="../config.js"></script>
-  <script src="script.js?v=4"></script>
+  <script src="script.js?v=5"></script>
 </body>
 
 </html>

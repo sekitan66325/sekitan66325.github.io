@@ -467,13 +467,13 @@ function getTrainType(train) {
 function getTrainTypeStyle(type) {
   switch (type) {
     case "sl":
-      return { stroke: "var(--c-accent)", width: 2.8, dash: "", filled: true };
+      return { stroke: "var(--train-sl)", width: 2.8, dash: "", label: "SLもおか", shortLabel: "SL" };
     case "extra":
-      return { stroke: "var(--c-accent)", width: 2.0, dash: "6,3", filled: false };
+      return { stroke: "var(--train-extra)", width: 2.1, dash: "", label: "臨時", shortLabel: "臨時" };
     case "empty":
-      return { stroke: "var(--c-muted)", width: 1.4, dash: "2,3", filled: false };
+      return { stroke: "var(--train-empty)", width: 1.4, dash: "4,3", label: "回送", shortLabel: "回送" };
     default:
-      return { stroke: "var(--c-fg)", width: 1.9, dash: "", filled: true };
+      return { stroke: "var(--train-local)", width: 1.9, dash: "", label: "普通", shortLabel: "普通" };
   }
 }
 
@@ -584,6 +584,7 @@ function effectiveTrains() {
 
 function renderNotice() {
   const box = $("#notice");
+  const icon = $("#notice-icon");
   const title = $("#notice-title");
   const updated = $("#notice-updated");
   const link = $("#notice-link");
@@ -592,6 +593,7 @@ function renderNotice() {
 
   if (!DATA.status) {
     box.className = "notice-bar status-loading";
+    if (icon) icon.textContent = "…";
     title.textContent = "公式運行情報を取得しています…";
     updated.textContent = "取得中…";
     link.classList.add("hidden");
@@ -610,6 +612,15 @@ function renderNotice() {
           ? "status-unknown"
           : "status-normal"
     );
+
+  if (icon) {
+    icon.textContent =
+      statusCode === "delay" || statusCode === "suspend"
+        ? "!"
+        : statusCode === "unknown"
+          ? "?"
+          : "✓";
+  }
 
   if (statusCode === "delay" || statusCode === "suspend") {
     if (banner) banner.classList.remove("hidden");
@@ -666,13 +677,14 @@ function renderNotice() {
 
 function shieldSVG(type, direction) {
   const st = getTrainTypeStyle(type);
-  const fill = st.filled ? st.stroke : "var(--c-bg)";
-  const dashAttr = type === "empty" ? `stroke-dasharray="2,2"` : "";
-  const rotation = direction === "down" ? "rotate(180)" : "";
-  const transform = rotation ? `transform="${rotation}" transform-origin="15 17"` : "";
+  const transform = direction === "down" ? `transform="rotate(180 15 17)"` : "";
   return `<svg viewBox="0 0 30 34" xmlns="http://www.w3.org/2000/svg">
-    <path d="M15 2 L27 9 L27 29 L3 29 L3 9 Z"
-          fill="${fill}" stroke="${st.stroke}" stroke-width="2" ${dashAttr} ${transform}/>
+    <g ${transform}>
+      <path d="M15 1 L28 7 L28 18 Q28 28 15 33 Q2 28 2 18 L2 7 Z"
+            fill="${st.stroke}" stroke="rgba(0,0,0,0.18)" stroke-width="1"/>
+      <path d="M10 13.5 L15 19.5 L20 13.5"
+            fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
   </svg>`;
 }
 
@@ -687,8 +699,9 @@ function renderStations() {
   const stationsReversed = [...DATA.stations].reverse();
 
   stationsReversed.forEach((s, i) => {
+    const isTerminal = i === 0 || i === stationsReversed.length - 1;
     const stRow = document.createElement("div");
-    stRow.className = "pos-station-row";
+    stRow.className = "pos-station-row" + ((s.can_exchange || isTerminal) ? " can-exchange" : "");
     stRow.dataset.station = s.code;
 
     stRow.innerHTML = `
@@ -848,11 +861,11 @@ function renderPosition() {
 }
 
 function createTrainCard(t) {
+  const type = getTrainType(t);
   const card = document.createElement("div");
-  card.className = "pos-train-card";
+  card.className = `pos-train-card type-${type}`;
 
   const isStopped = t.result.state === "STOPPED" || t.result.state === "ARRIVED" || t.result.state === "PRE_DEPARTURE";
-  const type = getTrainType(t);
 
   const shield = document.createElement("div");
   shield.className = "pos-train-shield";
@@ -865,7 +878,13 @@ function createTrainCard(t) {
 
   if (isStopped) {
     const badgeText = t.result.state === "PRE_DEPARTURE" ? "始発" : (t.result.state === "ARRIVED" ? "終着" : "停車中");
-    infoHTML += `<span class="pos-stopped-badge">${badgeText}</span>`;
+    const badgeMod = t.result.state === "PRE_DEPARTURE" ? " badge-origin" : (t.result.state === "ARRIVED" ? " badge-arrived" : "");
+    infoHTML += `<span class="pos-stopped-badge${badgeMod}">${badgeText}</span>`;
+  }
+
+  const maxDelay = Math.max(0, ...t.actual.filter(s => !s.is_cancelled).map(s => s.delay_minutes || 0));
+  if (maxDelay > 0) {
+    infoHTML += `<span class="pos-delay-badge">+${maxDelay}分</span>`;
   }
 
   infoHTML += `<span class="pos-train-dest">${t.destination}行</span>`;
@@ -888,22 +907,29 @@ function svgEl(name, attrs = {}) { const e = document.createElementNS("http://ww
 
 function renderDiagram() {
   const svg = $("#diagram-svg"); svg.innerHTML = "";
+  const axisSvg = $("#diagram-axis"); if (axisSvg) axisSvg.innerHTML = "";
   const trains = effectiveTrains().filter(t => state.diagramDir === "all" || t.direction === state.diagramDir);
 
   const maxDist = DATA.stations[DATA.stations.length - 1].distance_km;
-  const width = 4500, left = 82, topPad = 38, bottomPad = 55;
+  const axisWidth = 78;
+  const width = 4400, left = axisSvg ? 16 : 82, topPad = 38, bottomPad = 40;
 
   const container = $("#diagram-scroll");
-  const availableHeight = window.innerHeight - container.getBoundingClientRect().top - 40;
-  const containerHeight = Math.max(availableHeight, 420);
-  container.style.height = containerHeight + "px";
-
-  const chartHeight = containerHeight - topPad - bottomPad;
-  const height = chartHeight + topPad + bottomPad;
+  const availableHeight = window.innerHeight - container.getBoundingClientRect().top - 56;
+  const height = Math.max(availableHeight, 560);
+  const chartHeight = height - topPad - bottomPad;
 
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svg.setAttribute("width", width);
   svg.setAttribute("height", height);
+  if (axisSvg) {
+    axisSvg.setAttribute("viewBox", `0 0 ${axisWidth} ${height}`);
+    axisSvg.setAttribute("width", axisWidth);
+    axisSvg.setAttribute("height", height);
+    const axisHead = svgEl("text", { x: 10, y: 20, fill: "var(--svg-grid-text)", "font-size": "11", "font-weight": "600" });
+    axisHead.textContent = "駅名";
+    axisSvg.appendChild(axisHead);
+  }
 
   const maxM = 1740, minM = 300;
   const timeX = m => left + (m - minM) * 3;
@@ -928,9 +954,16 @@ function renderDiagram() {
     const isTerminal = i === 0 || i === stationsReversed.length - 1;
     const isExchange = s.can_exchange || isTerminal;
     const y = yOf(s.code);
-    svg.appendChild(svgEl("line", { x1: left, y1: y, x2: width, y2: y, stroke: isExchange ? "var(--svg-station-line)" : "var(--svg-station-line-alt)", "stroke-width": isExchange ? 1 : 0.7 }));
-    const label = svgEl("text", { x: 8, y: y + 4, fill: isExchange ? "var(--svg-station-text)" : "var(--svg-station-text-alt)", "font-size": "11", "font-weight": isExchange ? 600 : 400 });
-    label.textContent = formatStationName(s.name); svg.appendChild(label);
+    svg.appendChild(svgEl("line", { x1: 0, y1: y, x2: width, y2: y, stroke: isExchange ? "var(--svg-station-line)" : "var(--svg-station-line-alt)", "stroke-width": isExchange ? 1 : 0.7 }));
+    if (axisSvg) {
+      axisSvg.appendChild(svgEl("line", { x1: 0, y1: y, x2: axisWidth, y2: y, stroke: isExchange ? "var(--svg-station-line)" : "var(--svg-station-line-alt)", "stroke-width": isExchange ? 1 : 0.5, opacity: "0.55" }));
+      const label = svgEl("text", { x: 10, y: y + 4, fill: isExchange ? "var(--svg-station-text)" : "var(--svg-station-text-alt)", "font-size": "11", "font-weight": isExchange ? 700 : 400 });
+      label.textContent = formatStationName(s.name);
+      axisSvg.appendChild(label);
+    } else {
+      const label = svgEl("text", { x: 8, y: y + 4, fill: isExchange ? "var(--svg-station-text)" : "var(--svg-station-text-alt)", "font-size": "11", "font-weight": isExchange ? 600 : 400 });
+      label.textContent = formatStationName(s.name); svg.appendChild(label);
+    }
   });
 
   trains.forEach(t => {
@@ -994,9 +1027,12 @@ function renderDiagram() {
       const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
       const lab = svgEl("text", {
-        fill: "var(--svg-train-text)",
-        "font-size": "9",
-        "font-weight": "600",
+        fill: tStyle.stroke,
+        stroke: "#ffffff",
+        "stroke-width": "3",
+        "paint-order": "stroke",
+        "font-size": "9.5",
+        "font-weight": "700",
         "data-train-id": t.train_id,
         transform: `translate(${tp.x}, ${tp.y}) rotate(${angle})`,
         dx: "8",
@@ -1036,9 +1072,22 @@ function renderTimetable() {
     orderedStations = [...DATA.stations];
   }
 
+  const typeRow = document.createElement("tr");
+  typeRow.className = "tt-header-row tt-type";
+  typeRow.innerHTML = `<th>種別</th>` + trains.map(t => {
+    const type = getTrainType(t);
+    const st = getTrainTypeStyle(type);
+    return `<th class="tt-type-${type}">${st.shortLabel}</th>`;
+  }).join("");
+  th.appendChild(typeRow);
+
   const trainNoRow = document.createElement("tr");
   trainNoRow.className = "tt-header-row tt-trainno";
-  trainNoRow.innerHTML = `<th>列車番号</th>` + trains.map(t => `<th>${t.train_no}</th>`).join("");
+  trainNoRow.innerHTML = `<th>列車番号</th>` + trains.map(t => {
+    const type = getTrainType(t);
+    const mod = (type === "sl" || type === "extra") ? ` class="tt-type-${type}"` : "";
+    return `<th${mod}>${t.train_no}</th>`;
+  }).join("");
   th.appendChild(trainNoRow);
 
   const destRow = document.createElement("tr");
@@ -1046,8 +1095,11 @@ function renderTimetable() {
   destRow.innerHTML = `<th>行先</th>` + trains.map(t => `<th>${formatStationName(t.destination)}</th>`).join("");
   th.appendChild(destRow);
 
-  orderedStations.forEach((s) => {
+  orderedStations.forEach((s, idx) => {
     const tr = document.createElement("tr");
+    if (s.can_exchange || idx === 0 || idx === orderedStations.length - 1) {
+      tr.className = "tt-exchange-row";
+    }
     const stCell = document.createElement("td");
 
     let isStart = false;
@@ -1112,11 +1164,15 @@ function renderTimetable() {
 }
 
 function openTrainModal(t) {
+  const type = getTrainType(t);
+  const tStyle = getTrainTypeStyle(type);
+  const typeBadgeColor = type === "sl" ? "orange" : (type === "extra" ? "red" : (type === "local" ? "blue" : ""));
+
   let statusText = "";
-  let isAccentStatus = false;
+  let statusBadgeColor = "";
   if (t.actual.some(s => s.is_cancelled)) {
     statusText = "区間運休";
-    isAccentStatus = true;
+    statusBadgeColor = "red";
   } else {
     statusText = {
       RUNNING: "駅間走行中",
@@ -1126,7 +1182,9 @@ function openTrainModal(t) {
       OUT_OF_SERVICE: "運転時間外"
     }[t.result.state] || "不明";
     if (t.result.state === "RUNNING" || t.result.state === "STOPPED") {
-      isAccentStatus = true;
+      statusBadgeColor = "green";
+    } else if (t.result.state === "PRE_DEPARTURE") {
+      statusBadgeColor = "blue";
     }
   }
   let formation = [];
@@ -1142,10 +1200,11 @@ function openTrainModal(t) {
     <span class="modal-kicker">列車詳細 (${t.train_id})</span>
     <h3 class="modal-title">${t.train_no}</h3>
     <div class="modal-badges">
+      <span class="badge ${typeBadgeColor}">${tStyle.label}</span>
       <span class="badge">${t.direction === "up" ? "上り" : "下り"}</span>
       <span class="badge">${formatStationName(t.destination)}行</span>
-      <span class="badge ${isAccentStatus ? "accent" : ""}">${statusText}</span>
-      ${t.variant_label ? `<span class="badge accent">${t.variant_label}</span>` : ""}
+      <span class="badge ${statusBadgeColor}">${statusText}</span>
+      ${t.variant_label ? `<span class="badge orange">${t.variant_label}</span>` : ""}
     </div>
     <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${displayOpId}</strong></div></div>
     ${formation.length ? `<div class="formation"><h4>編成</h4><div class="formation-list">${formation.map(x => `<span>${x}</span>`).join("")}</div></div>` : ""}
