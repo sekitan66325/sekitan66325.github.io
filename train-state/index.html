@@ -3,15 +3,14 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>列車走行位置・時刻表 - 真岡鐵道 情報ポータル</title>
-  <meta name="description" content="真岡鐵道真岡線の現在の列車走行位置、ダイヤグラム、各駅の運行状況をリアルタイムで確認できるWebアプリケーションです。下館〜真岡〜茂木間の運行情報を可視化します。">
-  <meta name="keywords" content="真岡鐵道, 真岡線, 列車走行位置, 運行情報, 運行状況, ダイヤグラム, 時刻表, モオカ14, SLもおか">
+  <meta name="description" content="真岡鐵道真岡線の現在の列車走行位置、ダイヤグラム、各駅の時刻表を確認できるWebアプリケーションです。">
+  <meta name="keywords" content="真岡鐵道, 真岡線, 列車走行位置, 運行情報, ダイヤグラム, 時刻表, モオカ14, SLもおか">
   <link rel="canonical" href="https://sekitan66325.github.io/train-state/">
 
-  <!-- OGPタグ -->
   <meta property="og:title" content="列車走行位置・時刻表 - 真岡鐵道 情報ポータル">
-  <meta property="og:description" content="真岡鐵道真岡線の現在の列車走行位置、ダイヤグラム、各駅の運行状況をリアルタイムで確認できるWebアプリです。">
+  <meta property="og:description" content="真岡鐵道真岡線の現在の列車走行位置、ダイヤグラム、路線時刻表を確認できるWebアプリです。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sekitan66325.github.io/train-state/">
   <meta property="og:image" content="https://sekitan66325.github.io/assets/moka14.png">
@@ -19,7 +18,6 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@sekitan66325">
 
-  <!-- 構造化データ (JSON-LD BreadcrumbList) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -43,19 +41,19 @@
 
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../admin/datepicker.css">
   <link rel="icon" href="../assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 
-  <script defer src="../admin/datepicker.js?v=3"></script>
-  <link rel="stylesheet" href="../admin/datepicker.css">
+  <script defer src="../admin/datepicker.js?v=4"></script>
 </head>
 
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
-        <h1 class="logo" style="margin:0; font-size:1.15rem;"><a href="../index.html" style="color:inherit; text-decoration:none;">真岡鐵道 情報ポータル</a></h1>
-        <nav class="global-nav">
+      <div class="header-brand-nav">
+        <h1 class="logo"><a href="../index.html">真岡鐵道 情報ポータル</a></h1>
+        <nav class="global-nav" aria-label="メインナビゲーション">
           <a href="../index.html" class="nav-link">トップ</a>
           <a href="index.html" class="nav-link active">列車走行位置</a>
           <a href="../operation-board/index.html" class="nav-link">目撃掲示板</a>
@@ -63,62 +61,65 @@
         </nav>
       </div>
       <div class="header-clock">
-        <span id="service-date-label">2026年8月15日</span>
+        <span id="service-date-label">----年--月--日</span>
         <strong id="clock">--:--:--</strong>
       </div>
     </div>
   </header>
 
   <div id="offline-banner" class="offline-banner hidden">オフライン運用モード（基本ダイヤのみ表示中）</div>
-  <div id="irregular-banner" class="hidden"
-    style="background:#d32f2f; color:#fff; padding:8px 16px; text-align:center; font-size:14px; font-weight:bold; position:sticky; top:0; z-index:100;">
-    通常ダイヤとは異なる運行状況です。詳細は公式HPをご確認ください。</div>
+  <div id="irregular-banner" class="irregular-banner hidden">
+    通常ダイヤとは異なる運行状況が発表されています。詳細は真岡鐵道公式HPをご確認ください。
+  </div>
 
   <main class="container">
-    <section id="notice" class="notice-section status-normal">
-      <div class="notice-icon" id="notice-icon">i</div>
+    <section id="notice" class="notice-bar status-normal">
       <div class="notice-copy">
         <strong id="notice-title">公式運行情報を取得しています</strong>
         <span id="notice-updated">取得中…</span>
       </div>
-      <a id="notice-link" class="notice-chevron hidden" target="_blank" rel="noopener" aria-label="公式詳細">›</a>
+      <a id="notice-link" class="notice-link hidden" target="_blank" rel="noopener">公式情報 ›</a>
     </section>
 
     <section class="toolbar">
       <div class="toolbar-title">
-        <span class="section-kicker">SERVICE DATE</span>
-        <h2 id="date-title">2026年8月15日（土）</h2>
+        <h2 id="date-title">----年--月--日</h2>
       </div>
       <div class="toolbar-actions">
-        <button class="glass-btn" id="now-btn">現在時刻</button>
+        <button type="button" class="btn-secondary toolbar-btn" id="now-btn">現在時刻</button>
         <label class="date-control date-picker-control">
-          運行日 <input id="date-input" type="text" data-is-datepicker="true" value="2026-08-15" placeholder="YYYY-MM-DD">
+          <span>運行日</span>
+          <input id="date-input" type="text" data-is-datepicker="true" value="2026-08-15" placeholder="YYYY-MM-DD">
         </label>
         <label class="date-control time-picker-control"
           onclick="if(event.target.tagName !== 'INPUT') { const i = document.getElementById('time-input'); i.showPicker && i.showPicker(); }">
-          時刻 <input id="time-input" type="time" value="12:00">
+          <span>時刻</span>
+          <input id="time-input" type="time" value="12:00">
         </label>
       </div>
     </section>
 
+    <nav class="view-tabs" aria-label="表示切替">
+      <button type="button" class="view-tab active" data-view="position">走行位置</button>
+      <button type="button" class="view-tab" data-view="diagram">ダイヤグラム</button>
+      <button type="button" class="view-tab" data-view="timetable">路線時刻表</button>
+    </nav>
+
     <!-- 1. 列車走行位置ビュー -->
     <section id="view-position" class="view-panel active">
       <div class="panel-head">
-        <div>
-          <span class="section-kicker">LIVE MAP</span>
-          <h2>下館 〜 茂木 リアルタイム位置</h2>
-        </div>
+        <h2>下館 〜 茂木 走行位置</h2>
         <div class="legend">
-          <span><i class="dot local"></i>普通</span>
-          <span><i class="dot sl"></i>SLもおか</span>
-          <span><i class="dot extra"></i>臨時</span>
-          <span><i class="dot empty"></i>回送</span>
+          <span><i class="leg-mark local"></i>普通</span>
+          <span><i class="leg-mark sl"></i>SLもおか</span>
+          <span><i class="leg-mark extra"></i>臨時</span>
+          <span><i class="leg-mark empty"></i>回送</span>
         </div>
       </div>
       <div class="position-card">
         <div class="position-time">
           <strong id="position-current-time">--:--</strong>
-          <small>現在表示中の運行時刻</small>
+          <small>表示基準時刻（下り：左列 ／ 上り：右列）</small>
         </div>
         <div class="position-body" id="position-body"></div>
       </div>
@@ -128,14 +129,19 @@
     <!-- 2. ダイヤグラムビュー -->
     <section id="view-diagram" class="view-panel">
       <div class="panel-head">
-        <div>
-          <span class="section-kicker">SCHEDULE</span>
-          <h2>ダイヤグラム</h2>
-        </div>
+        <h2>ダイヤグラム</h2>
         <div class="diagram-tools">
-          <button class="seg-btn dir-filter active" data-dir="all">全列車</button>
-          <button class="seg-btn dir-filter" data-dir="up">上り</button>
-          <button class="seg-btn dir-filter" data-dir="down">下り</button>
+          <div class="legend diagram-legend">
+            <span><i class="leg-line local"></i>普通</span>
+            <span><i class="leg-line sl"></i>SL</span>
+            <span><i class="leg-line extra"></i>臨時</span>
+            <span><i class="leg-line empty"></i>回送</span>
+          </div>
+          <div class="seg-group">
+            <button type="button" class="seg-btn dir-filter active" data-dir="all">全列車</button>
+            <button type="button" class="seg-btn dir-filter" data-dir="up">上り</button>
+            <button type="button" class="seg-btn dir-filter" data-dir="down">下り</button>
+          </div>
         </div>
       </div>
       <div class="diagram-shell">
@@ -143,19 +149,16 @@
           <svg id="diagram-svg"></svg>
         </div>
       </div>
-      <p class="helper">横スクロールで早朝〜深夜の全列車を確認できます。列車線をタップすると詳細を表示します。</p>
+      <p class="helper">横スクロールで早朝〜深夜の全列車を確認できます。列車線をクリックすると各駅時刻を表示します。</p>
     </section>
 
     <!-- 3. 路線時刻表ビュー -->
     <section id="view-timetable" class="view-panel">
       <div class="panel-head">
-        <div>
-          <span class="section-kicker">TIMETABLE</span>
-          <h2>路線時刻表</h2>
-        </div>
-        <div class="diagram-tools">
-          <button class="seg-btn tt-dir active" data-dir="up">上り</button>
-          <button class="seg-btn tt-dir" data-dir="down">下り</button>
+        <h2>路線時刻表</h2>
+        <div class="seg-group">
+          <button type="button" class="seg-btn tt-dir active" data-dir="up">上り（茂木 → 下館）</button>
+          <button type="button" class="seg-btn tt-dir" data-dir="down">下り（下館 → 茂木）</button>
         </div>
       </div>
       <div class="table-card">
@@ -169,35 +172,37 @@
     </section>
   </main>
 
-  <nav class="floating-tab-bar" aria-label="メインナビゲーション">
-    <div class="tab-glider" id="tab-glider"></div>
-    <button class="tab-btn active" data-view="position">走行位置</button>
-    <button class="tab-btn" data-view="diagram">ダイヤ</button>
-    <button class="tab-btn" data-view="timetable">時刻表</button>
-  </nav>
-
   <div class="modal-overlay hidden" id="train-modal">
-    <article class="modal-content">
-      <button class="modal-close" id="modal-close" aria-label="閉じる">×</button>
+    <article class="modal-content train-modal-content">
+      <button type="button" class="modal-close" id="modal-close" aria-label="閉じる">×</button>
       <div id="modal-body"></div>
     </article>
   </div>
 
-  <div class="modal-overlay hidden" id="warning-modal" style="z-index: 9999;">
-    <article class="modal-content" style="text-align: center;">
-      <h3 style="color:#d32f2f; margin-bottom: 15px;">運行状況に関する注意</h3>
-      <p style="margin-bottom: 20px; line-height: 1.6;">
-        この画面は通常ダイヤで運転している場合の状況を示すもので、現在の運行状況とは異なるものを表示している場合があります。了承の上ご覧ください。<br><br>詳細な運転状況は真岡鐵道HPからご確認ください。</p>
-      <button id="warning-confirm-btn"
-        style="background:#2997ff; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">確認して進む</button>
+  <div class="modal-overlay hidden" id="warning-modal">
+    <article class="modal-content">
+      <h3 class="section-title">運行状況に関する注意</h3>
+      <p class="section-desc">
+        この画面は所定ダイヤに基づく位置推定を表示しており、突発的な遅延・運休とは異なる場合があります。最新の運転状況は真岡鐵道公式HPをご確認ください。
+      </p>
+      <div class="modal-actions">
+        <button type="button" id="warning-confirm-btn" class="btn-primary">確認して進む</button>
+      </div>
     </article>
   </div>
 
   <footer class="site-footer">
-    <div style="margin-bottom: 8px;">
-      <a href="../index.html" style="color:var(--text-secondary); text-decoration:none;">真岡鐵道 情報ポータル</a>
+    <div class="footer-inner">
+      <ul class="footer-links">
+        <li><a href="../index.html" class="footer-link">トップ</a></li>
+        <li><a href="index.html" class="footer-link">列車走行位置</a></li>
+        <li><a href="../operation-board/index.html" class="footer-link">目撃掲示板</a></li>
+        <li><a href="../database/unyou/index.html" class="footer-link">車両運用資料</a></li>
+        <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X (@sekitan66325)</a></li>
+        <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">お問い合わせ</a></li>
+      </ul>
+      <p class="copyright">© 2026 せきたん / 真岡鐵道 非公式情報ポータル</p>
     </div>
-    <p class="copyright" style="font-size:0.8rem; color:var(--text-secondary); margin:0;">© 真岡鐵道 非公式情報ポータル 2026</p>
   </footer>
 
   <!-- Google tag (gtag.js) -->
@@ -211,7 +216,7 @@
   </script>
 
   <script src="../config.js"></script>
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=4"></script>
 </body>
 
 </html>
