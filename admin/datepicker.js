@@ -79,9 +79,19 @@ function renderPicker() {
   }
 
   const todayStr    = new Date().toISOString().split('T')[0];
-  const selectedStrs = currentInput && currentInput.value
-    ? currentInput.value.split(',').map(s => s.trim()).filter(s => /^\d{4}-\d{2}-\d{2}$/.test(s))
-    : [];
+  let selectedStrs = [];
+  if (currentInput && currentInput.value) {
+    const val = currentInput.value.trim();
+    if (val.includes('~')) {
+      const [s, e] = val.split('~');
+      selectedStrs = getDatesInRange(s.trim(), e.trim());
+    } else if (val.includes('..')) {
+      const [s, e] = val.split('..');
+      selectedStrs = getDatesInRange(s.trim(), e.trim());
+    } else {
+      selectedStrs = val.split(',').map(s => s.trim()).filter(s => /^\d{4}-\d{2}-\d{2}$/.test(s));
+    }
+  }
   let selectedBtn = null;
 
   const isHoverRange = isRangeMode && rangeStart && !rangeEnd;
@@ -157,9 +167,12 @@ function renderPicker() {
           renderPicker();
         } else {
           rangeEnd = dStr;
-          const dates = getDatesInRange(rangeStart, rangeEnd);
+          let rStart = rangeStart;
+          let rEnd = rangeEnd;
+          if (rStart > rEnd) { const tmp = rStart; rStart = rEnd; rEnd = tmp; }
+          const formatted = (rStart === rEnd) ? rStart : `${rStart}~${rEnd}`;
           if (currentInput) {
-            currentInput.value = dates.join(',');
+            currentInput.value = formatted;
             currentInput.dispatchEvent(new Event('change', { bubbles: true }));
           }
           rangeStart = null;
@@ -217,7 +230,10 @@ function showPicker(inputEl) {
   rangeStart    = null;
   rangeEnd      = null;
 
-  const firstVal = (inputEl.value || '').split(',')[0].trim();
+  let firstVal = (inputEl.value || '').trim();
+  if (firstVal.includes('~')) firstVal = firstVal.split('~')[0].trim();
+  else if (firstVal.includes('..')) firstVal = firstVal.split('..')[0].trim();
+  else firstVal = firstVal.split(',')[0].trim();
   viewDate = (firstVal && /^\d{4}-\d{2}-\d{2}$/.test(firstVal))
     ? new Date(firstVal + 'T00:00:00')
     : new Date();

@@ -76,19 +76,25 @@
 }
 /* The floating highlight is replaced with static CSS classes for perfect centering */
 .cdp-day.selected {
-  background: var(--text-primary);
-  color: var(--bg-secondary);
-  font-weight: 600;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 6px;
 }
 .cdp-day.range-between {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(37, 99, 235, 0.25) !important;
+  color: #ffffff;
   border-radius: 0;
 }
 .cdp-day.range-start {
+  background: #2563eb !important;
+  color: #ffffff !important;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 .cdp-day.range-end {
+  background: #2563eb !important;
+  color: #ffffff !important;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
@@ -124,12 +130,7 @@
   color: var(--text-link);
   font-weight: 800;
 }
-.cdp-day.selected {
-  background: transparent !important; /* Rely on highlight */
-  color: var(--bg-system);
-  font-weight: 700;
-  transition: color 0.2s 0.1s;
-}
+/* selected styles handled above */
 
 .cdp-footer {
   margin-top: 16px;
@@ -159,13 +160,26 @@
   display: flex;
   align-items: center;
 }
-.date-control::after {
+.date-control:has([data-is-datepicker])::after,
+.date-picker-control::after {
   content: '';
   position: absolute;
   right: 12px;
   width: 16px;
   height: 16px;
   background-image: url('data:image/svg+xml;utf8,<svg fill="%2386868b" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,4H18V2H16V4H8V2H6V4H5A2,2 0 0,0 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V10H19V20M19,8H5V6H19V8M7,12H12V17H7V12Z"/></svg>');
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+}
+.date-control:has(input[type="time"])::after,
+.time-picker-control::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  width: 16px;
+  height: 16px;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%2386868b" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>');
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
