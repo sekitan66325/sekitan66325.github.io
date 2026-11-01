@@ -1,26 +1,37 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   1. 配色トークン（最大3色：背景・文字・アクセント） & 基本設定
+   1. 配色トークン & 基本設定
    ========================================================================== */
 :root {
+  --c-canvas: #f4f6f9;
   --c-bg: #ffffff;
   --c-fg: #18181b;
-  --c-accent: #1a4b8c;
+  --c-accent: #0066cc;
 
-  /* 3色からの濃度派生のみ（別色相を追加しない） */
-  --c-surface: rgba(24, 24, 27, 0.03);
-  --c-surface-hover: rgba(24, 24, 27, 0.055);
-  --c-muted: rgba(24, 24, 27, 0.62);
-  --c-faint: rgba(24, 24, 27, 0.42);
-  --c-border: rgba(24, 24, 27, 0.14);
-  --c-border-strong: rgba(24, 24, 27, 0.28);
-  --c-accent-soft: rgba(26, 75, 140, 0.08);
-  --c-accent-border: rgba(26, 75, 140, 0.35);
+  --c-surface: #f8fafc;
+  --c-surface-hover: #eef2f7;
+  --c-muted: #525866;
+  --c-faint: #8a94a6;
+  --c-border: #dce2ea;
+  --c-border-strong: #b8c2cf;
+  --c-accent-soft: rgba(0, 102, 204, 0.08);
+  --c-accent-border: rgba(0, 102, 204, 0.32);
+
+  /* ステータス・種別用セマンティックカラー */
+  --c-green: #2fb344;
+  --c-green-soft: #ebfbee;
+  --c-green-border: #b2f2bb;
+  --c-orange: #f08c00;
+  --c-orange-soft: #fff9db;
+  --c-orange-border: #ffec99;
+  --c-red: #e03131;
+  --c-red-soft: #fff5f5;
+  --c-red-border: #ffc9c9;
 
   /* 互換エイリアス */
-  --bg-system: var(--c-bg);
-  --bg-secondary: var(--c-surface);
+  --bg-system: var(--c-canvas);
+  --bg-secondary: var(--c-bg);
   --bg-card: var(--c-bg);
   --border-subtle: var(--c-border);
   --border-separator: var(--c-border);
@@ -40,13 +51,13 @@
 
 html {
   font-size: 16px;
-  background-color: var(--c-bg);
+  background-color: var(--c-canvas);
   color: var(--c-fg);
 }
 
 body {
   min-height: 100vh;
-  background-color: var(--c-bg);
+  background-color: var(--c-canvas);
   color: var(--c-fg);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
   line-height: 1.6;
@@ -182,10 +193,10 @@ main.container {
 .notice-section {
   padding: 13px 16px;
   margin-bottom: 24px;
-  background-color: var(--c-surface);
+  background-color: var(--c-bg);
   border: 1px solid var(--c-border);
-  border-left: 3px solid var(--c-fg);
-  border-radius: 2px;
+  border-left: 4px solid var(--c-accent);
+  border-radius: 4px;
 }
 
 .notice-section strong {
@@ -247,14 +258,14 @@ main.container {
   padding: 18px 16px;
   background-color: var(--c-bg);
   border: 1px solid var(--c-border);
-  border-radius: 2px;
+  border-radius: 4px;
   color: var(--c-fg);
   transition: border-color 0.12s, background-color 0.12s;
 }
 
 .portal-card:hover {
   border-color: var(--c-accent);
-  background-color: var(--c-surface);
+  background-color: #f8fbff;
 }
 
 .portal-card h2 {
@@ -279,12 +290,19 @@ main.container {
    ========================================================================== */
 .list-container {
   list-style: none;
-  border-top: 1px solid var(--c-border);
+  background-color: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
   margin-bottom: 24px;
+  overflow: hidden;
 }
 
 .list-item {
   border-bottom: 1px solid var(--c-border);
+}
+
+.list-item:last-child {
+  border-bottom: none;
 }
 
 .btn-link,
@@ -294,7 +312,7 @@ main.container {
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  padding: 12px 8px;
+  padding: 12px 14px;
   color: var(--c-fg);
   transition: background-color 0.12s;
 }
@@ -302,7 +320,7 @@ main.container {
 .btn-link-card {
   display: block;
   width: 100%;
-  padding: 12px 8px 14px;
+  padding: 12px 14px 14px;
   color: var(--c-fg);
   transition: background-color 0.12s;
 }
@@ -691,13 +709,20 @@ main.container {
 #board-list,
 #admin-post-list {
   list-style: none;
-  border-top: 1px solid var(--c-border);
+  background-color: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
   margin-bottom: 20px;
+  overflow: hidden;
 }
 
 .board-post-card {
-  padding: 14px 4px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--c-border);
+}
+
+.board-post-card:last-child {
+  border-bottom: none;
 }
 
 .post-header {
