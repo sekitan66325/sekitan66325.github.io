@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,10 @@
   <link rel="stylesheet" href="admin.css?v=5">
   <link rel="stylesheet" href="datepicker.css?v=4">
   <script defer src="datepicker.js?v=4"></script>
+
+  <link rel="icon" href="../assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+
 </head>
 
 <body>
@@ -22,7 +27,8 @@
         </nav>
       </div>
       <div>
-        <button type="button" id="logout-btn" class="btn-admin" style="display: none;" onclick="handleLogout()">ログアウト</button>
+        <button type="button" id="logout-btn" class="btn-admin" style="display: none;"
+          onclick="handleLogout()">ログアウト</button>
       </div>
     </div>
   </header>
@@ -38,7 +44,8 @@
           </div>
           <div class="form-group">
             <label class="form-label" for="login-pass">パスワード</label>
-            <input type="password" id="login-pass" name="admin_password" class="form-input" autocomplete="current-password" required>
+            <input type="password" id="login-pass" name="admin_password" class="form-input"
+              autocomplete="current-password" required>
           </div>
           <button type="submit" id="login-submit-btn" class="form-submit-btn">ログイン</button>
         </form>
@@ -54,21 +61,27 @@
         </div>
         <div class="status-bar-actions">
           <button type="button" class="btn-admin" id="btn-diff-modal" onclick="openDiffModal()">差分確認</button>
-          <button type="button" class="btn-admin btn-accent" id="btn-push-github" onclick="exportTimetable()">GitHubへ反映</button>
+          <button type="button" class="btn-admin btn-accent" id="btn-push-github"
+            onclick="exportTimetable()">GitHubへ反映</button>
           <button type="button" class="btn-admin" id="btn-reload-repo" onclick="confirmReloadRepo()">最新を取得</button>
-          <input type="file" id="timetable-upload" accept=".json" style="display:none;" onchange="handleTimetableUpload(event)">
-          <button type="button" class="btn-admin" onclick="document.getElementById('timetable-upload').click()">読込</button>
+          <input type="file" id="timetable-upload" accept=".json" style="display:none;"
+            onchange="handleTimetableUpload(event)">
+          <button type="button" class="btn-admin"
+            onclick="document.getElementById('timetable-upload').click()">読込</button>
           <button type="button" class="btn-admin" onclick="downloadTimetableFile()">JSON保存</button>
         </div>
       </div>
 
       <!-- 管理画面メインタブ -->
       <nav class="admin-tabs" aria-label="管理メニュー">
-        <button type="button" id="tab-btn-posts" class="admin-tab active" onclick="switchAdminTab('posts')">投稿管理</button>
+        <button type="button" id="tab-btn-posts" class="admin-tab active"
+          onclick="switchAdminTab('posts')">投稿管理</button>
         <button type="button" id="tab-btn-logs" class="admin-tab" onclick="switchAdminTab('logs')">操作・編集ログ</button>
         <button type="button" id="tab-btn-trains" class="admin-tab" onclick="switchAdminTab('trains')">運行データ管理</button>
-        <button type="button" id="tab-btn-operations" class="admin-tab" onclick="switchAdminTab('operations')">運用ベース管理</button>
-        <button type="button" id="tab-btn-simulation" class="admin-tab" onclick="switchAdminTab('simulation')">運行シミュレーション</button>
+        <button type="button" id="tab-btn-operations" class="admin-tab"
+          onclick="switchAdminTab('operations')">運用ベース管理</button>
+        <button type="button" id="tab-btn-simulation" class="admin-tab"
+          onclick="switchAdminTab('simulation')">運行シミュレーション</button>
       </nav>
 
       <!-- 1. 投稿管理 -->
@@ -76,7 +89,8 @@
         <div class="board-header-row">
           <h2 class="section-title">投稿一覧（全件）</h2>
           <div class="search-box">
-            <input type="search" id="admin-search" class="search-input" placeholder="投稿検索..." oninput="renderAdminPosts()">
+            <input type="search" id="admin-search" class="search-input" placeholder="投稿検索..."
+              oninput="renderAdminPosts()">
           </div>
         </div>
         <ul id="admin-post-list">
@@ -103,13 +117,19 @@
           <!-- 左ペイン：列車一覧 -->
           <aside class="train-list-sidebar">
             <div class="train-sidebar-head">
-              <input type="search" id="train-search" class="form-input train-search-input" placeholder="列番・行先・運用で検索..." oninput="renderTrainList()">
+              <input type="search" id="train-search" class="form-input train-search-input" placeholder="列番・行先・運用で検索..."
+                oninput="renderTrainList()">
               <div class="train-filter-bar" id="train-filter-bar">
-                <button type="button" class="filter-chip active" data-filter="all" onclick="setTrainListFilter('all')">全</button>
-                <button type="button" class="filter-chip" data-filter="down" onclick="setTrainListFilter('down')">下り</button>
-                <button type="button" class="filter-chip" data-filter="up" onclick="setTrainListFilter('up')">上り</button>
-                <button type="button" class="filter-chip" data-filter="special" onclick="setTrainListFilter('special')">SL・臨・回</button>
-                <button type="button" class="filter-chip" data-filter="dirty" onclick="setTrainListFilter('dirty')">変更有</button>
+                <button type="button" class="filter-chip active" data-filter="all"
+                  onclick="setTrainListFilter('all')">全</button>
+                <button type="button" class="filter-chip" data-filter="down"
+                  onclick="setTrainListFilter('down')">下り</button>
+                <button type="button" class="filter-chip" data-filter="up"
+                  onclick="setTrainListFilter('up')">上り</button>
+                <button type="button" class="filter-chip" data-filter="special"
+                  onclick="setTrainListFilter('special')">SL・臨・回</button>
+                <button type="button" class="filter-chip" data-filter="dirty"
+                  onclick="setTrainListFilter('dirty')">変更有</button>
               </div>
               <div class="train-list-col-head">
                 <span>列番</span>
@@ -134,7 +154,8 @@
         <div class="board-header-row">
           <h2 class="section-title">運用ベース管理</h2>
           <div class="inline-controls">
-            <input type="text" id="new-op-input" class="form-input op-add-input" placeholder="新運用名 (例: 14-7)" onkeydown="if(event.key==='Enter'){event.preventDefault();handleAddNewOperation();}">
+            <input type="text" id="new-op-input" class="form-input op-add-input" placeholder="新運用名 (例: 14-7)"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();handleAddNewOperation();}">
             <button class="btn-admin btn-accent" type="button" onclick="handleAddNewOperation()">+ 運用を追加</button>
           </div>
         </div>
@@ -150,7 +171,8 @@
           <h2 class="section-title">運行シミュレーション</h2>
           <div class="inline-controls">
             <label class="sim-date-label" for="sim-date-input">対象日:</label>
-            <input type="text" id="sim-date-input" class="form-input sim-date-field" data-is-datepicker="true" onchange="runSimulation()">
+            <input type="text" id="sim-date-input" class="form-input sim-date-field" data-is-datepicker="true"
+              onchange="runSimulation()">
             <button type="button" class="btn-admin" onclick="setSimDateOffset(0)">今日</button>
             <button type="button" class="btn-admin" onclick="setSimDateOffset(1)">明日</button>
             <button type="button" class="btn-admin" onclick="setSimNextWeekend()">次の土休日</button>
@@ -237,7 +259,8 @@
       </div>
       <div class="diff-modal-foot">
         <button type="button" onclick="closeDiffModal()" class="btn-admin">閉じる</button>
-        <button type="button" onclick="exportTimetable(); closeDiffModal();" class="btn-admin btn-accent">この内容でGitHubへ反映</button>
+        <button type="button" onclick="exportTimetable(); closeDiffModal();"
+          class="btn-admin btn-accent">この内容でGitHubへ反映</button>
       </div>
     </div>
   </div>
@@ -248,7 +271,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0GM4B0FTW9"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-0GM4B0FTW9');
@@ -257,4 +280,5 @@
   <script src="../config.js"></script>
   <script src="admin.js?v=4"></script>
 </body>
+
 </html>
