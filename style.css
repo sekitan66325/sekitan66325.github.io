@@ -8,16 +8,18 @@
   --spring-bouncy: cubic-bezier(0.34, 1.56, 0.64, 1);
   --spring-snappy: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-  --bg-system: #000000;
-  --bg-secondary: #1c1c1e;
+  --bg-system: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-card: #161b22;
 
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-separator: #2c2c2e;
+  --border-subtle: #30363d;
+  --border-separator: #21262d;
 
-  --text-primary: #f5f5f7;
-  --text-secondary: #86868b;
-  --text-link: #2997ff;
-  --color-error: #ff453a;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-link: #58a6ff;
+  --color-accent: #1f6feb;
+  --color-error: #f85149;
 }
 
 * {
@@ -39,15 +41,11 @@ a.nav-link:active {
 }
 
 body {
-  /* Vibrant background for refraction */
-  background-color: #0a0a0f;
-  background-image:
-    radial-gradient(circle at 15% 20%, rgba(85, 30, 110, 0.35) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(30, 80, 110, 0.3) 0%, transparent 40%);
-  background-attachment: fixed;
+  background-color: var(--bg-system);
+  background-image: none;
   min-height: 100vh;
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding: 0;
@@ -71,9 +69,49 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 28px 0 16px 0;
-  /* Seamless with body */
-  background: transparent;
+  padding: 12px 0;
+  background: rgba(13, 17, 23, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.global-nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.global-nav .nav-link {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.global-nav .nav-link:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.global-nav .nav-link.active {
+  color: #58a6ff;
+  background: rgba(88, 166, 255, 0.12);
+  border-color: rgba(88, 166, 255, 0.25);
+  font-weight: 600;
 }
 
 .logo {
@@ -112,11 +150,9 @@ body {
   border-radius: 12px;
   margin-bottom: 24px;
   /* Liquid Glass Surface */
-  background: rgba(44, 44, 46, 0.4);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
 }
 
 .notice-section strong {
@@ -145,10 +181,9 @@ body {
   overflow: hidden;
   margin-bottom: 32px;
   /* Liquid Glass Surface */
-  backdrop-filter: blur(24px) saturate(150%) url(#liquid-glass-filter);
-  -webkit-backdrop-filter: blur(24px) saturate(150%) url(#liquid-glass-filter);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
 }
 
 .board-rules-list {
@@ -234,10 +269,9 @@ body {
   border-radius: 16px;
   /* Liquid Glass Surface */
   background: rgba(28, 28, 30, 0.4);
-  backdrop-filter: blur(24px) saturate(150%) url(#liquid-glass-filter);
-  -webkit-backdrop-filter: blur(24px) saturate(150%) url(#liquid-glass-filter);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
 }
 
 .rule-box {
@@ -822,8 +856,8 @@ body {
   padding: 4px;
   width: max-content;
   background: rgba(25, 25, 28, 0.75);
-  backdrop-filter: blur(24px) saturate(180%) url(#liquid-glass-filter);
-  -webkit-backdrop-filter: blur(24px) saturate(180%) url(#liquid-glass-filter);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 32px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
@@ -985,44 +1019,44 @@ button:active:not(:disabled) {
     }
 
     .portal-card {
-      background: rgba(28, 28, 30, 0.4);
-      backdrop-filter: blur(24px) saturate(150%);
-      -webkit-backdrop-filter: blur(24px) saturate(150%);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
-      padding: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 24px 20px;
       text-decoration: none;
       color: var(--text-primary);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08);
-      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
+      text-align: left;
     }
 
     .portal-card:hover {
-      transform: translateY(-4px);
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      border-color: var(--text-link);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .portal-card .card-category {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-link);
+      margin-bottom: 6px;
+      text-transform: uppercase;
     }
 
     .portal-card h2 {
-      margin: 16px 0 8px 0;
-      font-size: 1.25rem;
+      margin: 0 0 8px 0;
+      font-size: 1.15rem;
       color: var(--text-primary);
     }
 
     .portal-card p {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-secondary);
-      line-height: 1.5;
+      line-height: 1.55;
       margin: 0;
-    }
-
-    .portal-icon {
-      font-size: 2.5rem;
-      margin-bottom: 8px;
     }
 
     .hero-title {

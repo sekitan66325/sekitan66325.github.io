@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body>
+<div id="output">TEST_FAILED: isJapaneseHoliday is not defined</div>
+<script src="script.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const out = document.getElementById('output');
+  try {
+    // 1. Test isJapaneseHoliday
+    const h1 = isJapaneseHoliday('2026-01-01'); // 元日
+    const h2 = isJapaneseHoliday('2026-05-03'); // 憲法記念日
+    const h3 = isJapaneseHoliday('2026-05-06'); // 振替休日
+    const h4 = isJapaneseHoliday('2026-06-10'); // 平日
+    if (!h1 || !h2 || !h3 || h4) {
+      throw new Error(`Holiday test failed: 2026-01-01:${h1}, 2026-05-03:${h2}, 2026-05-06:${h3}, 2026-06-10:${h4}`);
+    }
+
+    // 2. Test evaluateDateRule
+    // Single date
+    if (!evaluateDateRule('2026-08-15', '2026-08-15', false)) throw new Error('evaluateDateRule single date failed');
+    if (evaluateDateRule('2026-08-15', '2026-08-16', false)) throw new Error('evaluateDateRule single date negative failed');
+    // Date range
+    if (!evaluateDateRule('2026-08-10~2026-08-15', '2026-08-12', false)) throw new Error('evaluateDateRule range failed');
+    if (!evaluateDateRule('2026-08-10~2026-08-15', '2026-08-10', false)) throw new Error('evaluateDateRule range start failed');
+    if (!evaluateDateRule('2026-08-10~2026-08-15', '2026-08-15', false)) throw new Error('evaluateDateRule range end failed');
+    if (evaluateDateRule('2026-08-10~2026-08-15', '2026-08-09', false)) throw new Error('evaluateDateRule range before failed');
+    if (evaluateDateRule('2026-08-10~2026-08-15', '2026-08-16', false)) throw new Error('evaluateDateRule range after failed');
+    // Holiday
+    if (!evaluateDateRule('holiday', '2026-01-01', true)) throw new Error('evaluateDateRule holiday failed');
+    if (evaluateDateRule('holiday', '2026-06-10', false)) throw new Error('evaluateDateRule holiday negative failed');
+
+    // 3. Test SL train 6001
+    const slTrain = {
+      train_id: '6001',
+      train_no: '6001',
+      operation_rule: {
+        service_type: 'sl',
+        days_off: [1, 2, 3, 4, 5],
+        dates_run: ['2026-08-14'],
+        dates_off: ['2026-08-16']
+      }
+    };
+    // 2026-08-15 is Saturday -> should run
+    if (!isTrainOperatingOnDate(slTrain, '2026-08-15', false)) throw new Error('SL train Saturday failed');
+    // 2026-08-16 is Sunday but in dates_off -> should NOT run
+    if (isTrainOperatingOnDate(slTrain, '2026-08-16', false)) throw new Error('SL train dates_off failed');
+    // 2026-08-14 is Friday (weekday) but in dates_run -> should run
+    if (!isTrainOperatingOnDate(slTrain, '2026-08-14', false)) throw new Error('SL train dates_run weekday failed');
+    // 2026-08-12 is Wednesday -> should NOT run
+    if (isTrainOperatingOnDate(slTrain, '2026-08-12', false)) throw new Error('SL train weekday regular failed');
+
+    // 4. Test schedule_variants
+    const variantTrain = {
+      train_id: '103',
+      train_no: '103',
+      destination: '茂木',
+      stations: [{ code: 'M01', dep: '06:00' }],
+      schedule_variants: [
+        {
+          id: 'obon',
+          label: 'お盆ダイヤ',
+          dates: ['2026-08-13~2026-08-15'],
+          destination: '真岡',
+          stations: [{ code: 'M01', dep: '06:10' }]
+        }
+      ]
+    };
+    state.serviceDate = '2026-08-14';
+    const entry = buildTrainEntry(variantTrain, 400);
+    if (entry.destination !== '真岡') throw new Error('Variant destination failed: ' + entry.destination);
+    if (entry.actual[0].dep_scheduled !== '06:10') throw new Error('Variant stations failed: ' + entry.actual[0].dep_scheduled);
+    if (entry.variant_label !== 'お盆ダイヤ') throw new Error('Variant label failed: ' + entry.variant_label);
+
+    out.textContent = "ALL_TESTS_PASSED";
+  } catch (err) {
+    out.textContent = "TEST_FAILED: " + err.message;
+  }
+});
+</script>
+
+
+</body></html>

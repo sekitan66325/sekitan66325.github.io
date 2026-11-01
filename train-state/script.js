@@ -11,11 +11,6 @@ function formatStationName(name) {
 var ARRIVED_HOLD_MINUTES = 3; // 終着駅到着後の保持時間
 var DEPARTURE_HOLD_MINUTES = 15; // 始発駅発車前の保持時間
 
-/**
- * HH:MM 蠖｢蠑上E譎ょ綾譁EE怜E繧偵し繝ｼ繝薙せ蛻・焁E300縲・739)縺E螟画鋤
- * @param {string} timeStr - "06:02" 繧・"25:15" 縺E縺E縺E譎ょ綾譁EE怜E
- * @returns {number|null} 繧E繝ｼ繝薙せ蛻・焁E(萓E 05:00 -> 300)
- */
 function timeStringToMinutes(timeStr) {
   if (!timeStr) return null;
   const parts = timeStr.split(':');
@@ -28,43 +23,172 @@ function timeStringToMinutes(timeStr) {
   return hours * 60 + minutes;
 }
 
-// Evaluate a single date rule (e.g., '2026-08-15', 'mon', 'train:103', 'op:A1')
+/**
+ * 日本の祝日（振替休日・国民の休日含む）判定
+ */
+function isJapaneseHoliday(dateStr) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  const [y, m, d] = dateStr.split('-').map(Number);
+
+  const getHolidaysForYear = (year) => {
+    const list = new Set();
+    const add = (mon, day) => {
+      if (day != null) list.add(`${year}-${String(mon).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+    };
+
+    // 固定祝日
+    add(1, 1);   // 元日
+    add(2, 11);  // 建国記念の日
+    if (year >= 2020) add(2, 23); // 天皇誕生日
+    add(4, 29);  // 昭和の日
+    add(5, 3);   // 憲法記念日
+    add(5, 4);   // みどりの日
+    add(5, 5);   // こどもの日
+    if (year >= 2016) add(8, 11); // 山の日
+    add(11, 3);  // 文化の日
+    add(11, 23); // 勤労感謝の日
+
+    // ハッピーマンデー（第N月曜日）
+    const getNthMonday = (mon, n) => {
+      let count = 0;
+      for (let day = 1; day <= 31; day++) {
+        const dt = new Date(year, mon - 1, day);
+        if (dt.getMonth() !== mon - 1) break;
+        if (dt.getDay() === 1) {
+          count++;
+          if (count === n) return day;
+        }
+      }
+      return null;
+    };
+    add(1, getNthMonday(1, 2));   // 成人の日 (1月第2月曜)
+    add(7, getNthMonday(7, 3));   // 海の日 (7月第3月曜)
+    add(9, getNthMonday(9, 3));   // 敬老の日 (9月第3月曜)
+    add(10, getNthMonday(10, 2)); // スポーツの日 (10月第2月曜)
+
+    // 春分の日・秋分の日 (2000〜2099年近似式)
+    const vernalDay = Math.floor(20.8431 + 0.242194 * (year - 1980) - Math.floor((year - 1980) / 4));
+    add(3, vernalDay);
+    const autumnDay = Math.floor(23.2488 + 0.242194 * (year - 1980) - Math.floor((year - 1980) / 4));
+    add(9, autumnDay);
+
+    // 国民の休日（祝日に挟まれた平日）
+    for (let mon = 1; mon <= 12; mon++) {
+      for (let day = 2; day <= 30; day++) {
+        const prev = `${year}-${String(mon).padStart(2, '0')}-${String(day - 1).padStart(2, '0')}`;
+        const curr = `${year}-${String(mon).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const next = `${year}-${String(mon).padStart(2, '0')}-${String(day + 1).padStart(2, '0')}`;
+        if (list.has(prev) && list.has(next) && !list.has(curr)) {
+          const dt = new Date(year, mon - 1, day);
+          if (dt.getDay() !== 0) {
+            list.add(curr);
+          }
+        }
+      }
+    }
+
+    // 振替休日（祝日が日曜日の場合、翌日以降の直近の平日）
+    const rawHolidays = Array.from(list).sort();
+    rawHolidays.forEach(hStr => {
+      const [hy, hm, hd] = hStr.split('-').map(Number);
+      const hDate = new Date(hy, hm - 1, hd);
+      if (hDate.getDay() === 0) {
+        let check = new Date(hDate);
+        while (true) {
+          check.setDate(check.getDate() + 1);
+          const cStr = `${check.getFullYear()}-${String(check.getMonth() + 1).padStart(2, '0')}-${String(check.getDate()).padStart(2, '0')}`;
+          if (!list.has(cStr)) {
+            list.add(cStr);
+            break;
+          }
+        }
+      }
+    });
+
+    return list;
+  };
+
+  return getHolidaysForYear(y).has(dateStr);
+}
+
+// Evaluate a single date rule (e.g. '2026-08-15', '2026-08-10~2026-08-15', 'mon', 'holiday', 'train:103', 'op:A1')
 function evaluateDateRule(rule, serviceDate, isHoliday, evaluatedTrains = new Set()) {
-  rule = rule.trim().toLowerCase();
-  
-  // Specific Date
-  if (/^\d{4}-\d{2}-\d{2}$/.test(rule)) {
-    return rule === serviceDate;
+  if (!rule || typeof rule !== 'string') return false;
+  rule = rule.trim();
+  if (!rule) return false;
+
+  if (isHoliday === undefined) {
+    isHoliday = isJapaneseHoliday(serviceDate);
   }
-  
-  // Day of Week
-  const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-  if (days.includes(rule)) {
-    const d = new Date(serviceDate + 'T00:00:00');
-    return days[d.getDay()] === rule;
-  }
-  
-  // Link to another Train
-  if (rule.startsWith('train:')) {
-    const targetId = rule.split(':')[1];
-    if (!targetId || evaluatedTrains.has(targetId)) return false; // Prevent infinite loop
-    const targetTrain = DATA.timetable.find(t => t.train_id === targetId || t.train_no === targetId);
-    if (targetTrain) {
-      evaluatedTrains.add(targetId);
-      return isTrainOperatingOnDate(targetTrain, serviceDate, isHoliday, evaluatedTrains);
+
+  // 1. Period / Range (e.g. '2026-08-10~2026-08-15' or '2026-08-10..2026-08-15')
+  if (rule.includes('~') || rule.includes('..')) {
+    const parts = rule.includes('~') ? rule.split('~') : rule.split('..');
+    if (parts.length === 2) {
+      const start = parts[0].trim();
+      const end = parts[1].trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(start) && /^\d{4}-\d{2}-\d{2}$/.test(end)) {
+        return serviceDate >= start && serviceDate <= end;
+      }
     }
   }
 
-  // Link to an Operation ID
-  if (rule.startsWith('op:')) {
-    const targetOp = rule.split(':')[1];
-    if (!targetOp || evaluatedTrains.has('op:' + targetOp)) return false;
-    // Assume if ANY train in that operation runs, the operation runs.
-    const opTrains = DATA.timetable.filter(t => t.operation_id === targetOp);
+  // 2. Specific Single Date (e.g. '2026-08-15')
+  if (/^\d{4}-\d{2}-\d{2}$/.test(rule)) {
+    return rule === serviceDate;
+  }
+
+  const lower = rule.toLowerCase();
+
+  // 3. Holiday token ('holiday', '祝', '祝日')
+  if (lower === 'holiday' || lower === '祝' || lower === '祝日') {
+    return !!isHoliday;
+  }
+
+  // 4. Day of Week ('sun', 'mon', ..., 'sat' or '日', '月'...)
+  const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  const dayJa = ['日', '月', '火', '水', '木', '金', '土'];
+  const d = new Date(serviceDate + 'T00:00:00+09:00');
+  const dayIdx = d.getDay();
+
+  if (dayKeys.includes(lower)) {
+    return dayKeys[dayIdx] === lower;
+  }
+  if (dayJa.includes(rule)) {
+    return dayJa[dayIdx] === rule;
+  }
+
+  // 5. Link to another Train ('train:103', 'train:6001')
+  if (lower.startsWith('train:')) {
+    const targetId = rule.substring(6).trim();
+    const evalKey = 'train:' + targetId.toLowerCase();
+    if (!targetId || evaluatedTrains.has(evalKey)) return false;
+    evaluatedTrains.add(evalKey);
+    const targetTrain = DATA.timetable.find(t => 
+      (t.train_id && String(t.train_id).toLowerCase() === targetId.toLowerCase()) || 
+      (t.train_no && String(t.train_no).toLowerCase() === targetId.toLowerCase())
+    );
+    if (targetTrain) {
+      return isTrainOperatingOnDate(targetTrain, serviceDate, isHoliday, evaluatedTrains);
+    }
+    return false;
+  }
+
+  // 6. Link to an Operation ID ('op:A1', 'op:A601')
+  if (lower.startsWith('op:')) {
+    const targetOp = rule.substring(3).trim();
+    const evalKey = 'op:' + targetOp.toLowerCase();
+    if (!targetOp || evaluatedTrains.has(evalKey)) return false;
+    evaluatedTrains.add(evalKey);
+
+    const opTrains = DATA.timetable.filter(t => {
+      const ops = getTrainOperations(t, serviceDate);
+      return ops.some(o => o.toLowerCase() === targetOp.toLowerCase());
+    });
     if (opTrains.length > 0) {
-      evaluatedTrains.add('op:' + targetOp);
       return opTrains.some(t => isTrainOperatingOnDate(t, serviceDate, isHoliday, evaluatedTrains));
     }
+    return false;
   }
 
   return false;
@@ -73,55 +197,71 @@ function evaluateDateRule(rule, serviceDate, isHoliday, evaluatedTrains = new Se
 /**
  * 1. 運行日判定ロジック
  */
-function isTrainOperatingOnDate(train, serviceDate, isHoliday = false, evaluatedTrains = new Set()) {
-  // If we are evaluating this train as a root, add it to prevent self-reference loops
+function isTrainOperatingOnDate(train, serviceDate, isHoliday, evaluatedTrains = new Set()) {
+  if (!train) return false;
   if (!evaluatedTrains.has(train.train_id)) {
     evaluatedTrains.add(train.train_id);
   }
 
-  if (train.partial_cancellations && train.partial_cancellations.some(p => p.date === serviceDate)) return true;
+  if (isHoliday === undefined) {
+    isHoliday = isJapaneseHoliday(serviceDate);
+  }
+
   const rule = train.operation_rule || {};
   const datesOff = rule.dates_off || [];
   const datesRun = rule.dates_run || [];
   const daysOff = rule.days_off || [];
 
-
-  // 1. 特定運休日（またはルール）チェック
+  // 1. 特定運休日・期間チェック (dates_off) -> 最優先で運休
   if (datesOff.some(r => evaluateDateRule(r, serviceDate, isHoliday, evaluatedTrains))) {
     return false;
   }
 
-  // 2. 特定運転日（またはルール）チェック
+  // 2. 部分運休 (partial_cancellations) -> 該当日は区間運転として運行
+  if (train.partial_cancellations && train.partial_cancellations.some(p => p.date && evaluateDateRule(p.date, serviceDate, isHoliday, evaluatedTrains))) {
+    return true;
+  }
+
+  // 3. 特定運転日・期間チェック (dates_run) -> 運転
   if (datesRun.some(r => evaluateDateRule(r, serviceDate, isHoliday, evaluatedTrains))) {
     return true;
   }
 
-  // 3. 臨時列車チェック (datesRunに入っていなければ運休)
-  if (rule.service_type === 'extra' || rule.service_type === 'sl') {
+  // 4. 臨時列車 (extra) -> dates_run に指定がなければ運休
+  if (rule.service_type === 'extra') {
     return false;
   }
 
-  // 4. 曜日・祝日運休チェック
-  const d = new Date(serviceDate + 'T00:00:00');
+  const d = new Date(serviceDate + 'T00:00:00+09:00');
   const dayIdx = d.getDay();
-  // daysOff は [0, 1, 2, 3, 4, 5, 6] の数値が含まれる
-  if (daysOff.includes(dayIdx)) {
-    return false;
+
+  // 5. SL列車 (sl)
+  if (rule.service_type === 'sl') {
+    if (isHoliday) {
+      if (daysOff.includes('holiday')) return false;
+      return true;
+    }
+    if (daysOff.includes(dayIdx)) {
+      return false;
+    }
+    return true;
   }
 
-  // 祝日運休 (もし holidays 判定などの特別対応が必要ならここ。今回は簡略化)
+  // 6. 一般・回送列車 (regular / deadhead)
   if (isHoliday && daysOff.includes('holiday')) {
     return false;
   }
 
-  // 5. デフォルト運行
+  const dayKey = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][dayIdx];
+  if (daysOff.includes(dayIdx) || daysOff.includes(dayKey)) {
+    return false;
+  }
+
   return true;
 }
 
 /**
- * * @param {Object} train - 蝓ｺ譛ｬ繝繧�E�繝､縺�E�蛻苓ｻ翫が繝悶ず繧�E�繧�E�繝�E
- * @param {Object} override - 蠖捺律繧�E�繝ｼ繝�E・繝ｩ繧�E�繝峨ョ繝ｼ繧�E� (train_overrides[train_id])
- * @returns {Array<Object>} 蜷・�E�・・螳溷柑譎ょ綾繝ｻ驕�E�E��E�繝ｻ驕倶�E�代ヵ繝ｩ繧�E�驟榊�E
+ * 各駅の実効時刻・遅延・区間運休フラグを計算
  */
 function calculateActualTimetable(train, override) {
   const baseDelay = override?.delay_minutes || 0;
@@ -130,7 +270,6 @@ function calculateActualTimetable(train, override) {
   let actualStart = train.stations[0].code;
   let actualEnd = train.stations[train.stations.length - 1].code;
 
-  // 蛹�E�髢馴°莨代・繝�EΜ繝�E・繧�E�繝ｧ繝ｳ・亥�E�伜惠讀懁E���E� & 騾�E�陦梧婿蜷代・鬁E�E�E�乗､懁E���E�・・
   if (override?.actual_start && override?.actual_end) {
     const startIdx = train.stations.findIndex(s => s.code === override.actual_start);
     const endIdx = train.stations.findIndex(s => s.code === override.actual_end);
@@ -173,21 +312,15 @@ function calculateActualTimetable(train, override) {
   });
 }
 
-/**
- * 3. 蛻苓ｻ顔�E諷九�E蛻�E�螳夲�E�・迥�E�諷具�E�・
- * * @param {Array<Object>} actualStations - calculateActualTimetable() 縺�E�謌ｻ繧雁E��E�
- * @param {number} currentMinutes - 迴�E�蝨�E�縺�E�繧�E�繝ｼ繝薙せ蛻・焁E(300縲・739)
- * @returns {Object} { state, station_code, from_station, to_station, progress }
- */
 function evaluateTrainState(actualStations, currentMinutes) {
-  // 驕倶�E�第欠螳壹�E�E��後※縺・↑縺・怏蜉�E�鬧・そ繧�E�繝｡繝ｳ繝医�E�謚ｽ蜁E��
+  // 鬩募ｶ・ｽE・ｽ隨ｬ谺陞ｳ螢ｹ・ｽE・ｽE・ｽ・ｽ蠕娯ｻ邵ｺ繝ｻ竊醍ｸｺ繝ｻ諤剰怏・ｽE・ｽ鬯ｧ繝ｻ縺晉ｹｧ・ｽE・ｽ郢晢ｽ｡郢晢ｽｳ郢晏現・ｽE・ｽ隰夲ｽｽ陷・・ｽ・ｽ
   const activeStations = actualStations.filter(s => !s.is_cancelled);
   if (activeStations.length < 2) return { state: 'OUT_OF_SERVICE' };
 
   const firstStation = activeStations[0];
   const lastStation = activeStations[activeStations.length - 1];
 
-  // 1. 蟋狗匱逋ｺ霁E��燕繝�Eぉ繝�EぁE
+  // 1. 陝狗距蛹ｱ騾具ｽｺ髴・・ｽ・ｽ辯慕ｹ晢ｿｽE縺臥ｹ晢ｿｽE縺・
   if (currentMinutes < firstStation.dep_actual) {
     if (currentMinutes >= firstStation.dep_actual - DEPARTURE_HOLD_MINUTES) {
       return {
@@ -198,7 +331,7 @@ function evaluateTrainState(actualStations, currentMinutes) {
     return { state: 'OUT_OF_SERVICE' };
   }
 
-  // 2. 邨ら捩鬧・芦逹蠕後�E菫晁E�� (5蛻・俣) 縺翫�E�縺�E�蝨丞､夜�E遘ｻ
+  // 2. 驍ｨ繧画昆鬯ｧ繝ｻ闃ｦ騾ｹﾂ陟募ｾ鯉ｿｽE闖ｫ譎・・ｽ・ｽ (5陋ｻ繝ｻ菫｣) 邵ｺ鄙ｫ・ｽE・ｽ邵ｺ・ｽE・ｽ陜ｨ荳橸ｽ､螟懶ｿｽE驕假ｽｻ
   if (currentMinutes >= lastStation.arr_actual) {
     if (currentMinutes < lastStation.arr_actual + ARRIVED_HOLD_MINUTES) {
       return {
@@ -209,11 +342,11 @@ function evaluateTrainState(actualStations, currentMinutes) {
     return { state: 'OUT_OF_SERVICE' };
   }
 
-  // 3. 蜷・�E�・〒縺�E�蛛懆�E�翫メ繧�E�繝�EぁE
+  // 3. 陷ｷ繝ｻ・ｽE・ｽ繝ｻ縲堤ｸｺ・ｽE・ｽ陋帶㊥・ｽE・ｽ鄙ｫ繝｡郢ｧ・ｽE・ｽ郢晢ｿｽE縺・
   for (let i = 0; i < activeStations.length; i++) {
     const st = activeStations[i];
     if (st.arr_actual !== null && st.dep_actual !== null) {
-      // 逋ｺ逹譎ょ綾縺悟�E荳・域治譎る�E�・〒縺�E�縺・夐℃/荳迸�E�蛛懆�E�奁E��峨・1蛻・俣蟁E��蠢・
+      // 騾具ｽｺ騾ｹﾂ隴弱ｇ邯ｾ邵ｺ謔滂ｿｽE闕ｳﾂ繝ｻ蝓滓ｲｻ隴弱ｋ・ｽE・ｽ繝ｻ縲堤ｸｺ・ｽE・ｽ邵ｺ繝ｻﾂ螟絶с/闕ｳﾂ霑ｸ・ｽE・ｽ陋帶㊥・ｽE・ｽ螂・・ｽ・ｽ蟲ｨ繝ｻ1陋ｻ繝ｻ菫｣陝・・ｽ・ｽ陟｢繝ｻ
       if (st.arr_actual === st.dep_actual && currentMinutes === st.arr_actual) {
         return {
           state: 'STOPPED',
@@ -231,14 +364,14 @@ function evaluateTrainState(actualStations, currentMinutes) {
     }
   }
 
-  // 4. 鬧・俣襍ｰ陦後メ繧�E�繝�Eけ�E磯≦蟒ｶ蝗槫�E��E�譎ゅ・繧�E�繝ｭ髯�E�邂励ぎ繝ｼ繝�E�E�偁E��・
+  // 4. 鬯ｧ繝ｻ菫｣隘搾ｽｰ髯ｦ蠕後Γ郢ｧ・ｽE・ｽ郢晢ｿｽE縺托ｿｽE逎ｯ竕ｦ陝抵ｽｶ陜玲ｧｫ・ｽE・ｽ・ｽE・ｽ隴弱ｅ繝ｻ郢ｧ・ｽE・ｽ郢晢ｽｭ鬮ｯ・ｽE・ｽ驍ょ干縺守ｹ晢ｽｼ郢晢ｿｽE・ｽE・ｽ蛛・・ｽ・ｽ繝ｻ
   for (let i = 0; i < activeStations.length - 1; i++) {
     const fromSt = activeStations[i];
     const toSt = activeStations[i + 1];
 
     if (fromSt.dep_actual !== null && toSt.arr_actual !== null) {
       if (fromSt.dep_actual <= currentMinutes && currentMinutes < toSt.arr_actual) {
-        // 謁E�隕∵凾髢薙′繧�E�繝ｭ縺�E�縺溘�E雋�縺�E�縺�E�繧句屓蠕ｩ驕玖�E��E�荳肴紛蜷医∈縺�E�繧�E�繝ｼ繝会ｼ域怙蟆乗園隕∵凾髢薙ａE蛻・↓蝗�E�螳夲�E�・
+        // 隰・・ｽ髫補扱蜃ｾ鬮｢阮吮ｲ郢ｧ・ｽE・ｽ郢晢ｽｭ邵ｺ・ｽE・ｽ邵ｺ貅假ｿｽE髮具ｿｽ邵ｺ・ｽE・ｽ邵ｺ・ｽE・ｽ郢ｧ蜿･螻楢包ｽｩ鬩慕事・ｽE・ｽ・ｽE・ｽ闕ｳ閧ｴ邏幄惺蛹ｻ竏育ｸｺ・ｽE・ｽ郢ｧ・ｽE・ｽ郢晢ｽｼ郢昜ｼ夲ｽｼ蝓滓呵氣荵怜恍髫補扱蜃ｾ鬮｢阮呻ｽ・陋ｻ繝ｻ竊楢摎・ｽE・ｽ陞ｳ螟ｲ・ｽE・ｽ繝ｻ
         const totalTime = Math.max(1, toSt.arr_actual - fromSt.dep_actual);
         const elapsedTime = currentMinutes - fromSt.dep_actual;
         const progress = Math.min(1.0, Math.max(0.0, elapsedTime / totalTime));
@@ -256,20 +389,11 @@ function evaluateTrainState(actualStations, currentMinutes) {
   return { state: 'OUT_OF_SERVICE' };
 }
 
-/**
- * 4. 繝｡繧�E�繝ｳ蜈ｬ髢矩未謨�E�: 繝繧�E�繝､蜈ｨ蛻苓ｻ翫・迥�E�諷倶�E�諡�E�險育�E�・
- * * @param {Array<Object>} timetable - 蝓ｺ譛ｬ繝繧�E�繝､驟榊�E
- * @param {Object} todayStatus - GAS API縺九ｉ蜿門�E�励�E�縺溷�E�捺律繧�E�繝�E・繧�E�繧�E�
- * @param {number} currentMinutes - 險育�E�怜ｯ�E�雎｡譎ょ綾・医し繝ｼ繝薙せ蛻・焚�E・
- * @param {boolean} isHoliday - 蝨滓律逾晏�E螳・
- * @returns {Array<Object>} 迥�E�諷玖ｨ育�E�礼�E�先棡繧貞性繧薙□蛻苓ｻ翫Μ繧�E�繝�E
- */
 function computeAllTrainStates(timetable, todayStatus, currentMinutes, isHoliday = false) {
   const serviceDate = todayStatus.service_date;
   const overrides = todayStatus.train_overrides || {};
 
   return timetable.map(train => {
-    // 驕玖�E�梧律蛻�E�螳・
     const isOperating = isTrainOperatingOnDate(train, serviceDate, isHoliday);
     if (!isOperating) {
       return {
@@ -281,11 +405,8 @@ function computeAllTrainStates(timetable, todayStatus, currentMinutes, isHoliday
       };
     }
 
-    // 繧�E�繝ｼ繝�E・繝ｩ繧�E�繝牙叙蠕�E・・螳溷柑譎ょ綾險育�E�・
     const override = overrides[train.train_id] || null;
     const actualStations = calculateActualTimetable(train, override);
-
-    // 蛻苓ｻ顔�E諷玖ｨ育�E�・
     const stateInfo = evaluateTrainState(actualStations, currentMinutes);
 
     return {
@@ -322,28 +443,25 @@ function normalizeToServiceContext(d) {
   return { service_date: formatYMD(base), service_minutes: mins };
 }
 function formatServiceTime(m) {
-  if (m == null) return "—"; let h = Math.floor(m / 60), mm = String(m % 60).padStart(2, "0"); return `${String(h).padStart(2, "0")}:${mm}`;
+  if (m == null) return "—";
+  let h = Math.floor(m / 60), mm = String(m % 60).padStart(2, "0");
+  return `${String(h).padStart(2, "0")}:${mm}`;
 }
+
 function serviceDateLabel(s) {
   const d = new Date(`${s}T12:00:00+09:00`);
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${"日月火水木金土"[d.getDay()]}）`;
 }
 function serviceRuns(train, date) {
-  if (train.partial_cancellations && train.partial_cancellations.some(p => p.date === date)) return true;
-  const r = train.operation_rule || {};
-  if ((r.dates_off || []).includes(date)) return false;
-  if ((r.dates_run || []).includes(date)) return true;
-  if (r.service_type === "extra") return false;
-  const day = new Date(`${date}T12:00:00+09:00`).getDay();
-  const key = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][day];
-  const daysOff = r.days_off || [];
-  return !daysOff.includes(key) && !daysOff.includes(day);
+  return isTrainOperatingOnDate(train, date, isJapaneseHoliday(date));
 }
 
 function getTrainType(train) {
-  if (train.train_no.startsWith("回")) return "empty";
-  if (train.train_no.startsWith("6")) return "sl";
+  if (train.train_no && train.train_no.startsWith("回")) return "empty";
+  if (train.train_no && train.train_no.startsWith("6")) return "sl";
+  if (train.operation_rule?.service_type === "sl") return "sl";
   if (train.operation_rule?.service_type === "extra") return "extra";
+  if (train.operation_rule?.service_type === "deadhead") return "empty";
   return "local";
 }
 function getTrainTypeColor(type) {
@@ -398,11 +516,30 @@ function getPrevDate(dateStr) {
   return formatYMD(d);
 }
 function buildTrainEntry(train, currentMins) {
-  let ov = DATA.status.train_overrides[train.train_id] || {};
+  let effectiveTrain = train;
+  const isHoliday = isJapaneseHoliday(state.serviceDate);
 
-  // Inject static partial_cancellations if applicable for today
-  if (train.partial_cancellations) {
-    const pc = train.partial_cancellations.find(p => p.date === state.serviceDate);
+  // Check schedule_variants for date-specific timetable / destination overrides
+  if (train.schedule_variants && train.schedule_variants.length > 0) {
+    const matchingVariant = train.schedule_variants.find(v => {
+      return v.dates && v.dates.some(r => evaluateDateRule(r, state.serviceDate, isHoliday));
+    });
+    if (matchingVariant) {
+      effectiveTrain = {
+        ...train,
+        stations: matchingVariant.stations || train.stations,
+        destination: matchingVariant.destination || train.destination,
+        train_no: matchingVariant.train_no || train.train_no,
+        variant_label: matchingVariant.label || "特別ダイヤ"
+      };
+    }
+  }
+
+  let ov = (DATA.status && DATA.status.train_overrides && DATA.status.train_overrides[effectiveTrain.train_id]) || {};
+
+  // Inject static partial_cancellations if applicable for today (supports date range and single date)
+  if (effectiveTrain.partial_cancellations) {
+    const pc = effectiveTrain.partial_cancellations.find(p => p.date && evaluateDateRule(p.date, state.serviceDate, isHoliday));
     if (pc) {
       ov = { ...ov };
       if (!ov.actual_start) ov.actual_start = pc.actual_start;
@@ -410,22 +547,24 @@ function buildTrainEntry(train, currentMins) {
     }
   }
 
-  const actual = calculateActualTimetable(train, ov);
+  const actual = calculateActualTimetable(effectiveTrain, ov);
   const result = evaluateTrainState(actual, currentMins ?? 720);
-  return { ...train, override: ov, actual, result, position: positionForState(train, actual, result) };
+  return { ...effectiveTrain, override: ov, actual, result, position: positionForState(effectiveTrain, actual, result) };
 }
 function effectiveTrains() {
   const cur = state.currentMinutes ?? 720;
+  const isHoliday = isJapaneseHoliday(state.serviceDate);
   const today = DATA.timetable
-    .filter(t => serviceRuns(t, state.serviceDate))
+    .filter(t => isTrainOperatingOnDate(t, state.serviceDate, isHoliday))
     .map(t => buildTrainEntry(t, cur));
 
   let crossover = [];
   if (cur < 300 && DATA.prevTimetable.length) {
     const prevDate = getPrevDate(state.serviceDate);
+    const prevHoliday = isJapaneseHoliday(prevDate);
     const extendedMins = cur + 1440;
     crossover = DATA.prevTimetable
-      .filter(t => serviceRuns(t, prevDate))
+      .filter(t => isTrainOperatingOnDate(t, prevDate, prevHoliday))
       .filter(t => t.stations.some(s => (s.arr && timeStringToMinutes(s.arr) >= 1440) || (s.dep && timeStringToMinutes(s.dep) >= 1440)))
       .map(t => buildTrainEntry(t, extendedMins));
   }
@@ -475,7 +614,7 @@ function renderNotice() {
       ? "!"
       : statusCode === "unknown"
         ? "?"
-        : "✓";
+        : "";
 
   if (statusCode === "delay" || statusCode === "suspend") {
     if (banner) banner.classList.remove("hidden");
@@ -492,7 +631,7 @@ function renderNotice() {
     btn.onclick = () => { warningModal.classList.add("hidden"); };
   }
 
-  let fallbackText = n.text || "公式運行情報を取得できませんでした。";
+  let fallbackText = n.text || "公式運行情報を取得できませんでした";
   if (fallbackText.startsWith("公式: ")) fallbackText = fallbackText.substring(4).trim();
   else if (fallbackText.startsWith("公式：")) fallbackText = fallbackText.substring(3).trim();
 
@@ -526,7 +665,7 @@ function renderNotice() {
           hour12: false
         }
       )
-      : "—"
+      : "-"
     }`;
 }
 
@@ -585,8 +724,8 @@ function renderStations() {
 }
 
 /**
- * 上下列車の交換が行われている駅コードの Set を返す
- * 「先に到着する列車が到着したとき」から「先に発車する列車が出発したとき」まで
+ * 荳贋ｸ句・霆翫・莠､謠帙′陦後ｏ繧後※縺・ｋ鬧・さ繝ｼ繝峨・ Set 繧定ｿ斐☆
+ * 縲悟・縺ｫ蛻ｰ逹縺吶ｋ蛻苓ｻ翫′蛻ｰ逹縺励◆縺ｨ縺阪阪°繧峨悟・縺ｫ逋ｺ霆翫☆繧句・霆翫′蜃ｺ逋ｺ縺励◆縺ｨ縺阪阪∪縺ｧ
  */
 function computeExchangingStations(trains, currentMinutes) {
   const exchanging = new Set();
@@ -645,7 +784,7 @@ function renderPosition() {
 
   const trainsWithPos = trains.filter(t => t.position);
 
-  // 同一運用番号を持つ列車同士の排他制御（始発保持・終着保持の重複や本線走行との矛盾を排除）
+  // 蜷御ｸ驕狗畑逡ｪ蜿ｷ繧呈戟縺､蛻苓ｻ雁酔螢ｫ縺ｮ謗剃ｻ門宛蠕｡・亥ｧ狗匱菫晄戟繝ｻ邨ら捩菫晄戟縺ｮ驥崎､・ｄ譛ｬ邱夊ｵｰ陦後→縺ｮ遏帷崟繧呈賜髯､・・
   const filteredTrains = trainsWithPos.filter(t => {
     const isHoldState = t.result.state === "PRE_DEPARTURE" || t.result.state === "ARRIVED";
 
@@ -653,24 +792,24 @@ function renderPosition() {
       if (t2.train_id === t.train_id) continue;
       if (!hasMatchingOperation(t, t2, state.serviceDate)) continue;
 
-      // 1. 同一運用の別列車が本線を走行中(RUNNING)または駅に停車中(STOPPED)の場合、保持状態(始発保持/終着保持)の列車tは非表示
+      // 1. 蜷御ｸ驕狗畑縺ｮ蛻･蛻苓ｻ翫′譛ｬ邱壹ｒ襍ｰ陦御ｸｭ(RUNNING)縺ｾ縺溘・鬧・↓蛛懆ｻ贋ｸｭ(STOPPED)縺ｮ蝣ｴ蜷医∽ｿ晄戟迥ｶ諷・蟋狗匱菫晄戟/邨ら捩菫晄戟)縺ｮ蛻苓ｻ閣縺ｯ髱櫁｡ｨ遉ｺ
       if (isHoldState && (t2.result.state === "RUNNING" || t2.result.state === "STOPPED")) {
         return false;
       }
 
-      // 2. 列車tが終着保持(ARRIVED)で、同一運用の折り返し列車t2が始発保持(PRE_DEPARTURE)の場合、終着保持tは非表示にして始発保持t2を表示
+      // 2. 蛻苓ｻ閣縺檎ｵら捩菫晄戟(ARRIVED)縺ｧ縲∝酔荳驕狗畑縺ｮ謚倥ｊ霑斐＠蛻苓ｻ閣2縺悟ｧ狗匱菫晄戟(PRE_DEPARTURE)縺ｮ蝣ｴ蜷医∫ｵら捩菫晄戟t縺ｯ髱櫁｡ｨ遉ｺ縺ｫ縺励※蟋狗匱菫晄戟t2繧定｡ｨ遉ｺ
       if (t.result.state === "ARRIVED" && t2.result.state === "PRE_DEPARTURE") {
         return false;
       }
 
-      // 3. 両方とも始発保持(PRE_DEPARTURE)の場合、発車時刻が遅い方の列車を非表示
+      // 3. 荳｡譁ｹ縺ｨ繧ょｧ狗匱菫晄戟(PRE_DEPARTURE)縺ｮ蝣ｴ蜷医∫匱霆頑凾蛻ｻ縺碁≦縺・婿縺ｮ蛻苓ｻ翫ｒ髱櫁｡ｨ遉ｺ
       if (t.result.state === "PRE_DEPARTURE" && t2.result.state === "PRE_DEPARTURE") {
         const tDep = t.actual[0]?.dep_actual ?? 9999;
         const t2Dep = t2.actual[0]?.dep_actual ?? 9999;
         if (tDep > t2Dep) return false;
       }
 
-      // 4. 両方とも終着保持(ARRIVED)の場合、到着時刻が古い方の列車を非表示
+      // 4. 荳｡譁ｹ縺ｨ繧らｵら捩菫晄戟(ARRIVED)縺ｮ蝣ｴ蜷医∝芦逹譎ょ綾縺悟商縺・婿縺ｮ蛻苓ｻ翫ｒ髱櫁｡ｨ遉ｺ
       if (t.result.state === "ARRIVED" && t2.result.state === "ARRIVED") {
         const tArr = t.actual[t.actual.length - 1]?.arr_actual ?? 0;
         const t2Arr = t2.actual[t2.actual.length - 1]?.arr_actual ?? 0;
@@ -736,7 +875,7 @@ function createTrainCard(t) {
     infoHTML += `<span class="pos-stopped-badge">${badgeText}</span>`;
   }
 
-  infoHTML += `<span class="pos-train-dest">${t.destination} 行</span>`;
+  infoHTML += `<span class="pos-train-dest">${t.destination}行</span>`;
   info.innerHTML = infoHTML;
 
   if (t.direction === "down") {
@@ -828,7 +967,7 @@ function renderDiagram() {
     const targetPoints = [];
     if (pts.length > 1) {
       targetPoints.push({ x: pts[0][0], y: pts[0][1], nextX: pts[1][0], nextY: pts[1][1] });
-      const mokaCode = DATA.stations.find(s => s.name === "真岡")?.code;
+      const mokaCode = DATA.stations.find(s => s.name === "逵溷ｲ｡")?.code;
       if (mokaCode && t.stations[0].code !== mokaCode) {
         const mokaY = yOf(mokaCode);
         const mokaPtIdx = pts.findLastIndex(p => Math.abs(p[1] - mokaY) < 1);
@@ -896,7 +1035,7 @@ function renderTimetable() {
 
   const destRow = document.createElement("tr");
   destRow.className = "tt-header-row tt-dest";
-  destRow.innerHTML = `<th>行先</th>` + trains.map(t => `<th>${formatStationName(t.destination)}</th>`).join("");
+  destRow.innerHTML = `<th>陦悟・</th>` + trains.map(t => `<th>${formatStationName(t.destination)}</th>`).join("");
   th.appendChild(destRow);
 
   orderedStations.forEach((s, i) => {
@@ -914,9 +1053,9 @@ function renderTimetable() {
       isEnd = (s.code === "M17");
     }
 
-    let labelsHTML = `<span>着</span><span>発</span>`;
+    let labelsHTML = `<span>逹</span><span>逋ｺ</span>`;
     if (isStart) labelsHTML = `<span>発</span>`;
-    if (isEnd) labelsHTML = `<span>着</span>`;
+    if (isEnd) labelsHTML = `<span>逹</span>`;
 
     stCell.innerHTML = `<div class="tt-st-cell"><strong>${formatStationName(s.name)}</strong><div class="tt-st-labels">${labelsHTML}</div></div>`;
     tr.appendChild(stCell);
@@ -974,7 +1113,7 @@ function openTrainModal(t) {
     const stateText = {
       RUNNING: "駅間走行中",
       STOPPED: "駅停車中",
-      ARRIVED: "終着駅到着",
+      ARRIVED: "終着駅着",
       PRE_DEPARTURE: "始発駅停車中",
       OUT_OF_SERVICE: "運転時間外"
     }[t.result.state] || "不明";
@@ -1017,7 +1156,7 @@ function updateClock() {
   const ctx = normalizeToServiceContext(new Date());
 
   if (ctx.service_date !== state.serviceDate) {
-    DATA.prevTimetable = [...DATA.timetable]; // 前日ダイヤを日またぎ列車用に保存
+    DATA.prevTimetable = [...DATA.timetable]; // 蜑肴律繝繧､繝､繧呈律縺ｾ縺溘℃蛻苓ｻ顔畑縺ｫ菫晏ｭ・
     state.serviceDate = ctx.service_date;
     state.currentMinutes = ctx.service_minutes;
     $("#date-input").value = state.serviceDate;
@@ -1095,7 +1234,7 @@ async function loadData() {
       service_date: state.serviceDate,
       official_info: {
         status_code: "unknown",
-        text: "公式運行情報を取得できませんでした",
+        text: "蜈ｬ蠑城°陦梧ュ蝣ｱ繧貞叙蠕励〒縺阪∪縺帙ｓ縺ｧ縺励◆",
         link_url: "",
         has_detail: false,
         fetched_at: null
@@ -1196,7 +1335,7 @@ var STATIONS_FALLBACK = [];
 
 setInterval(updateClock, 1000);
 
-// 初期状態ではまだGASから取得できていないためrenderNotice()はここでは呼ばない
+// 蛻晄悄迥ｶ諷九〒縺ｯ縺ｾ縺GAS縺九ｉ蜿門ｾ励〒縺阪※縺・↑縺・◆繧〉enderNotice()縺ｯ縺薙％縺ｧ縺ｯ蜻ｼ縺ｰ縺ｪ縺・
 
 loadData();
 

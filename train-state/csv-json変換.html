@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>OuDia CSV to Timetable JSON Converter</title>
+  <style>
+    body { font-family: sans-serif; background: #1c1c1e; color: #f5f5f7; padding: 20px; }
+    .drop-zone { border: 2px dashed #86868b; border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 20px; }
+    button { background: #2997ff; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>OuDia CSV ➔ timetable.json 変換ツール</h2>
+  <div class="drop-zone" id="dropZone">
+    ここに nobori.csv と kudari.csv をまとめてドロップしてください
+  </div>
+  <button id="downloadBtn" style="display:none;">timetable.json をダウンロード</button>
+
+  <script>
+    const stationMap = {
+      "下館": "M01", "下館二高前": "M02", "折本": "M03", "ひぐち": "M04",
+      "久下田": "M05", "寺内": "M06", "真岡": "M07", "北真岡": "M08",
+      "西田井": "M09", "北山": "M10", "益子": "M11", "七井": "M12",
+      "多田羅": "M13", "市塙": "M14", "笹原田": "M15", "天矢場": "M16", "茂木": "M17"
+    };
+
+    let resultJSON = [];
+
+    function parseTime(s) {
+      if (!s || s === '||' || s === '..') return null;
+      s = s.trim().replace(/\?/g, '');
+      if (s === 'ﾚ' || s === '↓' || s === 'レ') return 'pass';
+      if (!/^\d+$/.test(s)) return null;
+      if (s.length === 5) return `0${s[0]}:${s.substring(1, 3)}`;
+      if (s.length === 6) return `${s.substring(0, 2)}:${s.substring(2, 4)}`;
+      return null;
+    }
+
+    function parseCSV(text) {
+      const lines = text.split('\n').map(l => l.trim().split(','));
+      const direction = lines[2][0] === '下り' ? 'up' : 'down'; // OuDiaの行ヘッダー判定
+      const colCount = lines[4] ? lines[4].length : 0;
+      
+      const stationRows = {};
+      lines.forEach((row, idx) => {
+        const stName = row[0] ? row[0].trim() : '';
+        const stType = row[1] ? row[1].trim() : '';
+        if (stationMap[stName]) {
+          if (!stationRows[stName]) stationRows[stName] = {};
+          if (stType === '着' || stType === '発') stationRows[stName][stType] = idx;
+        }
+      });
+
+      const trainsByNo = {};
+      let extraCount = 1;
+
+      for (let col = 2; col < colCount; col++) {
+        const trainNo = lines[4][col] ? lines[4][col].trim() : '';
+        const dest = lines[12][col] ? lines[12][col].trim() : '';
+        const stTimes = [];
+
+        Object.keys(stationRows).forEach(stName => {
+          const r = stationRows[stName];
+          const arr = r['着'] ? parseTime(lines[r['着']][col]) : null;
+          const dep = r['発'] ? parseTime(lines[r['発']][col]) : null;
+          if (arr || dep) {
+            stTimes.push({ code: stationMap[stName], name: stName, arr, dep });
+          }
+        });
+
+        if (stTimes.length === 0) continue;
+
+        const isExtra = trainNo.startsWith('6') || trainNo.startsWith('C');
+        const groupingKey = (trainNo && trainNo !== "回送") ? trainNo : `EXTRA_${col}`;
+        
+        if (!trainsByNo[groupingKey]) {
+          trainsByNo[groupingKey] = {
+             train_no: trainNo || "回送",
+             direction: direction,
+             isExtra: isExtra,
+             dest: dest,
+             stations: []
+          };
+        }
+        trainsByNo[groupingKey].stations.push(...stTimes);
+      }
+
+      Object.keys(trainsByNo).forEach(key => {
+        const t = trainsByNo[key];
+        
+        t.stations.sort((a, b) => {
+          const numA = parseInt(a.code.replace('M', ''));
+          const numB = parseInt(b.code.replace('M', ''));
+          return direction === 'up' ? numB - numA : numA - numB;
+        });
+
+        const uniqueStations = [];
+        let lastCode = null;
+        for (const s of t.stations) {
+          if (s.code === lastCode) {
+            const last = uniqueStations[uniqueStations.length - 1];
+            if (s.arr) last.arr = s.arr;
+            if (s.dep) last.dep = s.dep;
+          } else {
+            uniqueStations.push(s);
+            lastCode = s.code;
+          }
+        }
+        
+        if(uniqueStations.length > 0) {
+          uniqueStations[0].arr = null;
+          uniqueStations[uniqueStations.length - 1].dep = null;
+        }
+
+        const actualDest = stationMap[t.dest] ? t.dest : (uniqueStations.length ? uniqueStations[uniqueStations.length - 1].name : "");
+        let id = t.train_no && t.train_no !== "回送" ? t.train_no : `EX-${direction === 'up' ? 'U' : 'D'}${extraCount++}`;
+
+        resultJSON.push({
+          train_id: id,
+          train_no: t.train_no,
+          operation_id: "A1",
+          direction: t.direction,
+          destination: actualDest,
+          operation_rule: {
+            service_type: t.isExtra ? "extra" : "regular",
+            days_off: [],
+            dates_run: [],
+            dates_off: []
+          },
+          stations: uniqueStations.map(s => ({ code: s.code, arr: s.arr, dep: s.dep }))
+        });
+      });
+    }
+
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', e => e.preventDefault());
+    dropZone.addEventListener('drop', async e => {
+      e.preventDefault();
+      resultJSON = [];
+      for (let file of e.dataTransfer.files) {
+        const text = await file.text();
+        parseCSV(text);
+      }
+      document.getElementById('downloadBtn').style.display = 'inline-block';
+      alert(`${resultJSON.length} 件の列車データを変換しました！`);
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(resultJSON, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'timetable.json';
+      a.click();
+    });
+  </script>
+</body>
+</html>
