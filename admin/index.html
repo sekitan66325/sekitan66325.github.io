@@ -2,74 +2,76 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>真岡線運用掲示板 - 管理者ダッシュボード</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>運行管理パネル - 真岡鐵道 情報ポータル</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="admin.css">
-  <script defer src="datepicker.js?v=3"></script>
   <link rel="stylesheet" href="datepicker.css">
+  <script defer src="datepicker.js?v=4"></script>
 </head>
 
 <body>
-
   <header class="site-header">
-    <div class="header-inner container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 92%;">
-      <h1 class="logo">真岡線 運行管理パネル</h1>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <button id="logout-btn" class="btn-admin btn-danger" style="display: none;" onclick="handleLogout()">ログアウト</button>
+    <div class="header-inner admin-shell">
+      <div class="header-brand-nav">
+        <h1 class="logo">真岡線 運行管理パネル</h1>
+        <nav class="global-nav">
+          <a href="../index.html" class="nav-link" target="_blank" rel="noopener">公開トップ ↗</a>
+          <a href="../train-state/index.html" class="nav-link" target="_blank" rel="noopener">走行位置 ↗</a>
+        </nav>
+      </div>
+      <div>
+        <button type="button" id="logout-btn" class="btn-admin" style="display: none;" onclick="handleLogout()">ログアウト</button>
       </div>
     </div>
   </header>
 
-  <main class="container" id="main-container" style="max-width: 1200px;">
-    
-    <section id="login-view" style="max-width: 380px; margin: 40px auto;">
-      <div class="notice-section" style="text-align: center;">
-        <strong style="font-size: 1.1rem; margin-bottom: 12px; display: block;">管理者ログイン</strong>
-
+  <main class="container admin-shell" id="main-container">
+    <section id="login-view" class="login-box">
+      <div class="login-card">
+        <h2 class="section-title">管理者ログイン</h2>
         <form id="admin-login-form" onsubmit="handleLogin(event)">
           <div class="form-group">
-            <label class="form-label">管理者ID</label>
+            <label class="form-label" for="login-id">管理者ID</label>
             <input type="text" id="login-id" name="admin_username" class="form-input" autocomplete="username" required>
           </div>
-          
           <div class="form-group">
-            <label class="form-label">パスワード</label>
+            <label class="form-label" for="login-pass">パスワード</label>
             <input type="password" id="login-pass" name="admin_password" class="form-input" autocomplete="current-password" required>
           </div>
-          
           <button type="submit" id="login-submit-btn" class="form-submit-btn">ログイン</button>
         </form>
-
       </div>
     </section>
 
     <section id="dashboard-view" style="display: none;">
-      <!-- Persistent Sync & Action Status Bar -->
+      <!-- 同期ステータス & 共通アクションバー -->
       <div class="admin-status-bar" id="admin-status-bar">
-        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-          <span id="admin-sync-badge" class="status-badge sync-ok">同期済み</span>
-          <span id="admin-sync-memo" style="font-size: 0.8rem; color: var(--text-secondary);">変更なし (GitHub最新)</span>
+        <div class="status-bar-left">
+          <span id="admin-sync-badge" class="sync-indicator sync-ok">同期済み</span>
+          <span id="admin-sync-memo" class="sync-memo">変更なし (GitHub最新)</span>
         </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <div class="status-bar-actions">
           <button type="button" class="btn-admin" id="btn-diff-modal" onclick="openDiffModal()">差分確認</button>
-          <button type="button" class="btn-admin btn-success" id="btn-push-github" onclick="exportTimetable()">GitHubへ反映</button>
+          <button type="button" class="btn-admin btn-accent" id="btn-push-github" onclick="exportTimetable()">GitHubへ反映</button>
           <button type="button" class="btn-admin" id="btn-reload-repo" onclick="confirmReloadRepo()">最新を取得</button>
           <input type="file" id="timetable-upload" accept=".json" style="display:none;" onchange="handleTimetableUpload(event)">
-          <button type="button" class="btn-admin" onclick="document.getElementById('timetable-upload').click()">ファイル読込</button>
+          <button type="button" class="btn-admin" onclick="document.getElementById('timetable-upload').click()">読込</button>
           <button type="button" class="btn-admin" onclick="downloadTimetableFile()">JSON保存</button>
         </div>
       </div>
 
-      <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
-        <button type="button" id="tab-btn-posts" class="btn-admin active" onclick="switchAdminTab('posts')">投稿管理</button>
-        <button type="button" id="tab-btn-logs" class="btn-admin" onclick="switchAdminTab('logs')">操作・編集ログ</button>
-        <button type="button" id="tab-btn-trains" class="btn-admin" onclick="switchAdminTab('trains')">運行データ管理</button>
-        <button type="button" id="tab-btn-operations" class="btn-admin" onclick="switchAdminTab('operations')">運用ベース管理</button>
-        <button type="button" id="tab-btn-simulation" class="btn-admin" onclick="switchAdminTab('simulation')">運行シミュレーション</button>
-      </div>
+      <!-- 管理画面メインタブ -->
+      <nav class="admin-tabs" aria-label="管理メニュー">
+        <button type="button" id="tab-btn-posts" class="admin-tab active" onclick="switchAdminTab('posts')">投稿管理</button>
+        <button type="button" id="tab-btn-logs" class="admin-tab" onclick="switchAdminTab('logs')">操作・編集ログ</button>
+        <button type="button" id="tab-btn-trains" class="admin-tab" onclick="switchAdminTab('trains')">運行データ管理</button>
+        <button type="button" id="tab-btn-operations" class="admin-tab" onclick="switchAdminTab('operations')">運用ベース管理</button>
+        <button type="button" id="tab-btn-simulation" class="admin-tab" onclick="switchAdminTab('simulation')">運行シミュレーション</button>
+      </nav>
 
+      <!-- 1. 投稿管理 -->
       <div id="panel-posts" class="view-panel show">
         <div class="board-header-row">
           <h2 class="section-title">投稿一覧（全件）</h2>
@@ -77,73 +79,88 @@
             <input type="search" id="admin-search" class="search-input" placeholder="投稿検索..." oninput="renderAdminPosts()">
           </div>
         </div>
-
-        <ul id="admin-post-list" style="list-style: none;">
-          <li style="text-align: center; color: var(--text-secondary); padding: 20px;">読み込み中...</li>
+        <ul id="admin-post-list">
+          <li class="empty-message">読み込み中...</li>
         </ul>
       </div>
 
+      <!-- 2. 操作ログ -->
       <div id="panel-logs" class="view-panel">
         <h2 class="section-title">操作・変更履歴 (edit_log)</h2>
         <div id="admin-log-list">
-          <div style="text-align: center; color: var(--text-secondary); padding: 20px;">読み込み中...</div>
+          <div class="empty-message">読み込み中...</div>
         </div>
       </div>
 
+      <!-- 3. 運行データ管理（2ペイン独立スクロール） -->
       <div id="panel-trains" class="view-panel">
-        <div class="board-header-row">
-          <h2 class="section-title">運行データ (timetable.json) 管理</h2>
+        <div class="workspace-caption-row">
+          <span class="workspace-caption">列車を選択して編集後、「変更を適用 (メモリ)」→ 上部「GitHubへ反映」で公開データへ保存します。</span>
+          <span class="workspace-shortcut-hint">Ctrl + S : メモリ適用</span>
         </div>
-        
-        <div id="trains-workspace" style="display: flex; gap: 20px; margin-top: 16px;">
-          <!-- 列車リスト -->
-          <div class="train-list-sidebar">
-            <input type="search" id="train-search" class="search-input" placeholder="列車検索 (例: 103, 6001)..." oninput="renderTrainList()">
-            <ul id="train-list" style="list-style: none; padding: 0; margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
-              <li style="color: var(--text-secondary); text-align: center;">データを読み込んでください</li>
+
+        <div id="trains-workspace" class="trains-workspace">
+          <!-- 左ペイン：列車一覧 -->
+          <aside class="train-list-sidebar">
+            <div class="train-sidebar-head">
+              <input type="search" id="train-search" class="form-input train-search-input" placeholder="列番・行先・運用で検索..." oninput="renderTrainList()">
+              <div class="train-filter-bar" id="train-filter-bar">
+                <button type="button" class="filter-chip active" data-filter="all" onclick="setTrainListFilter('all')">全</button>
+                <button type="button" class="filter-chip" data-filter="down" onclick="setTrainListFilter('down')">下り</button>
+                <button type="button" class="filter-chip" data-filter="up" onclick="setTrainListFilter('up')">上り</button>
+                <button type="button" class="filter-chip" data-filter="special" onclick="setTrainListFilter('special')">SL・臨・回</button>
+                <button type="button" class="filter-chip" data-filter="dirty" onclick="setTrainListFilter('dirty')">変更有</button>
+              </div>
+              <div class="train-list-col-head">
+                <span>列番</span>
+                <span>方向・行先 <em id="train-list-count"></em></span>
+                <span>運用</span>
+              </div>
+            </div>
+            <ul id="train-list" class="train-list-scroll">
+              <li class="empty-message">データを読み込んでいます...</li>
             </ul>
-          </div>
-          
-          <!-- エディタ -->
-          <div id="train-editor-container" class="train-editor-container" style="display: none;">
-            <!-- ここにJavaScriptでフォームを生成 -->
+          </aside>
+
+          <!-- 右ペイン：列車エディタ -->
+          <div id="train-editor-container" class="train-editor-pane">
+            <div class="editor-empty-state">左の列車リストから編集する列車を選択してください。</div>
           </div>
         </div>
       </div>
 
+      <!-- 4. 運用ベース管理 -->
       <div id="panel-operations" class="view-panel">
-        <div class="board-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
-          <h2 class="section-title" style="margin: 0;">運用ベース管理</h2>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="new-op-input" class="form-input" placeholder="新運用名 (例: 14-7)" style="width: 140px; padding: 6px 10px; font-size: 0.82rem;" onkeydown="if(event.key==='Enter'){event.preventDefault();handleAddNewOperation();}">
-            <button class="btn-admin btn-success" type="button" onclick="handleAddNewOperation()">+ 運用を追加</button>
+        <div class="board-header-row">
+          <h2 class="section-title">運用ベース管理</h2>
+          <div class="inline-controls">
+            <input type="text" id="new-op-input" class="form-input op-add-input" placeholder="新運用名 (例: 14-7)" onkeydown="if(event.key==='Enter'){event.preventDefault();handleAddNewOperation();}">
+            <button class="btn-admin btn-accent" type="button" onclick="handleAddNewOperation()">+ 運用を追加</button>
           </div>
         </div>
-        <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5;">
-          曜日ごとにどの列車をどの運用に入れるか設定します。<br>
-          ※設定したデータは、列車ベースのデータと同じ timetable.json に保存されます。
+        <p class="section-desc">
+          曜日ごとにどの列車をどの運用に充当するか設定します。適用後は上部「GitHubへ反映」を押して保存してください。
         </p>
-        <div id="op-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
-          <!-- JS will render operations here -->
-        </div>
+        <div id="op-list" class="op-grid"></div>
       </div>
 
+      <!-- 5. 運行シミュレーション -->
       <div id="panel-simulation" class="view-panel">
-        <div class="board-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-          <h2 class="section-title" style="margin: 0;">運行シミュレーション</h2>
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <label style="font-size: 0.85rem; color: var(--text-secondary);">シミュレーション日:</label>
-            <input type="text" id="sim-date-input" class="form-input" data-is-datepicker="true" style="width: 140px; padding: 6px 10px; font-size: 0.85rem;" onchange="runSimulation()">
+        <div class="board-header-row">
+          <h2 class="section-title">運行シミュレーション</h2>
+          <div class="inline-controls">
+            <label class="sim-date-label" for="sim-date-input">対象日:</label>
+            <input type="text" id="sim-date-input" class="form-input sim-date-field" data-is-datepicker="true" onchange="runSimulation()">
             <button type="button" class="btn-admin" onclick="setSimDateOffset(0)">今日</button>
             <button type="button" class="btn-admin" onclick="setSimDateOffset(1)">明日</button>
             <button type="button" class="btn-admin" onclick="setSimNextWeekend()">次の土休日</button>
           </div>
         </div>
-        <p style="color: var(--text-secondary); margin: 8px 0 16px; font-size: 0.85rem;">
-          指定した日付における全列車の運行可否、適用ダイヤ（通常／特別ダイヤ）、行先、運用をシミュレーション確認できます。
+        <p class="section-desc">
+          指定日における全列車の運行可否、適用ダイヤ（通常／特別ダイヤ）、行先、充当運用を一覧確認できます。
         </p>
-        <div id="sim-summary" style="display: flex; gap: 16px; margin-bottom: 16px; font-size: 0.85rem; color: var(--text-primary);"></div>
-        <div style="background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-subtle); overflow-x: auto;">
+        <div id="sim-summary" class="sim-summary-bar"></div>
+        <div class="table-wrap">
           <table class="sim-table" id="sim-table">
             <thead>
               <tr>
@@ -159,26 +176,22 @@
             </thead>
             <tbody id="sim-tbody">
               <tr>
-                <td colspan="8" style="text-align: center; padding: 24px; color: var(--text-secondary);">シミュレーション日を選択してください</td>
+                <td colspan="8" class="empty-message">対象日を選択してください</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
     </section>
-
   </main>
 
   <div id="password-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
-      <h3 style="margin-top:0; font-size: 1.1rem; color: var(--text-primary);">初回パスワードの変更</h3>
-      <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">
-        セキュリティ保護のため、初期パスワードを変更してください。
-      </p>
+      <h3 class="section-title">初回パスワードの変更</h3>
+      <p class="section-desc">セキュリティ保護のため、初期パスワードを変更してください。</p>
       <form onsubmit="handleChangePassword(event)">
         <div class="form-group">
-          <label class="form-label">新しいパスワード（半角英数字4桁以上）</label>
+          <label class="form-label" for="new-password">新しいパスワード（半角英数字4桁以上）</label>
           <input type="password" id="new-password" class="form-input" minlength="4" required>
         </div>
         <button type="submit" class="form-submit-btn">変更して開始する</button>
@@ -188,27 +201,27 @@
 
   <div id="admin-edit-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
-      <h3 style="margin-top:0; font-size: 1.1rem; color: var(--text-primary);">投稿内容の直接修正</h3>
+      <h3 class="section-title">投稿内容の直接修正</h3>
       <input type="hidden" id="admin-edit-id">
-      <div class="form-group" style="margin-top: 12px;">
-        <label class="form-label">本文</label>
+      <div class="form-group">
+        <label class="form-label" for="admin-edit-message">本文</label>
         <textarea id="admin-edit-message" class="form-textarea" rows="5"></textarea>
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+      <div class="modal-actions">
         <button type="button" onclick="closeAdminEditModal()" class="btn-admin">キャンセル</button>
-        <button type="button" onclick="submitAdminEdit()" class="form-submit-btn" style="width: auto; padding: 8px 16px; margin: 0;">保存する</button>
+        <button type="button" onclick="submitAdminEdit()" class="btn-admin btn-accent">保存する</button>
       </div>
     </div>
   </div>
 
   <div id="diff-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 720px; max-height: 80vh; display: flex; flex-direction: column;">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px; margin-bottom: 12px;">
-        <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">変更差分プレビュー (GitHub最新との比較)</h3>
-        <button type="button" class="btn-admin" style="min-width: auto; padding: 4px 8px;" onclick="closeDiffModal()">×</button>
+    <div class="modal-content diff-modal-content">
+      <div class="diff-modal-head">
+        <h3 class="diff-modal-title">変更差分プレビュー (GitHub最新との比較)</h3>
+        <button type="button" class="btn-admin btn-compact" onclick="closeDiffModal()">×</button>
       </div>
-      <div id="diff-summary-text" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;"></div>
-      <div style="overflow-y: auto; flex: 1;">
+      <div id="diff-summary-text" class="diff-summary-text"></div>
+      <div class="diff-table-scroll">
         <table class="diff-table" id="diff-table">
           <thead>
             <tr>
@@ -222,9 +235,9 @@
           <tbody id="diff-tbody"></tbody>
         </table>
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
+      <div class="diff-modal-foot">
         <button type="button" onclick="closeDiffModal()" class="btn-admin">閉じる</button>
-        <button type="button" onclick="exportTimetable(); closeDiffModal();" class="btn-admin btn-success">この内容でGitHubへ反映</button>
+        <button type="button" onclick="exportTimetable(); closeDiffModal();" class="btn-admin btn-accent">この内容でGitHubへ反映</button>
       </div>
     </div>
   </div>
@@ -242,6 +255,6 @@
   </script>
 
   <script src="../config.js"></script>
-  <script src="admin.js?v=639231599055514103"></script>
+  <script src="admin.js?v=4"></script>
 </body>
 </html>

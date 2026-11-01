@@ -1,187 +1,174 @@
-/* Custom Date Picker (Modern Glassmorphism) */
+@charset "UTF-8";
+
+/* ==========================================================================
+   カスタムデートピッカー（3色フラット設計）
+   ========================================================================== */
 .custom-date-picker {
   position: absolute;
-  z-index: 1000;
-  width: 280px;
-  background: rgba(30, 30, 35, 0.65);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  opacity: 0;
-  transform: translateY(-8px) scale(0.96);
-  pointer-events: none;
-  visibility: hidden;
-  transition: opacity 0.4s var(--spring-smooth), transform 0.4s var(--spring-bouncy), visibility 0.4s;
+  z-index: 9500;
+  width: 268px;
+  background-color: var(--c-bg, #ffffff);
+  border: 1px solid var(--c-border-strong, rgba(24, 24, 27, 0.28));
+  border-radius: 3px;
+  padding: 12px;
+  display: none;
+  color: var(--c-fg, #18181b);
 }
-@media (prefers-color-scheme: light) {
-  .custom-date-picker {
-    background: rgba(255, 255, 255, 0.75);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
-  }
-}
+
 .custom-date-picker.show {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
-  visibility: visible;
-}
-.stagger-item {
-  opacity: 0;
-}
-@keyframes fadeUp {
-  0% { opacity: 0; transform: translateY(8px); }
-  100% { opacity: 1; transform: translateY(0); }
+  display: block;
 }
 
 .cdp-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--c-border, rgba(24, 24, 27, 0.14));
 }
+
 .cdp-header button {
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  font-size: 1.1rem;
+  background-color: var(--c-bg, #ffffff);
+  border: 1px solid var(--c-border, rgba(24, 24, 27, 0.14));
+  color: var(--c-fg, #18181b);
+  font-size: 0.85rem;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  transition: transform 0.2s var(--spring-bouncy), background 0.2s;
-  display: flex;
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-.cdp-header button:hover { background: rgba(150, 150, 150, 0.2); }
-.cdp-header button:active { transform: scale(0.85); }
-.cdp-month { font-weight: 700; font-size: 0.95rem; }
+
+.cdp-header button:hover {
+  background-color: var(--c-surface-hover, rgba(24, 24, 27, 0.055));
+}
+
+.cdp-month {
+  font-weight: 700;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+}
 
 .cdp-days-header {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--c-muted, rgba(24, 24, 27, 0.62));
+  margin-bottom: 4px;
 }
 
 .cdp-grid-wrapper {
   position: relative;
 }
-/* The floating highlight is replaced with static CSS classes for perfect centering */
-.cdp-day.selected {
-  background: #2563eb !important;
-  color: #ffffff !important;
-  font-weight: 700;
-  border-radius: 6px;
-}
-.cdp-day.range-between {
-  background: rgba(37, 99, 235, 0.25) !important;
-  color: #ffffff;
-  border-radius: 0;
-}
-.cdp-day.range-start {
-  background: #2563eb !important;
-  color: #ffffff !important;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-.cdp-day.range-end {
-  background: #2563eb !important;
-  color: #ffffff !important;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
 
 .cdp-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  position: relative;
-  z-index: 2;
+  gap: 2px;
 }
+
 .cdp-day {
   background: transparent;
-  border: none;
-  color: var(--text-primary);
-  height: 34px;
-  border-radius: 50%;
+  border: 1px solid transparent;
+  color: var(--c-fg, #18181b);
+  height: 32px;
+  border-radius: 2px;
   cursor: pointer;
-  transition: transform 0.2s var(--spring-bouncy);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
 }
+
 .cdp-day:not(.empty):hover {
-  background: rgba(150, 150, 150, 0.15);
+  background-color: var(--c-surface-hover, rgba(24, 24, 27, 0.055));
 }
-.cdp-day:not(.empty):active {
-  transform: scale(0.85);
-}
+
 .cdp-day.today {
-  color: var(--text-link);
-  font-weight: 800;
+  color: var(--c-accent, #1a4b8c);
+  border-color: var(--c-accent-border, rgba(26, 75, 140, 0.35));
+  font-weight: 700;
 }
-/* selected styles handled above */
+
+.cdp-day.selected,
+.cdp-day.range-start,
+.cdp-day.range-end {
+  background-color: var(--c-accent, #1a4b8c) !important;
+  border-color: var(--c-accent, #1a4b8c) !important;
+  color: var(--c-bg, #ffffff) !important;
+  font-weight: 700;
+}
+
+.cdp-day.range-between {
+  background-color: var(--c-accent-soft, rgba(26, 75, 140, 0.08)) !important;
+  color: var(--c-fg, #18181b);
+  border-radius: 0;
+}
 
 .cdp-footer {
-  margin-top: 16px;
-  display: flex; justify-content: space-between; align-items: center;
-}
-.cdp-today {
-  background: rgba(150, 150, 150, 0.1);
-  border: none;
-  color: var(--text-primary);
-  padding: 8px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: transform 0.2s var(--spring-bouncy), background 0.2s;
-}
-.cdp-today:hover {
-  background: rgba(150, 150, 150, 0.2);
-}
-.cdp-today:active {
-  transform: scale(0.92);
-}
-
-
-.date-control {
-  position: relative;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--c-border, rgba(24, 24, 27, 0.14));
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: 8px;
 }
+
+.cdp-range-hint {
+  font-size: 0.72rem;
+  color: var(--c-muted, rgba(24, 24, 27, 0.62));
+  flex: 1;
+  text-align: left;
+}
+
+.cdp-today {
+  background-color: var(--c-bg, #ffffff);
+  border: 1px solid var(--c-border-strong, rgba(24, 24, 27, 0.28));
+  color: var(--c-fg, #18181b);
+  padding: 4px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.cdp-today:hover {
+  background-color: var(--c-surface-hover, rgba(24, 24, 27, 0.055));
+}
+
 .date-control:has([data-is-datepicker])::after,
 .date-picker-control::after {
-  content: '';
+  content: "";
   position: absolute;
-  right: 12px;
-  width: 16px;
-  height: 16px;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%2386868b" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,4H18V2H16V4H8V2H6V4H5A2,2 0 0,0 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V10H19V20M19,8H5V6H19V8M7,12H12V17H7V12Z"/></svg>');
-  background-repeat: no-repeat;
-  background-size: contain;
-  pointer-events: none;
-}
-.date-control:has(input[type="time"])::after,
-.time-picker-control::after {
-  content: '';
-  position: absolute;
-  right: 12px;
-  width: 16px;
-  height: 16px;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%2386868b" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>');
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23666666" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,4H18V2H16V4H8V2H6V4H5A2,2 0 0,0 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V10H19V20M19,8H5V6H19V8M7,12H12V17H7V12Z"/></svg>');
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
 }
 
+.date-control:has(input[type="time"])::after,
+.time-picker-control::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23666666" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>');
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+}

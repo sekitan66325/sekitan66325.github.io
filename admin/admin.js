@@ -141,6 +141,9 @@ async function switchAdminTab(tab) {
     } else {
       renderTrainList();
     }
+    if (!currentTrainId && timetableData.length > 0) {
+      editTrain(timetableData[0].train_id);
+    }
   } else if (tab === 'logs') {
     fetchAdminLogs();
   } else if (tab === 'simulation') {
@@ -345,9 +348,31 @@ let timetableData = [];
 let originalTimetableData = [];
 let stationsData = [];
 let currentTrainId = null;
+let currentTrainFilter = 'all';
+let currentEditorSubTab = 'basic';
+let filteredTrainIds = [];
+let hasUnappliedFormEdits = false;
 let manualOperations = new Set();
 let dirtyTrainIds = new Set();
 const DRAFT_STORAGE_KEY = 'moka_admin_timetable_draft';
+
+function markEditorUnapplied(flag = true) {
+  hasUnappliedFormEdits = flag;
+  const hint = document.getElementById('unapplied-hint');
+  if (hint) {
+    hint.style.display = flag ? 'inline' : 'none';
+  }
+}
+
+window.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+    const trainsPanel = document.getElementById('panel-trains');
+    if (trainsPanel && trainsPanel.classList.contains('show') && currentTrainId) {
+      e.preventDefault();
+      saveTrainData();
+    }
+  }
+});
 
 // --- Sync Status & Toast ---
 function updateSyncStatus() {
@@ -356,11 +381,11 @@ function updateSyncStatus() {
   if (!badge) return;
 
   if (dirtyTrainIds.size > 0) {
-    badge.className = 'status-badge sync-dirty';
+    badge.className = 'sync-indicator sync-dirty';
     badge.textContent = `未プッシュの変更あり (${dirtyTrainIds.size}件)`;
     if (memo) memo.textContent = 'メモリ・下書きに保存済。「GitHubへ反映」で確定してください';
   } else {
-    badge.className = 'status-badge sync-ok';
+    badge.className = 'sync-indicator sync-ok';
     badge.textContent = '同期済み';
     if (memo) memo.textContent = '変更なし (GitHub最新)';
   }
@@ -426,6 +451,7 @@ async function loadTimetableFromRepo(silent = false) {
             if (!silent) showToast('下書きデータを復元しました');
             renderTrainList();
             renderOperationsView();
+            if (!currentTrainId && timetableData.length > 0) editTrain(timetableData[0].train_id);
             return;
           } else {
             localStorage.removeItem(DRAFT_STORAGE_KEY);
@@ -442,6 +468,11 @@ async function loadTimetableFromRepo(silent = false) {
     if (!silent) showToast('リポジトリから最新データを読み込みました');
     renderTrainList();
     renderOperationsView();
+    if (currentTrainId && timetableData.some(x => x.train_id === currentTrainId)) {
+      editTrain(currentTrainId);
+    } else if (timetableData.length > 0) {
+      editTrain(timetableData[0].train_id);
+    }
   } catch (err) {
     console.error(err);
     if (!silent) alert('読込エラー: ' + err.message);
@@ -473,6 +504,11 @@ function handleTimetableUpload(event) {
       showToast('ファイルからデータを読み込みました');
       renderTrainList();
       renderOperationsView();
+      if (currentTrainId && timetableData.some(x => x.train_id === currentTrainId)) {
+        editTrain(currentTrainId);
+      } else if (timetableData.length > 0) {
+        editTrain(timetableData[0].train_id);
+      }
     } catch (err) {
       alert('JSONのパースに失敗しました: ' + err.message);
     }
@@ -495,50 +531,97 @@ function downloadTimetableFile() {
   showToast('timetable.json をダウンロードしました');
 }
 
-// --- Train List Rendering ---
+// --- Train List Filtering & Rendering ---
+function setTrainListFilter(filter) {
+  currentTrainFilter = filter;
+  document.querySelectorAll('#train-filter-bar .filter-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  renderTrainList();
+}
+
+function stepTrain(delta) {
+  if (!filteredTrainIds.length) return;
+  const idx = filteredTrainIds.indexOf(currentTrainId);
+  const nextIdx = idx === -1 ? 0 : (idx + delta + filteredTrainIds.length) % filteredTrainIds.length;
+  const nextId = filteredTrainIds[nextIdx];
+  editTrain(nextId);
+  const activeItem = document.querySelector(`.train-list-item[data-train-id="${CSS.escape(nextId)}"]`);
+  if (activeItem) activeItem.scrollIntoView({ block: 'nearest' });
+}
+
+function switchEditorSubTab(subTab) {
+  currentEditorSubTab = subTab;
+  document.querySelectorAll('.editor-subtab').forEach(b => {
+    b.classList.toggle('active', b.dataset.subtab === subTab);
+  });
+  document.querySelectorAll('.editor-section').forEach(sec => {
+    sec.classList.toggle('active', sec.id === 'editor-sec-' + subTab);
+  });
+}
+
 function renderTrainList() {
   const list = document.getElementById('train-list');
+  const countEl = document.getElementById('train-list-count');
   if (!list) return;
+  const prevScroll = list.scrollTop;
   const query = (document.getElementById('train-search') ? document.getElementById('train-search').value : '').trim().toLowerCase();
 
   if (timetableData.length === 0) {
-    list.innerHTML = '<li style="color: var(--text-secondary); text-align: center; padding: 20px;">データがありません</li>';
+    filteredTrainIds = [];
+    if (countEl) countEl.textContent = '';
+    list.innerHTML = '<li class="empty-message">データがありません</li>';
     return;
   }
 
   const filtered = timetableData.filter(t => {
+    const svcType = (t.operation_rule && t.operation_rule.service_type) || 'regular';
+    if (currentTrainFilter === 'down' && t.direction !== 'down') return false;
+    if (currentTrainFilter === 'up' && t.direction !== 'up') return false;
+    if (currentTrainFilter === 'special' && svcType === 'regular') return false;
+    if (currentTrainFilter === 'dirty' && !dirtyTrainIds.has(t.train_id)) return false;
+
     if (!query) return true;
-    return (t.train_id && t.train_id.toLowerCase().includes(query)) ||
-           (t.train_no && t.train_no.toLowerCase().includes(query)) ||
-           (t.operation_id && t.operation_id.toLowerCase().includes(query)) ||
-           (t.destination && t.destination.toLowerCase().includes(query));
+    return (t.train_id && String(t.train_id).toLowerCase().includes(query)) ||
+           (t.train_no && String(t.train_no).toLowerCase().includes(query)) ||
+           (t.operation_id && String(t.operation_id).toLowerCase().includes(query)) ||
+           (t.destination && String(t.destination).toLowerCase().includes(query));
   });
+
+  filteredTrainIds = filtered.map(t => t.train_id);
+  if (countEl) countEl.textContent = `(${filtered.length}/${timetableData.length})`;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<li class="empty-message">条件に一致する列車がありません</li>';
+    return;
+  }
 
   list.innerHTML = filtered.map(t => {
     const isSelected = t.train_id === currentTrainId;
     const isDirty = dirtyTrainIds.has(t.train_id);
     const svcType = (t.operation_rule && t.operation_rule.service_type) || 'regular';
-    const typeLabel = svcType === 'sl' ? 'SL' : (svcType === 'extra' ? '臨時' : (svcType === 'deadhead' ? '回送' : '普通'));
-    const dirLabel = t.direction === 'up' ? '上り' : '下り';
+    const shortTag = svcType === 'sl' ? 'SL' : (svcType === 'extra' ? '臨' : (svcType === 'deadhead' ? '回' : ''));
+    const dirShort = t.direction === 'up' ? '上り' : '下り';
     const hasVariants = t.schedule_variants && t.schedule_variants.length > 0;
+    const opDisplay = t.operation_dict ? '曜日別' : (t.operation_id || '—');
 
     return `
-      <li class="train-list-item ${isSelected ? 'selected' : ''}" onclick="editTrain('${t.train_id}')">
-        <div>
-          <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
-            <span>${escapeHTML(t.train_no)}</span>
-            <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: normal;">(${escapeHTML(t.train_id)})</span>
-            <span class="sim-badge ${svcType}">${typeLabel}</span>
-            ${hasVariants ? '<span class="sim-badge variant">特定ダイヤ有</span>' : ''}
-          </div>
-          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">
-            ${dirLabel} | 行先: ${escapeHTML(t.destination)} | 運用: ${escapeHTML(t.operation_id || '未設定')}
-          </div>
+      <li class="train-list-item ${isSelected ? 'selected' : ''}" data-train-id="${escapeHTML(t.train_id)}" onclick="editTrain('${escapeHTML(t.train_id)}')">
+        <div class="tli-no">
+          <span>${escapeHTML(t.train_no)}</span>
+          ${shortTag ? `<span class="tli-tag">${shortTag}</span>` : ''}
         </div>
-        ${isDirty ? '<span class="dirty-dot" title="未反映の変更あり"></span>' : ''}
+        <div class="tli-route">${dirShort}・${escapeHTML(t.destination || '—')}</div>
+        <div class="tli-meta">
+          <span>${escapeHTML(opDisplay)}</span>
+          ${hasVariants ? '<span title="特定日変更ダイヤあり">*</span>' : ''}
+          ${isDirty ? '<span class="dirty-dot" title="未反映の変更あり"></span>' : ''}
+        </div>
       </li>
     `;
   }).join('');
+
+  list.scrollTop = prevScroll;
 }
 
 function getStationName(code) {
@@ -551,9 +634,8 @@ function editTrain(trainId) {
   const t = timetableData.find(x => x.train_id === trainId);
   if (!t) return;
   currentTrainId = trainId;
+  markEditorUnapplied(false);
 
-  // Highlight selected in sidebar
-  document.querySelectorAll('.train-list-item').forEach(el => el.classList.remove('selected'));
   renderTrainList();
 
   const container = document.getElementById('train-editor-container');
@@ -561,7 +643,6 @@ function editTrain(trainId) {
 
   const rule = t.operation_rule || { service_type: 'regular', days_off: [] };
   const daysOff = rule.days_off || [];
-  // Days map: 1=月, 2=火, 3=水, 4=木, 5=金, 6=土, 0=日
   const weekdays = [
     { key: 1, label: '月' },
     { key: 2, label: '火' },
@@ -572,206 +653,259 @@ function editTrain(trainId) {
     { key: 0, label: '日' }
   ];
 
-  const datesRunStr = (rule.dates_run || []).join(',');
+  const datesRunStr = (rule.dates_run || []).filter(d => d !== 'holiday').join(',');
   const datesOffStr = (rule.dates_off || []).join(',');
-  const isHolidayRun = (rule.dates_run || []).includes('holiday');
+  const hasHolidayOff = daysOff.includes('holiday') || (rule.dates_off || []).includes('holiday');
+  const hasHolidayRun = (rule.dates_run || []).includes('holiday');
+  const numDaysOff = daysOff.filter(d => typeof d === 'number').length;
+  const isHolidayRun = !hasHolidayOff && (
+    hasHolidayRun ||
+    rule.service_type === 'sl' ||
+    (rule.service_type !== 'extra' && numDaysOff === 0)
+  );
 
   const partialCancellations = t.partial_cancellations || [];
   const scheduleVariants = t.schedule_variants || [];
+  const specialCount = scheduleVariants.length + partialCancellations.length;
+  const stCount = (t.stations || []).length;
 
   let html = `
-    <div style="display:flex; flex-direction:column; gap:16px;">
-      <div class="editor-header">
-        <div>
-          <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary);">列車編集: ${escapeHTML(t.train_no)} (${escapeHTML(t.train_id)})</h3>
-          <span style="font-size: 0.8rem; color: var(--text-secondary);">変更後は右上の「変更を適用 (メモリ上)」を押してください</span>
+    <div class="editor-sticky-bar">
+      <div class="editor-header-top">
+        <div class="editor-title-group">
+          <h3 class="editor-train-title">列車 ${escapeHTML(t.train_no)} <span class="editor-train-id">(ID: ${escapeHTML(t.train_id)})</span></h3>
+          <div class="editor-step-btns">
+            <button type="button" class="btn-admin btn-compact" onclick="stepTrain(-1)" title="前の列車">‹ 前</button>
+            <button type="button" class="btn-admin btn-compact" onclick="stepTrain(1)" title="次の列車">次 ›</button>
+          </div>
         </div>
-        <button type="button" class="btn-admin btn-success" onclick="saveTrainData()">変更を適用 (メモリ上)</button>
-      </div>
-
-      <div class="train-editor-grid">
-        <div class="form-group">
-          <label class="form-label">列車番号 (train_no)</label>
-          <input type="text" id="edit-train-no" class="form-input" value="${escapeHTML(t.train_no || '')}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">運用番号 (operation_id)</label>
-          ${t.operation_dict ? '<div style="font-size:0.75rem; color:#ff9f0a; margin-bottom:4px;">※曜日別運用が設定されています。変更は「運用ベース管理」タブで行うか、直接入力して単一運用へ上書きしてください。</div>' : ''}
-          <input type="text" id="edit-op-id" class="form-input" value="${escapeHTML(t.operation_id || '')}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">方向 (direction)</label>
-          <select id="edit-dir" class="form-input">
-            <option value="down" ${t.direction === 'down' ? 'selected' : ''}>下り (下館 → 茂木)</option>
-            <option value="up" ${t.direction === 'up' ? 'selected' : ''}>上り (茂木 → 下館)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">行先 (destination)</label>
-          <input type="text" id="edit-dest" class="form-input" value="${escapeHTML(t.destination || '')}">
+        <div class="editor-apply-group">
+          <span id="unapplied-hint" class="unapplied-hint" style="display: none;">未適用の入力あり</span>
+          <button type="button" class="btn-admin btn-accent" onclick="saveTrainData()">変更を適用 (メモリ)</button>
         </div>
       </div>
 
-      <h4 style="margin-top: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">運行ルール (operation_rule)</h4>
-      <div class="train-editor-grid">
-        <div class="form-group">
-          <label class="form-label">種別 (service_type)</label>
-          <select id="edit-svc-type" class="form-input">
-            <option value="regular" ${rule.service_type === 'regular' ? 'selected' : ''}>普通 (regular)</option>
-            <option value="sl" ${rule.service_type === 'sl' ? 'selected' : ''}>SL (sl)</option>
-            <option value="extra" ${rule.service_type === 'extra' ? 'selected' : ''}>臨時 (extra)</option>
-            <option value="deadhead" ${rule.service_type === 'deadhead' ? 'selected' : ''}>回送 (deadhead)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">運転曜日 (選択された曜日に運転)</label>
-          <div class="day-pills-group" id="edit-days-pills">
-            ${weekdays.map(w => {
-              const runs = !daysOff.includes(w.key);
-              return `<button type="button" class="day-toggle-pill ${runs ? 'active' : ''}" data-day="${w.key}" onclick="toggleDayPill(this)">${w.label}</button>`;
-            }).join('')}
-            <button type="button" class="day-toggle-pill holiday ${isHolidayRun ? 'active' : ''}" id="edit-pill-holiday" onclick="this.classList.toggle('active')">祝日</button>
-          </div>
-          <div class="preset-pills">
-            <button type="button" class="preset-pill" onclick="setDayPreset('all')">全日</button>
-            <button type="button" class="preset-pill" onclick="setDayPreset('weekday')">平日のみ</button>
-            <button type="button" class="preset-pill" onclick="setDayPreset('weekend')">土休日のみ</button>
-            <button type="button" class="preset-pill" onclick="setDayPreset('none')">全休</button>
-          </div>
-        </div>
+      <div class="editor-subtabs">
+        <button type="button" class="editor-subtab ${currentEditorSubTab === 'basic' ? 'active' : ''}" data-subtab="basic" onclick="switchEditorSubTab('basic')">基本・運行ルール</button>
+        <button type="button" class="editor-subtab ${currentEditorSubTab === 'stations' ? 'active' : ''}" data-subtab="stations" onclick="switchEditorSubTab('stations')">各駅時刻 (${stCount}駅)</button>
+        <button type="button" class="editor-subtab ${currentEditorSubTab === 'variants' ? 'active' : ''}" data-subtab="variants" onclick="switchEditorSubTab('variants')">特定日変更・区間運休${specialCount ? ` (${specialCount})` : ''}</button>
       </div>
+    </div>
 
-      <!-- 運転日・運休日 -->
-      <div class="train-editor-grid">
-        <div class="form-group">
-          <label class="form-label">特定運転日 (dates_run) ※期間・連動指定可</label>
-          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px;">
-            <input type="text" id="date-run-input" class="form-input" data-is-datepicker="true" data-range="true" placeholder="日付・期間 (例: 2026-08-15, 2026-08-10~2026-08-15)" style="flex:1;">
-            <button type="button" class="btn-admin" onclick="addDateChip('dates_run', 'date-run-input')">追加</button>
+    <div class="editor-body" oninput="markEditorUnapplied(true)" onchange="markEditorUnapplied(true)">
+      <!-- サブタブ 1: 基本・運行ルール -->
+      <section id="editor-sec-basic" class="editor-section ${currentEditorSubTab === 'basic' ? 'active' : ''}">
+        <h4 class="editor-block-title">基本情報</h4>
+        <div class="train-editor-grid-4">
+          <div class="form-group">
+            <label class="form-label">列車番号</label>
+            <input type="text" id="edit-train-no" class="form-input" value="${escapeHTML(t.train_no || '')}">
           </div>
-          <div style="display: flex; gap: 6px; align-items: center;">
-            <input type="text" id="rule-run-input" class="form-input" placeholder="連動条件 (例: train:103, op:A1)" style="flex:1;">
-            <button type="button" class="btn-admin" onclick="addDateChip('dates_run', 'rule-run-input')">追加</button>
+          <div class="form-group">
+            <label class="form-label">方向</label>
+            <select id="edit-dir" class="form-input">
+              <option value="down" ${t.direction === 'down' ? 'selected' : ''}>下り (下館 → 茂木)</option>
+              <option value="up" ${t.direction === 'up' ? 'selected' : ''}>上り (茂木 → 下館)</option>
+            </select>
           </div>
-          <input type="hidden" id="edit-dates-run" value="${datesRunStr}">
-          <div id="dates-run-chips" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
+          <div class="form-group">
+            <label class="form-label">行先</label>
+            <input type="text" id="edit-dest" class="form-input" value="${escapeHTML(t.destination || '')}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">運用番号</label>
+            <input type="text" id="edit-op-id" class="form-input" value="${escapeHTML(t.operation_id || '')}">
+          </div>
+        </div>
+        ${t.operation_dict ? '<div class="field-note">※この列車には曜日別運用が設定されています。直接運用番号を書き換えると単一運用へ上書きされます（曜日別編集は「運用ベース管理」タブで行えます）。</div>' : ''}
+
+        <h4 class="editor-block-title">運行ルール (operation_rule)</h4>
+        <div class="train-editor-grid">
+          <div class="form-group">
+            <label class="form-label">種別 (service_type)</label>
+            <select id="edit-svc-type" class="form-input">
+              <option value="regular" ${rule.service_type === 'regular' ? 'selected' : ''}>普通 (regular)</option>
+              <option value="sl" ${rule.service_type === 'sl' ? 'selected' : ''}>SL (sl)</option>
+              <option value="extra" ${rule.service_type === 'extra' ? 'selected' : ''}>臨時 (extra)</option>
+              <option value="deadhead" ${rule.service_type === 'deadhead' ? 'selected' : ''}>回送 (deadhead)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">運転曜日（選択された曜日に運転）</label>
+            <div class="day-pills-group" id="edit-days-pills">
+              ${weekdays.map(w => {
+                const runs = !daysOff.includes(w.key);
+                return `<button type="button" class="day-toggle-pill ${runs ? 'active' : ''}" data-day="${w.key}" onclick="toggleDayPill(this)">${w.label}</button>`;
+              }).join('')}
+              <button type="button" class="day-toggle-pill holiday ${isHolidayRun ? 'active' : ''}" id="edit-pill-holiday" onclick="this.classList.toggle('active'); markEditorUnapplied(true);">祝日</button>
+            </div>
+            <div class="preset-pills">
+              <button type="button" class="preset-pill" onclick="setDayPreset('all')">全日</button>
+              <button type="button" class="preset-pill" onclick="setDayPreset('weekday')">平日のみ</button>
+              <button type="button" class="preset-pill" onclick="setDayPreset('weekend')">土休日のみ</button>
+              <button type="button" class="preset-pill" onclick="setDayPreset('none')">全休</button>
+            </div>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">特定運休日 (dates_off) ※期間・連動指定可</label>
-          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px;">
-            <input type="text" id="date-off-input" class="form-input" data-is-datepicker="true" data-range="true" placeholder="日付・期間 (例: 2026-08-15, 2026-08-10~2026-08-15)" style="flex:1;">
-            <button type="button" class="btn-admin" onclick="addDateChip('dates_off', 'date-off-input')">追加</button>
+        <div class="train-editor-grid" style="margin-top: 8px;">
+          <div class="form-group">
+            <label class="form-label">特定運転日 (dates_run) ※期間・連動指定可</label>
+            <div class="chip-input-row">
+              <input type="text" id="date-run-input" class="form-input" data-is-datepicker="true" data-range="true" placeholder="日付・期間 (例: 2026-08-15, 2026-08-10~2026-08-15)">
+              <button type="button" class="btn-admin" onclick="addDateChip('dates_run', 'date-run-input')">追加</button>
+            </div>
+            <div class="chip-input-row">
+              <input type="text" id="rule-run-input" class="form-input" placeholder="連動条件 (例: train:6001, op:A1)">
+              <button type="button" class="btn-admin" onclick="addDateChip('dates_run', 'rule-run-input')">追加</button>
+            </div>
+            <input type="hidden" id="edit-dates-run" value="${escapeHTML(datesRunStr)}">
+            <div id="dates-run-chips" class="chip-list"></div>
           </div>
-          <div style="display: flex; gap: 6px; align-items: center;">
-            <input type="text" id="rule-off-input" class="form-input" placeholder="連動条件 (例: train:103, op:A1)" style="flex:1;">
-            <button type="button" class="btn-admin" onclick="addDateChip('dates_off', 'rule-off-input')">追加</button>
-          </div>
-          <input type="hidden" id="edit-dates-off" value="${datesOffStr}">
-          <div id="dates-off-chips" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
-        </div>
-      </div>
 
-      <!-- 特定日・変更ダイヤ (schedule_variants) -->
-      <div style="margin-top: 12px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
-          <div>
-            <h4 style="margin: 0; font-size: 1rem; color: var(--text-primary);">特定日・変更ダイヤ (schedule_variants)</h4>
-            <span style="font-size: 0.78rem; color: var(--text-secondary);">特定日のみ時刻変更・延長運転・区間短縮・行先変更を行う場合の設定</span>
+          <div class="form-group">
+            <label class="form-label">特定運休日 (dates_off) ※期間・連動指定可</label>
+            <div class="chip-input-row">
+              <input type="text" id="date-off-input" class="form-input" data-is-datepicker="true" data-range="true" placeholder="日付・期間 (例: 2026-08-15, 2026-08-10~2026-08-15)">
+              <button type="button" class="btn-admin" onclick="addDateChip('dates_off', 'date-off-input')">追加</button>
+            </div>
+            <div class="chip-input-row">
+              <input type="text" id="rule-off-input" class="form-input" placeholder="連動条件 (例: train:6001, op:A1)">
+              <button type="button" class="btn-admin" onclick="addDateChip('dates_off', 'rule-off-input')">追加</button>
+            </div>
+            <input type="hidden" id="edit-dates-off" value="${escapeHTML(datesOffStr)}">
+            <div id="dates-off-chips" class="chip-list"></div>
           </div>
-          <button type="button" class="btn-admin" onclick="addNewVariant()">+ 変更ダイヤを追加</button>
         </div>
-        <div id="variants-container" style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
-          ${scheduleVariants.map((v, vIdx) => renderVariantCard(v, vIdx)).join('')}
-        </div>
-      </div>
+      </section>
 
-      <!-- 日付指定の区間運休 (partial_cancellations) -->
-      <div style="margin-top: 12px;">
-        <h4 style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; margin: 0 0 10px;">日付指定の区間運休 (partial_cancellations)</h4>
-        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px;">
-          <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 0.85rem;">
+      <!-- サブタブ 2: 基本時刻表データ -->
+      <section id="editor-sec-stations" class="editor-section ${currentEditorSubTab === 'stations' ? 'active' : ''}">
+        <div class="editor-table-box">
+          <div class="editor-table-toolbar">
+            <div class="inline-controls">
+              <span class="sim-date-label">全駅時刻シフト:</span>
+              <input type="number" id="base-shift-mins" class="form-input" placeholder="±分" style="width: 72px; padding: 3px 6px;">
+              <button type="button" class="btn-admin btn-compact" onclick="shiftBaseStationTimes()">シフト適用</button>
+            </div>
+            <button type="button" class="btn-admin btn-compact" onclick="addStationRow()">+ 駅を追加</button>
+          </div>
+          <table class="editor-table">
             <thead>
               <tr>
-                <th style="padding: 6px; color: var(--text-secondary);">日付・期間</th>
-                <th style="padding: 6px; color: var(--text-secondary);">実質始発駅</th>
-                <th style="padding: 6px; color: var(--text-secondary);">実質終着駅</th>
-                <th style="padding: 6px;"></th>
-              </tr>
-            </thead>
-            <tbody id="edit-pc-body">
-              ${partialCancellations.map(pc => `
-                <tr>
-                  <td style="padding: 4px;">
-                    <input type="text" class="form-input pc-date" data-is-datepicker="true" data-range="true" value="${escapeHTML(pc.date || '')}" placeholder="YYYY-MM-DD または YYYY-MM-DD~YYYY-MM-DD" style="width:100%;">
-                  </td>
-                  <td style="padding: 4px;">
-                    <select class="form-input pc-start">
-                      ${stationsData.map(s => `<option value="${s.code}" ${s.code === pc.actual_start ? 'selected' : ''}>${s.name}</option>`).join('')}
-                    </select>
-                  </td>
-                  <td style="padding: 4px;">
-                    <select class="form-input pc-end">
-                      ${stationsData.map(s => `<option value="${s.code}" ${s.code === pc.actual_end ? 'selected' : ''}>${s.name}</option>`).join('')}
-                    </select>
-                  </td>
-                  <td style="padding: 4px; text-align: right;">
-                    <button type="button" class="btn-admin btn-danger" style="padding: 4px 8px; font-size: 0.75rem;" onclick="this.closest('tr').remove()">削除</button>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-          <button type="button" class="btn-admin" style="margin-top: 10px; font-size: 0.8rem;" onclick="addPCRow()">+ 区間運休を追加</button>
-        </div>
-      </div>
-
-      <!-- 基本各駅時刻データ -->
-      <div style="margin-top: 12px;">
-        <h4 style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; margin: 0 0 10px;">基本時刻表データ (stations)</h4>
-        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px;">
-          <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 0.85rem;">
-            <thead>
-              <tr>
-                <th style="padding: 6px; color: var(--text-secondary);">駅コード</th>
-                <th style="padding: 6px; color: var(--text-secondary);">駅名</th>
-                <th style="padding: 6px; color: var(--text-secondary);">着時刻 (HH:MM)</th>
-                <th style="padding: 6px; color: var(--text-secondary);">発時刻 (HH:MM)</th>
-                <th style="padding: 6px;"></th>
+                <th style="width: 80px;">駅コード</th>
+                <th style="width: 110px;">駅名</th>
+                <th>着時刻 (HH:MM / pass)</th>
+                <th>発時刻 (HH:MM / pass)</th>
+                <th style="width: 64px;"></th>
               </tr>
             </thead>
             <tbody id="edit-stations-body">
               ${(t.stations || []).map(st => `
                 <tr>
-                  <td style="padding: 4px;"><input type="text" class="form-input st-code" value="${escapeHTML(st.code)}" style="width: 60px;"></td>
-                  <td style="padding: 4px;">${escapeHTML(getStationName(st.code))}</td>
-                  <td style="padding: 4px;"><input type="text" class="form-input st-arr" value="${st.arr ? escapeHTML(st.arr) : ''}" placeholder="null"></td>
-                  <td style="padding: 4px;"><input type="text" class="form-input st-dep" value="${st.dep ? escapeHTML(st.dep) : ''}" placeholder="null"></td>
-                  <td style="padding: 4px; text-align: right;"><button type="button" class="btn-admin btn-danger" style="padding: 4px 8px; font-size: 0.75rem;" onclick="this.closest('tr').remove()">削除</button></td>
+                  <td><input type="text" class="form-input st-code" value="${escapeHTML(st.code)}"></td>
+                  <td>${escapeHTML(getStationName(st.code))}</td>
+                  <td><input type="text" class="form-input st-arr" value="${st.arr ? escapeHTML(st.arr) : ''}" placeholder="—"></td>
+                  <td><input type="text" class="form-input st-dep" value="${st.dep ? escapeHTML(st.dep) : ''}" placeholder="—"></td>
+                  <td style="text-align: right;"><button type="button" class="btn-admin btn-danger btn-compact" onclick="this.closest('tr').remove(); markEditorUnapplied(true);">削除</button></td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
-          <button type="button" class="btn-admin" style="margin-top: 10px; font-size: 0.8rem;" onclick="addStationRow()">+ 駅を追加</button>
         </div>
-      </div>
+      </section>
 
-      <div style="margin-top: 16px; text-align: right;">
-        <button type="button" class="btn-admin btn-success" onclick="saveTrainData()">この列車の変更を適用 (メモリ上)</button>
-      </div>
+      <!-- サブタブ 3: 特定日変更・区間運休 -->
+      <section id="editor-sec-variants" class="editor-section ${currentEditorSubTab === 'variants' ? 'active' : ''}">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div>
+            <h4 class="editor-block-title" style="border: none; margin: 0; padding: 0;">特定日・変更ダイヤ (schedule_variants)</h4>
+            <span class="sim-date-label">特定日のみ時刻変更・延長運転・行先変更を行う場合の設定</span>
+          </div>
+          <button type="button" class="btn-admin" onclick="addNewVariant()">+ 変更ダイヤを追加</button>
+        </div>
+        <div id="variants-container">
+          ${scheduleVariants.map((v, vIdx) => renderVariantCard(v, vIdx)).join('')}
+        </div>
+
+        <h4 class="editor-block-title" style="margin-top: 24px;">日付指定の区間運休 (partial_cancellations)</h4>
+        <div class="editor-table-box">
+          <table class="editor-table">
+            <thead>
+              <tr>
+                <th>日付・期間</th>
+                <th>実質始発駅</th>
+                <th>実質終着駅</th>
+                <th style="width: 64px;"></th>
+              </tr>
+            </thead>
+            <tbody id="edit-pc-body">
+              ${partialCancellations.map(pc => `
+                <tr>
+                  <td>
+                    <input type="text" class="form-input pc-date" data-is-datepicker="true" data-range="true" value="${escapeHTML(pc.date || '')}" placeholder="YYYY-MM-DD または YYYY-MM-DD~YYYY-MM-DD">
+                  </td>
+                  <td>
+                    <select class="form-input pc-start">
+                      ${stationsData.map(s => `<option value="${s.code}" ${s.code === pc.actual_start ? 'selected' : ''}>${s.name}</option>`).join('')}
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-input pc-end">
+                      ${stationsData.map(s => `<option value="${s.code}" ${s.code === pc.actual_end ? 'selected' : ''}>${s.name}</option>`).join('')}
+                    </select>
+                  </td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-admin btn-danger btn-compact" onclick="this.closest('tr').remove(); markEditorUnapplied(true);">削除</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div style="padding: 8px 10px; border-top: 1px solid var(--c-border);">
+            <button type="button" class="btn-admin btn-compact" onclick="addPCRow()">+ 区間運休を追加</button>
+          </div>
+        </div>
+      </section>
     </div>
   `;
 
   container.innerHTML = html;
-  container.style.display = 'block';
 
   renderDateChips('dates_run');
   renderDateChips('dates_off');
 }
 
+function shiftBaseStationTimes() {
+  const shiftInput = document.getElementById('base-shift-mins');
+  if (!shiftInput) return;
+  const shift = parseInt(shiftInput.value, 10);
+  if (isNaN(shift) || shift === 0) {
+    alert('シフトする分数 (例: 10 または -5) を入力してください');
+    return;
+  }
+  const shiftTimeStr = (timeStr) => {
+    if (!timeStr || !timeStr.includes(':')) return timeStr;
+    const [h, m] = timeStr.split(':').map(Number);
+    if (isNaN(h) || isNaN(m)) return timeStr;
+    let totalMins = h * 60 + m + shift;
+    if (totalMins < 0) totalMins += 1440;
+    const nh = String(Math.floor(totalMins / 60)).padStart(2, '0');
+    const nm = String(totalMins % 60).padStart(2, '0');
+    return `${nh}:${nm}`;
+  };
+  document.querySelectorAll('#edit-stations-body .st-arr, #edit-stations-body .st-dep').forEach(inp => {
+    if (inp.value) inp.value = shiftTimeStr(inp.value.trim());
+  });
+  shiftInput.value = '';
+  markEditorUnapplied(true);
+  showToast(`基本時刻を ${shift > 0 ? '+' : ''}${shift} 分シフトしました`);
+}
+
 // --- Weekday Pills Logic ---
 function toggleDayPill(btn) {
   btn.classList.toggle('active');
+  markEditorUnapplied(true);
 }
 
 function setDayPreset(preset) {
@@ -799,6 +933,7 @@ function setDayPreset(preset) {
     pills.forEach(p => p.classList.remove('active'));
     if (holidayPill) holidayPill.classList.remove('active');
   }
+  markEditorUnapplied(true);
 }
 
 // --- Date Chips Functions (supports range YYYY-MM-DD~YYYY-MM-DD) ---
@@ -806,25 +941,33 @@ function addDateChip(type, inputId) {
   const input = document.getElementById(inputId);
   const hidden = document.getElementById(type === 'dates_run' ? 'edit-dates-run' : 'edit-dates-off');
   if (!input || !hidden) return;
-  const val = input.value.trim();
-  if (!val) return;
+  const raw = input.value.trim();
+  if (!raw) return;
 
   let current = hidden.value ? hidden.value.split(',').map(s => s.trim()).filter(Boolean) : [];
-  if (!current.includes(val)) {
-    current.push(val);
-    hidden.value = current.join(',');
-    renderDateChips(type);
-  }
+  raw.split(',').map(s => s.trim()).filter(Boolean).forEach(val => {
+    if (!current.includes(val)) {
+      current.push(val);
+    }
+  });
+  hidden.value = current.join(',');
+  renderDateChips(type);
+  markEditorUnapplied(true);
   input.value = '';
 }
 
-function removeDateChip(type, val) {
+function removeDateChip(type, idxOrVal) {
   const hidden = document.getElementById(type === 'dates_run' ? 'edit-dates-run' : 'edit-dates-off');
   if (!hidden) return;
   let current = hidden.value ? hidden.value.split(',').map(s => s.trim()).filter(Boolean) : [];
-  current = current.filter(d => d !== val);
+  if (typeof idxOrVal === 'number') {
+    current.splice(idxOrVal, 1);
+  } else {
+    current = current.filter(d => d !== idxOrVal);
+  }
   hidden.value = current.join(',');
   renderDateChips(type);
+  markEditorUnapplied(true);
 }
 
 function renderDateChips(type) {
@@ -833,7 +976,7 @@ function renderDateChips(type) {
   if (!hidden || !container) return;
   const current = hidden.value ? hidden.value.split(',').map(s => s.trim()).filter(Boolean) : [];
 
-  container.innerHTML = current.map(d => {
+  container.innerHTML = current.map((d, idx) => {
     let display = d;
     if (d.includes('~')) {
       const [s, e] = d.split('~');
@@ -843,15 +986,20 @@ function renderDateChips(type) {
       display = `${s} 〜 ${e}`;
     }
     return `
-      <div style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-subtle); padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+      <div class="date-chip">
         <span>${escapeHTML(display)}</span>
-        <span style="cursor:pointer; color: #ff6b6b; font-weight:bold; font-size: 0.9rem;" onclick="removeDateChip('${type}', '${escapeHTML(d)}')">×</span>
+        <button type="button" class="date-chip-remove" onclick="removeDateChip('${type}', ${idx})" title="削除">×</button>
       </div>
     `;
   }).join('');
 }
 
 // --- Schedule Variants UI ---
+function resolveVariantCard(target) {
+  if (target && target.closest) return target.closest('.variant-card');
+  return document.querySelector(`.variant-card[data-v-idx="${target}"]`);
+}
+
 function renderVariantCard(v, idx) {
   const dates = v.dates || [];
   const stations = v.stations || [];
@@ -859,51 +1007,53 @@ function renderVariantCard(v, idx) {
   return `
     <div class="variant-card" data-v-idx="${idx}">
       <div class="variant-header">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <input type="text" class="form-input v-label" value="${escapeHTML(v.label || '特別ダイヤ')}" placeholder="ダイヤ名称 (例: SLもおか重連運転)" style="font-weight:700; width: 220px;">
+        <div class="inline-controls">
+          <input type="text" class="form-input v-label" value="${escapeHTML(v.label || '特別ダイヤ')}" placeholder="ダイヤ名称 (例: SLもおか重連運転)" style="font-weight: 700; width: 220px;">
           <input type="text" class="form-input v-dest" value="${escapeHTML(v.destination || '')}" placeholder="行先変更 (未指定なら通常行先)" style="width: 180px;">
         </div>
-        <button type="button" class="btn-admin btn-danger" style="padding: 4px 8px; font-size: 0.75rem;" onclick="removeVariantCard(${idx})">この変更ダイヤを削除</button>
+        <button type="button" class="btn-admin btn-danger btn-compact" onclick="removeVariantCard(this)">この変更ダイヤを削除</button>
       </div>
 
-      <div style="margin: 8px 0;">
-        <label class="form-label" style="font-size:0.8rem;">適用日付・期間 (カンマ区切り、または日付指定)</label>
+      <div class="form-group" style="margin-bottom: 10px;">
+        <label class="form-label">適用日付・期間 (カンマ区切り、またはカレンダー選択)</label>
         <input type="text" class="form-input v-dates" data-is-datepicker="true" data-range="true" value="${escapeHTML(dates.join(','))}" placeholder="例: 2026-08-15, 2026-11-03~2026-11-05">
       </div>
 
-      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
-        <button type="button" class="btn-admin" style="font-size: 0.78rem;" onclick="copyBaseStationsToVariant(${idx})">基本時刻表からコピー</button>
-        <span style="font-size: 0.78rem; color: var(--text-secondary);">時刻一括シフト:</span>
-        <input type="number" class="form-input v-shift-mins" placeholder="±分" style="width: 70px; padding: 4px 8px; font-size: 0.8rem;">
-        <button type="button" class="btn-admin" style="font-size: 0.78rem;" onclick="shiftVariantTimes(${idx})">シフト適用</button>
+      <div class="inline-controls" style="margin-bottom: 8px;">
+        <button type="button" class="btn-admin btn-compact" onclick="copyBaseStationsToVariant(this)">基本時刻表からコピー</button>
+        <span class="sim-date-label">時刻一括シフト:</span>
+        <input type="number" class="form-input v-shift-mins" placeholder="±分" style="width: 72px; padding: 3px 6px;">
+        <button type="button" class="btn-admin btn-compact" onclick="shiftVariantTimes(this)">シフト適用</button>
       </div>
 
-      <div style="max-height: 220px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 4px; padding: 6px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+      <div class="variant-scroll">
+        <table class="editor-table">
           <thead>
             <tr>
-              <th style="padding: 4px; color: var(--text-secondary);">駅</th>
-              <th style="padding: 4px; color: var(--text-secondary);">着 (HH:MM)</th>
-              <th style="padding: 4px; color: var(--text-secondary);">発 (HH:MM)</th>
-              <th style="padding: 4px;"></th>
+              <th>駅</th>
+              <th>着 (HH:MM)</th>
+              <th>発 (HH:MM)</th>
+              <th style="width: 48px;"></th>
             </tr>
           </thead>
           <tbody class="v-stations-tbody">
             ${stations.map(st => `
               <tr>
-                <td style="padding: 2px 4px;">
-                  <select class="form-input v-st-code" style="padding: 2px 4px; font-size: 0.78rem;">
+                <td>
+                  <select class="form-input v-st-code">
                     ${stationsData.map(s => `<option value="${s.code}" ${s.code === st.code ? 'selected' : ''}>${s.name} (${s.code})</option>`).join('')}
                   </select>
                 </td>
-                <td style="padding: 2px 4px;"><input type="text" class="form-input v-st-arr" value="${st.arr || ''}" placeholder="null" style="padding: 2px 6px; font-size: 0.78rem;"></td>
-                <td style="padding: 2px 4px;"><input type="text" class="form-input v-st-dep" value="${st.dep || ''}" placeholder="null" style="padding: 2px 6px; font-size: 0.78rem;"></td>
-                <td style="padding: 2px 4px; text-align:right;"><button type="button" class="btn-admin btn-danger" style="padding: 2px 6px; font-size: 0.7rem;" onclick="this.closest('tr').remove()">×</button></td>
+                <td><input type="text" class="form-input v-st-arr" value="${st.arr ? escapeHTML(st.arr) : ''}" placeholder="—"></td>
+                <td><input type="text" class="form-input v-st-dep" value="${st.dep ? escapeHTML(st.dep) : ''}" placeholder="—"></td>
+                <td style="text-align: right;"><button type="button" class="btn-admin btn-danger btn-compact" onclick="this.closest('tr').remove(); markEditorUnapplied(true);">×</button></td>
               </tr>
             `).join('')}
           </tbody>
         </table>
-        <button type="button" class="btn-admin" style="margin-top: 6px; font-size: 0.75rem; padding: 3px 8px;" onclick="addVariantStationRow(this)">+ 駅を追加</button>
+      </div>
+      <div style="margin-top: 8px;">
+        <button type="button" class="btn-admin btn-compact" onclick="addVariantStationRow(this)">+ 駅を追加</button>
       </div>
     </div>
   `;
@@ -923,36 +1073,41 @@ function addNewVariant() {
   const div = document.createElement('div');
   div.innerHTML = renderVariantCard(newV, currentCount);
   container.appendChild(div.firstElementChild);
+  markEditorUnapplied(true);
 }
 
-function removeVariantCard(idx) {
-  const card = document.querySelector(`.variant-card[data-v-idx="${idx}"]`);
-  if (card) card.remove();
+function removeVariantCard(btnOrIdx) {
+  const card = resolveVariantCard(btnOrIdx);
+  if (card) {
+    card.remove();
+    markEditorUnapplied(true);
+  }
 }
 
-function copyBaseStationsToVariant(idx) {
+function copyBaseStationsToVariant(btnOrIdx) {
   const t = timetableData.find(x => x.train_id === currentTrainId);
   if (!t || !t.stations) return;
-  const card = document.querySelector(`.variant-card[data-v-idx="${idx}"]`);
+  const card = resolveVariantCard(btnOrIdx);
   if (!card) return;
   const tbody = card.querySelector('.v-stations-tbody');
   tbody.innerHTML = t.stations.map(st => `
     <tr>
-      <td style="padding: 2px 4px;">
-        <select class="form-input v-st-code" style="padding: 2px 4px; font-size: 0.78rem;">
+      <td>
+        <select class="form-input v-st-code">
           ${stationsData.map(s => `<option value="${s.code}" ${s.code === st.code ? 'selected' : ''}>${s.name} (${s.code})</option>`).join('')}
         </select>
       </td>
-      <td style="padding: 2px 4px;"><input type="text" class="form-input v-st-arr" value="${st.arr || ''}" placeholder="null" style="padding: 2px 6px; font-size: 0.78rem;"></td>
-      <td style="padding: 2px 4px;"><input type="text" class="form-input v-st-dep" value="${st.dep || ''}" placeholder="null" style="padding: 2px 6px; font-size: 0.78rem;"></td>
-      <td style="padding: 2px 4px; text-align:right;"><button type="button" class="btn-admin btn-danger" style="padding: 2px 6px; font-size: 0.7rem;" onclick="this.closest('tr').remove()">×</button></td>
+      <td><input type="text" class="form-input v-st-arr" value="${st.arr ? escapeHTML(st.arr) : ''}" placeholder="—"></td>
+      <td><input type="text" class="form-input v-st-dep" value="${st.dep ? escapeHTML(st.dep) : ''}" placeholder="—"></td>
+      <td style="text-align: right;"><button type="button" class="btn-admin btn-danger btn-compact" onclick="this.closest('tr').remove(); markEditorUnapplied(true);">×</button></td>
     </tr>
   `).join('');
+  markEditorUnapplied(true);
   showToast('基本時刻表をコピーしました');
 }
 
-function shiftVariantTimes(idx) {
-  const card = document.querySelector(`.variant-card[data-v-idx="${idx}"]`);
+function shiftVariantTimes(btnOrIdx) {
+  const card = resolveVariantCard(btnOrIdx);
   if (!card) return;
   const shiftInput = card.querySelector('.v-shift-mins');
   const shift = parseInt(shiftInput.value, 10);
@@ -964,6 +1119,7 @@ function shiftVariantTimes(idx) {
   const shiftTimeStr = (timeStr) => {
     if (!timeStr || !timeStr.includes(':')) return timeStr;
     const [h, m] = timeStr.split(':').map(Number);
+    if (isNaN(h) || isNaN(m)) return timeStr;
     let totalMins = h * 60 + m + shift;
     if (totalMins < 0) totalMins += 1440;
     totalMins = totalMins % 1440;
@@ -972,29 +1128,31 @@ function shiftVariantTimes(idx) {
     return `${nh}:${nm}`;
   };
 
-  const arrInputs = card.querySelectorAll('.v-st-arr');
-  const depInputs = card.querySelectorAll('.v-st-dep');
-  arrInputs.forEach(i => { if (i.value) i.value = shiftTimeStr(i.value.trim()); });
-  depInputs.forEach(i => { if (i.value) i.value = shiftTimeStr(i.value.trim()); });
+  card.querySelectorAll('.v-st-arr, .v-st-dep').forEach(i => {
+    if (i.value) i.value = shiftTimeStr(i.value.trim());
+  });
   shiftInput.value = '';
+  markEditorUnapplied(true);
   showToast(`全駅時刻を ${shift > 0 ? '+' : ''}${shift} 分シフトしました`);
 }
 
 function addVariantStationRow(btn) {
-  const tbody = btn.previousElementSibling.querySelector('tbody') || btn.closest('.variant-card').querySelector('.v-stations-tbody');
+  const card = btn.closest('.variant-card');
+  const tbody = card ? card.querySelector('.v-stations-tbody') : null;
   if (!tbody) return;
   const tr = document.createElement('tr');
   tr.innerHTML = `
-    <td style="padding: 2px 4px;">
-      <select class="form-input v-st-code" style="padding: 2px 4px; font-size: 0.78rem;">
+    <td>
+      <select class="form-input v-st-code">
         ${stationsData.map(s => `<option value="${s.code}">${s.name} (${s.code})</option>`).join('')}
       </select>
     </td>
-    <td style="padding: 2px 4px;"><input type="text" class="form-input v-st-arr" value="" placeholder="null" style="padding: 2px 6px; font-size: 0.78rem;"></td>
-    <td style="padding: 2px 4px;"><input type="text" class="form-input v-st-dep" value="" placeholder="null" style="padding: 2px 6px; font-size: 0.78rem;"></td>
-    <td style="padding: 2px 4px; text-align:right;"><button type="button" class="btn-admin btn-danger" style="padding: 2px 6px; font-size: 0.7rem;" onclick="this.closest('tr').remove()">×</button></td>
+    <td><input type="text" class="form-input v-st-arr" value="" placeholder="—"></td>
+    <td><input type="text" class="form-input v-st-dep" value="" placeholder="—"></td>
+    <td style="text-align: right;"><button type="button" class="btn-admin btn-danger btn-compact" onclick="this.closest('tr').remove(); markEditorUnapplied(true);">×</button></td>
   `;
   tbody.appendChild(tr);
+  markEditorUnapplied(true);
 }
 
 // --- Partial Cancellations & Stations Helpers ---
@@ -1003,38 +1161,41 @@ function addPCRow() {
   if (!tbody) return;
   const tr = document.createElement('tr');
   tr.innerHTML = `
-    <td style="padding: 4px;">
-      <input type="text" class="form-input pc-date" data-is-datepicker="true" data-range="true" value="" placeholder="YYYY-MM-DD または YYYY-MM-DD~YYYY-MM-DD" style="width:100%;">
+    <td>
+      <input type="text" class="form-input pc-date" data-is-datepicker="true" data-range="true" value="" placeholder="YYYY-MM-DD または YYYY-MM-DD~YYYY-MM-DD">
     </td>
-    <td style="padding: 4px;">
+    <td>
       <select class="form-input pc-start">
         ${stationsData.map(s => `<option value="${s.code}">${s.name}</option>`).join('')}
       </select>
     </td>
-    <td style="padding: 4px;">
+    <td>
       <select class="form-input pc-end">
         ${stationsData.map(s => `<option value="${s.code}">${s.name}</option>`).join('')}
       </select>
     </td>
-    <td style="padding: 4px; text-align: right;">
-      <button type="button" class="btn-admin btn-danger" style="padding: 4px 8px; font-size: 0.75rem;" onclick="this.closest('tr').remove()">削除</button>
+    <td style="text-align: right;">
+      <button type="button" class="btn-admin btn-danger btn-compact" onclick="this.closest('tr').remove(); markEditorUnapplied(true);">削除</button>
     </td>
   `;
   tbody.appendChild(tr);
+  markEditorUnapplied(true);
 }
 
 function addStationRow() {
   const tbody = document.getElementById('edit-stations-body');
   if (!tbody) return;
+  const defaultCode = stationsData.length > 0 ? stationsData[0].code : 'M01';
   const tr = document.createElement('tr');
   tr.innerHTML = `
-    <td style="padding: 4px;"><input type="text" class="form-input st-code" value="" style="width: 60px;"></td>
-    <td style="padding: 4px;">新規</td>
-    <td style="padding: 4px;"><input type="text" class="form-input st-arr" value="" placeholder="null"></td>
-    <td style="padding: 4px;"><input type="text" class="form-input st-dep" value="" placeholder="null"></td>
-    <td style="padding: 4px; text-align: right;"><button type="button" class="btn-admin btn-danger" style="padding: 4px 8px; font-size: 0.75rem;" onclick="this.closest('tr').remove()">削除</button></td>
+    <td><input type="text" class="form-input st-code" value="${defaultCode}" oninput="const td = this.closest('tr').children[1]; if (td) td.textContent = getStationName(this.value.trim());"></td>
+    <td>${escapeHTML(getStationName(defaultCode))}</td>
+    <td><input type="text" class="form-input st-arr" value="" placeholder="—"></td>
+    <td><input type="text" class="form-input st-dep" value="" placeholder="—"></td>
+    <td style="text-align: right;"><button type="button" class="btn-admin btn-danger btn-compact" onclick="this.closest('tr').remove(); markEditorUnapplied(true);">削除</button></td>
   `;
   tbody.appendChild(tr);
+  markEditorUnapplied(true);
 }
 
 // --- Save Train Data to Memory ---
@@ -1055,10 +1216,11 @@ function saveTrainData() {
   t.destination = document.getElementById('edit-dest').value.trim();
 
   // Operation Rule
-  if (!t.operation_rule) t.operation_rule = { service_type: 'regular', days_off: [] };
-  t.operation_rule.service_type = document.getElementById('edit-svc-type').value;
+  if (!t.operation_rule) t.operation_rule = { service_type: 'regular' };
+  const svcType = document.getElementById('edit-svc-type').value;
+  t.operation_rule.service_type = svcType;
 
-  // Active pills = runs. Inactive = days_off!
+  // Active pills = runs. Inactive = days_off
   const pills = document.querySelectorAll('#edit-days-pills .day-toggle-pill:not(.holiday)');
   const daysOff = [];
   pills.forEach(p => {
@@ -1066,21 +1228,35 @@ function saveTrainData() {
       daysOff.push(Number(p.dataset.day));
     }
   });
-  t.operation_rule.days_off = daysOff;
 
   const parseArray = (str) => str.split(',').map(s => s.trim()).filter(Boolean);
   let datesRun = parseArray(document.getElementById('edit-dates-run').value);
   const datesOff = parseArray(document.getElementById('edit-dates-off').value);
 
   const holidayPill = document.getElementById('edit-pill-holiday');
-  if (holidayPill && holidayPill.classList.contains('active')) {
-    if (!datesRun.includes('holiday')) datesRun.push('holiday');
+  const holidayActive = holidayPill && holidayPill.classList.contains('active');
+  if (holidayActive) {
+    // SL and 7-day regular trains run on holidays naturally; other partial-week or extra trains need 'holiday' in dates_run
+    if ((daysOff.length > 0 && svcType !== 'sl') || svcType === 'extra') {
+      if (!datesRun.includes('holiday')) datesRun.push('holiday');
+    } else {
+      datesRun = datesRun.filter(d => d !== 'holiday');
+    }
   } else {
     datesRun = datesRun.filter(d => d !== 'holiday');
+    if (daysOff.length < 7 && svcType !== 'extra') {
+      daysOff.push('holiday');
+    }
   }
 
-  t.operation_rule.dates_run = datesRun.length > 0 ? datesRun : undefined;
-  t.operation_rule.dates_off = datesOff.length > 0 ? datesOff : undefined;
+  if (daysOff.length > 0) t.operation_rule.days_off = daysOff;
+  else delete t.operation_rule.days_off;
+
+  if (datesRun.length > 0) t.operation_rule.dates_run = datesRun;
+  else delete t.operation_rule.dates_run;
+
+  if (datesOff.length > 0) t.operation_rule.dates_off = datesOff;
+  else delete t.operation_rule.dates_off;
 
   // Schedule Variants
   const variantCards = document.querySelectorAll('.variant-card');
@@ -1092,21 +1268,20 @@ function saveTrainData() {
     const stations = [];
     card.querySelectorAll('.v-stations-tbody tr').forEach(tr => {
       const code = tr.querySelector('.v-st-code').value.trim();
-      let arr = tr.querySelector('.v-st-arr').value.trim() || null;
-      let dep = tr.querySelector('.v-st-dep').value.trim() || null;
+      const arr = tr.querySelector('.v-st-arr').value.trim() || null;
+      const dep = tr.querySelector('.v-st-dep').value.trim() || null;
       if (code) stations.push({ code, arr, dep });
     });
 
     if (dates.length > 0 && stations.length > 0) {
-      variants.push({
-        label: label || '特別ダイヤ',
-        dates,
-        destination: destination || undefined,
-        stations
-      });
+      const entry = { label: label || '特別ダイヤ', dates };
+      if (destination) entry.destination = destination;
+      entry.stations = stations;
+      variants.push(entry);
     }
   });
-  t.schedule_variants = variants.length > 0 ? variants : undefined;
+  if (variants.length > 0) t.schedule_variants = variants;
+  else delete t.schedule_variants;
 
   // Partial Cancellations
   const pcRows = document.querySelectorAll('#edit-pc-body tr');
@@ -1119,21 +1294,39 @@ function saveTrainData() {
       pc.push({ date, actual_start: start, actual_end: end });
     }
   });
-  t.partial_cancellations = pc.length > 0 ? pc : undefined;
+  if (pc.length > 0) t.partial_cancellations = pc;
+  else delete t.partial_cancellations;
 
   // Base Station Timetable
   const stRows = document.querySelectorAll('#edit-stations-body tr');
   t.stations = [];
   stRows.forEach(tr => {
     const code = tr.querySelector('.st-code').value.trim();
-    let arr = tr.querySelector('.st-arr').value.trim() || null;
-    let dep = tr.querySelector('.st-dep').value.trim() || null;
+    const arr = tr.querySelector('.st-arr').value.trim() || null;
+    const dep = tr.querySelector('.st-dep').value.trim() || null;
     if (code) {
       t.stations.push({ code, arr, dep });
     }
   });
 
-  dirtyTrainIds.add(t.train_id);
+  if (originalTimetableData.length > 0) {
+    calculateDirtySet();
+  } else {
+    dirtyTrainIds.add(t.train_id);
+  }
+  markEditorUnapplied(false);
+
+  // Update header & subtab counts in place
+  const titleEl = document.querySelector('.editor-train-title');
+  if (titleEl) {
+    titleEl.innerHTML = `列車 ${escapeHTML(t.train_no)} <span class="editor-train-id">(ID: ${escapeHTML(t.train_id)})</span>`;
+  }
+  const stTab = document.querySelector('.editor-subtab[data-subtab="stations"]');
+  if (stTab) stTab.textContent = `各駅時刻 (${t.stations.length}駅)`;
+  const varTab = document.querySelector('.editor-subtab[data-subtab="variants"]');
+  const specialCount = (t.schedule_variants || []).length + (t.partial_cancellations || []).length;
+  if (varTab) varTab.textContent = `特定日変更・区間運休${specialCount ? ` (${specialCount})` : ''}`;
+
   saveDraftToStorage();
   updateSyncStatus();
   renderTrainList();
@@ -1153,17 +1346,17 @@ function renderOperationsView() {
   timetableData.forEach(t => {
     if (t.operation_dict) {
       Object.values(t.operation_dict).forEach(opstr => {
-        opstr.split(',').map(s=>s.trim()).filter(Boolean).forEach(o => ops.add(o));
+        opstr.split(',').map(s => s.trim()).filter(Boolean).forEach(o => ops.add(o));
       });
     } else if (t.operation_id) {
-      t.operation_id.toString().split(',').map(s=>s.trim()).filter(Boolean).forEach(o => ops.add(o));
+      t.operation_id.toString().split(',').map(s => s.trim()).filter(Boolean).forEach(o => ops.add(o));
     }
   });
 
   if (ops.size === 0) {
     opList.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 32px 16px; background: var(--bg-card); border-radius: 8px;">
-        運用データがありません。右上の「＋ 運用を追加」から運用を作成してください。
+      <div class="editor-empty-state" style="grid-column: 1 / -1; border: 1px solid var(--c-border);">
+        運用データがありません。右上の「追加」から運用を作成してください。
       </div>
     `;
     return;
@@ -1172,14 +1365,13 @@ function renderOperationsView() {
   let html = '';
   Array.from(ops).sort().forEach(op => {
     html += `
-      <div class="op-card" style="background: var(--bg-card); padding: 16px; border-radius: 8px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
-          <h3 style="margin:0; font-size:1.1rem; color:var(--text-primary);">運用 ${escapeHTML(op)}</h3>
-          <button type="button" class="btn-admin btn-danger" style="padding: 3px 8px; font-size: 0.75rem; min-width: auto;" onclick="handleDeleteOperation('${escapeHTML(op)}')">運用を削除</button>
+      <div class="op-card">
+        <div class="op-card-head">
+          <h3>運用 ${escapeHTML(op)}</h3>
+          <button type="button" class="btn-admin btn-danger btn-compact" onclick="handleDeleteOperation('${escapeHTML(op)}')">削除</button>
         </div>
-
-        <div style="margin-top:12px;">
-          <strong style="display:block; margin-bottom:8px; font-size:0.85rem; color: var(--text-secondary);">▼ 曜日ごとの充当列車 (列車番号をカンマ区切り)</strong>
+        <div>
+          <span class="sim-date-label" style="display: block; margin-bottom: 6px;">曜日ごとの充当列車（列車番号をカンマ区切り）</span>
     `;
 
     DAYS_KEYS.forEach(dayKey => {
@@ -1190,13 +1382,13 @@ function renderOperationsView() {
         } else {
           val = t.operation_id || '';
         }
-        return val.split(',').map(s=>s.trim()).includes(op);
+        return val.split(',').map(s => s.trim()).includes(op);
       }).map(t => t.train_no);
 
       html += `
-        <div class="op-day-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-          <span style="color:var(--text-secondary); width:32px; font-weight:600;">${DAYS_LABELS[dayKey]}</span>
-          <input type="text" class="form-input op-edit-input" style="flex:1; padding:4px 8px; font-size:0.85rem;"
+        <div class="op-day-row">
+          <span class="op-day-label">${DAYS_LABELS[dayKey]}</span>
+          <input type="text" class="form-input op-edit-input" style="flex: 1; padding: 4px 8px; font-size: 0.82rem;"
             data-op="${escapeHTML(op)}" data-day="${dayKey}" value="${escapeHTML(trainsAssigned.join(', '))}" placeholder="例: 103, 105">
         </div>
       `;
@@ -1206,10 +1398,12 @@ function renderOperationsView() {
   });
 
   html += `
-    <div style="grid-column: 1 / -1; margin-top: 16px;">
-      <button type="button" class="btn-admin btn-success" onclick="saveOperationsToMemory()">変更を適用 (メモリ)</button>
-      <button type="button" class="btn-admin" onclick="renderOperationsView()" style="margin-left:8px;">リセット</button>
-      <p style="font-size:0.8rem; margin-top:8px; color:var(--text-secondary);">※変更を適用後、上部の「GitHubへ反映」を押して保存してください。</p>
+    <div style="grid-column: 1 / -1; margin-top: 8px;">
+      <div class="inline-controls">
+        <button type="button" class="btn-admin btn-accent" onclick="saveOperationsToMemory()">変更を適用 (メモリ)</button>
+        <button type="button" class="btn-admin" onclick="renderOperationsView()">リセット</button>
+      </div>
+      <p class="sync-memo" style="margin-top: 8px;">変更を適用後、上部の「GitHubへ反映」を押して確定してください。</p>
     </div>
   `;
   opList.innerHTML = html;
@@ -1220,7 +1414,7 @@ function handleAddNewOperation() {
   if (!input) return;
   const newOp = input.value.trim();
   if (!newOp) {
-    alert('追加する運用名を入力してください (例: 14-7)');
+    alert('追加する運用名を入力してください (例: A1)');
     return;
   }
   manualOperations.add(newOp);
@@ -1249,9 +1443,10 @@ function handleDeleteOperation(op) {
       t.operation_id = opsArray.join(', ');
       changed = true;
     }
-    if (changed) dirtyTrainIds.add(t.train_id);
+    if (changed && originalTimetableData.length === 0) dirtyTrainIds.add(t.train_id);
   });
 
+  if (originalTimetableData.length > 0) calculateDirtySet();
   saveDraftToStorage();
   updateSyncStatus();
   renderOperationsView();
@@ -1287,7 +1482,7 @@ function saveOperationsToMemory() {
         } else {
           targetTrain.operation_dict[dayKey] = op;
         }
-        dirtyTrainIds.add(targetTrain.train_id);
+        if (originalTimetableData.length === 0) dirtyTrainIds.add(targetTrain.train_id);
       }
     });
   });
@@ -1312,6 +1507,7 @@ function saveOperationsToMemory() {
     }
   });
 
+  if (originalTimetableData.length > 0) calculateDirtySet();
   saveDraftToStorage();
   updateSyncStatus();
   renderTrainList();
@@ -1382,9 +1578,26 @@ function isJapaneseHoliday(dateStr) {
   return false;
 }
 
-function evaluateDateRule(rule, serviceDate, isHoliday) {
+function getTrainOpsOnDate(train, serviceDate, isHoliday) {
+  if (!train) return [];
+  if (train.operation_dict) {
+    const dow = new Date(`${serviceDate}T12:00:00+09:00`).getDay();
+    const key = isHoliday && train.operation_dict.holiday
+      ? 'holiday'
+      : ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][dow];
+    const raw = train.operation_dict[key] || '';
+    return raw.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  if (train.operation_id) {
+    return String(train.operation_id).split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+function evaluateDateRule(rule, serviceDate, isHoliday, evaluatedTrains = new Set()) {
   if (!rule || !serviceDate) return false;
-  const r = rule.trim();
+  const r = String(rule).trim();
+  const lower = r.toLowerCase();
 
   // Range YYYY-MM-DD~YYYY-MM-DD or ..
   if (r.includes('~') || r.includes('..')) {
@@ -1399,39 +1612,96 @@ function evaluateDateRule(rule, serviceDate, isHoliday) {
     return serviceDate === r;
   }
 
-  if (r.toLowerCase() === 'holiday') return isHoliday;
+  if (lower === 'holiday') return Boolean(isHoliday);
 
   const dayOfWeek = new Date(`${serviceDate}T12:00:00+09:00`).getDay();
-  const dowMap = { 'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 };
-  if (dowMap[r.toLowerCase()] !== undefined) {
-    return dayOfWeek === dowMap[r.toLowerCase()];
+  const dowMap = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+  if (dowMap[lower] !== undefined) {
+    return dayOfWeek === dowMap[lower];
+  }
+  const dayJa = ['日', '月', '火', '水', '木', '金', '土'];
+  if (dayJa.includes(r)) {
+    return dayJa[dayOfWeek] === r;
+  }
+
+  // Link to another Train ('train:6001')
+  if (lower.startsWith('train:')) {
+    const targetId = r.substring(6).trim();
+    const evalKey = 'train:' + targetId.toLowerCase();
+    if (!targetId || evaluatedTrains.has(evalKey)) return false;
+    evaluatedTrains.add(evalKey);
+    const targetTrain = timetableData.find(t =>
+      (t.train_id && String(t.train_id).toLowerCase() === targetId.toLowerCase()) ||
+      (t.train_no && String(t.train_no).toLowerCase() === targetId.toLowerCase())
+    );
+    return targetTrain ? isTrainOperatingOnDate(targetTrain, serviceDate, isHoliday, evaluatedTrains) : false;
+  }
+
+  // Link to an Operation ID ('op:A1')
+  if (lower.startsWith('op:')) {
+    const targetOp = r.substring(3).trim();
+    const evalKey = 'op:' + targetOp.toLowerCase();
+    if (!targetOp || evaluatedTrains.has(evalKey)) return false;
+    evaluatedTrains.add(evalKey);
+    const opTrains = timetableData.filter(t =>
+      getTrainOpsOnDate(t, serviceDate, isHoliday).some(o => o.toLowerCase() === targetOp.toLowerCase())
+    );
+    return opTrains.some(t => isTrainOperatingOnDate(t, serviceDate, isHoliday, evaluatedTrains));
   }
 
   return false;
 }
 
-function isTrainOperatingOnDate(train, serviceDate, isHoliday) {
+function isTrainOperatingOnDate(train, serviceDate, isHoliday, evaluatedTrains = new Set()) {
   if (!train) return false;
+  if (!evaluatedTrains.has(train.train_id)) {
+    evaluatedTrains.add(train.train_id);
+  }
+  if (isHoliday === undefined) {
+    isHoliday = isJapaneseHoliday(serviceDate);
+  }
+
   const rule = train.operation_rule || {};
-
-  // 1. Explicit dates_off check
-  if (rule.dates_off && rule.dates_off.length > 0) {
-    for (const roff of rule.dates_off) {
-      if (evaluateDateRule(roff, serviceDate, isHoliday)) return false;
-    }
-  }
-
-  // 2. Explicit dates_run check
-  if (rule.dates_run && rule.dates_run.length > 0) {
-    for (const rrun of rule.dates_run) {
-      if (evaluateDateRule(rrun, serviceDate, isHoliday)) return true;
-    }
-  }
-
-  // 3. Weekday days_off check
-  const dayOfWeek = new Date(`${serviceDate}T12:00:00+09:00`).getDay();
+  const datesOff = rule.dates_off || [];
+  const datesRun = rule.dates_run || [];
   const daysOff = rule.days_off || [];
-  if (daysOff.includes(dayOfWeek)) {
+
+  // 1. Explicit dates_off check (highest priority)
+  if (datesOff.some(roff => evaluateDateRule(roff, serviceDate, isHoliday, evaluatedTrains))) {
+    return false;
+  }
+
+  // 2. Partial cancellations -> operates on remaining segment
+  if (train.partial_cancellations && train.partial_cancellations.some(p => p.date && evaluateDateRule(p.date, serviceDate, isHoliday, evaluatedTrains))) {
+    return true;
+  }
+
+  // 3. Explicit dates_run check
+  if (datesRun.some(rrun => evaluateDateRule(rrun, serviceDate, isHoliday, evaluatedTrains))) {
+    return true;
+  }
+
+  // 4. Extra trains only run on explicit dates_run
+  if (rule.service_type === 'extra') {
+    return false;
+  }
+
+  const dayOfWeek = new Date(`${serviceDate}T12:00:00+09:00`).getDay();
+
+  // 5. SL trains run on holidays unless 'holiday' is in days_off
+  if (rule.service_type === 'sl') {
+    if (isHoliday) {
+      return !daysOff.includes('holiday');
+    }
+    return !daysOff.includes(dayOfWeek);
+  }
+
+  // 6. Regular / deadhead trains
+  if (isHoliday && daysOff.includes('holiday')) {
+    return false;
+  }
+  const dayKey = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][dayOfWeek];
+  if (daysOff.includes(dayOfWeek) || daysOff.includes(dayKey)) {
     return false;
   }
 
@@ -1463,10 +1733,10 @@ function runSimulation() {
   const summary = document.getElementById('sim-summary');
   if (summary) {
     summary.innerHTML = `
-      <div><strong>日付:</strong> ${dateStr} (${dayLabel})</div>
+      <div><strong>日付:</strong> ${escapeHTML(dateStr)} (${escapeHTML(dayLabel)})</div>
       <div><strong>全列車数:</strong> ${timetableData.length}本</div>
-      <div><strong style="color:#30d158;">運転:</strong> ${operating.length}本</div>
-      <div><strong style="color:#ff6b6b;">運休:</strong> ${suspended.length}本</div>
+      <div><strong style="color: var(--c-accent);">運転:</strong> ${operating.length}本</div>
+      <div><strong style="color: var(--c-muted);">運休:</strong> ${suspended.length}本</div>
     `;
   }
 
@@ -1474,48 +1744,64 @@ function runSimulation() {
   if (!tbody) return;
 
   if (operating.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 24px; color: var(--text-secondary);">この日の運転列車はありません</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--c-muted);">この日の運転列車はありません</td></tr>`;
     return;
   }
 
-  const dowKey = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][dayOfWeek];
   tbody.innerHTML = operating.map(t => {
     let effectiveStations = t.stations || [];
     let effectiveDest = t.destination || '';
-    let variantBadge = '<span class="sim-badge regular">通常</span>';
+    const badges = [];
 
     if (t.schedule_variants) {
-      const matchV = t.schedule_variants.find(v => {
-        return v.dates && v.dates.some(r => evaluateDateRule(r, dateStr, isHoliday));
-      });
+      const matchV = t.schedule_variants.find(v =>
+        v.dates && v.dates.some(r => evaluateDateRule(r, dateStr, isHoliday))
+      );
       if (matchV) {
         if (matchV.stations) effectiveStations = matchV.stations;
         if (matchV.destination) effectiveDest = matchV.destination;
-        variantBadge = `<span class="sim-badge variant">${escapeHTML(matchV.label || '特別ダイヤ')}</span>`;
+        badges.push(`<span class="sim-badge variant">${escapeHTML(matchV.label || '特別ダイヤ')}</span>`);
       }
     }
 
-    const firstSt = effectiveStations[0] || {};
-    const lastSt = effectiveStations[effectiveStations.length - 1] || {};
+    let firstSt = effectiveStations[0] || {};
+    let lastSt = effectiveStations[effectiveStations.length - 1] || {};
+
+    if (t.partial_cancellations) {
+      const matchPC = t.partial_cancellations.find(p =>
+        p.date && evaluateDateRule(p.date, dateStr, isHoliday)
+      );
+      if (matchPC) {
+        const sIdx = effectiveStations.findIndex(s => s.code === matchPC.actual_start);
+        const eIdx = effectiveStations.findIndex(s => s.code === matchPC.actual_end);
+        if (sIdx !== -1 && eIdx !== -1 && sIdx <= eIdx) {
+          firstSt = effectiveStations[sIdx];
+          lastSt = effectiveStations[eIdx];
+          effectiveDest = getStationName(lastSt.code);
+        }
+        badges.push('<span class="sim-badge variant">区間運休</span>');
+      }
+    }
+
+    const variantBadge = badges.length > 0 ? badges.join(' ') : '<span class="sim-badge regular">通常</span>';
     const firstTime = firstSt.dep || firstSt.arr || '--:--';
     const lastTime = lastSt.arr || lastSt.dep || '--:--';
     const svcType = (t.operation_rule && t.operation_rule.service_type) || 'regular';
+    const svcLabelMap = { regular: '普通', sl: 'SL', extra: '臨時', deadhead: '回送' };
 
-    let opId = t.operation_id || '--';
-    if (t.operation_dict && t.operation_dict[dowKey]) {
-      opId = t.operation_dict[dowKey];
-    }
+    const ops = getTrainOpsOnDate(t, dateStr, isHoliday);
+    const opId = ops.length > 0 ? ops.join(', ') : '--';
 
     return `
       <tr>
-        <td style="font-weight:700;">${escapeHTML(t.train_no)}</td>
-        <td><span class="sim-badge ${svcType}">${svcType.toUpperCase()}</span></td>
+        <td style="font-weight: 700;">${escapeHTML(t.train_no)}</td>
+        <td><span class="sim-badge ${escapeHTML(svcType)}">${escapeHTML(svcLabelMap[svcType] || svcType)}</span></td>
         <td>${t.direction === 'up' ? '上り' : '下り'}</td>
         <td>${escapeHTML(getStationName(firstSt.code))} → ${escapeHTML(effectiveDest)}</td>
-        <td>${firstTime}</td>
-        <td>${lastTime}</td>
+        <td>${escapeHTML(firstTime)}</td>
+        <td>${escapeHTML(lastTime)}</td>
         <td>${variantBadge}</td>
-        <td style="font-weight:600;">${escapeHTML(opId)}</td>
+        <td style="font-weight: 600;">${escapeHTML(opId)}</td>
       </tr>
     `;
   }).join('');
@@ -1543,6 +1829,12 @@ function setSimNextWeekend() {
 
 // --- Diff Modal ---
 function openDiffModal() {
+  if (hasUnappliedFormEdits && currentTrainId) {
+    if (confirm('現在編集中の列車フォームに「未適用の入力」があります。\n先にメモリへ適用してから変更内容を確認しますか？')) {
+      saveTrainData();
+    }
+  }
+
   const modal = document.getElementById('diff-modal');
   const tbody = document.getElementById('diff-tbody');
   const summaryText = document.getElementById('diff-summary-text');
@@ -1562,17 +1854,26 @@ function openDiffModal() {
     }
 
     if (t.train_no !== orig.train_no) {
-      diffs.push({ train: t.train_no, tag: 'mod', field: '列車番号', before: orig.train_no, after: t.train_no });
+      diffs.push({ train: t.train_no, tag: 'mod', field: '列車番号', before: orig.train_no || '', after: t.train_no || '' });
+    }
+    if (t.direction !== orig.direction) {
+      diffs.push({ train: t.train_no, tag: 'mod', field: '方向', before: orig.direction || '', after: t.direction || '' });
     }
     if (t.destination !== orig.destination) {
-      diffs.push({ train: t.train_no, tag: 'mod', field: '行先', before: orig.destination, after: t.destination });
+      diffs.push({ train: t.train_no, tag: 'mod', field: '行先', before: orig.destination || '', after: t.destination || '' });
     }
-    if (t.operation_id !== orig.operation_id) {
-      diffs.push({ train: t.train_no, tag: 'mod', field: '運用', before: orig.operation_id, after: t.operation_id });
+    if ((t.operation_id || '') !== (orig.operation_id || '')) {
+      diffs.push({ train: t.train_no, tag: 'mod', field: '運用番号', before: orig.operation_id || '--', after: t.operation_id || '--' });
+    }
+    if (JSON.stringify(orig.operation_dict || null) !== JSON.stringify(t.operation_dict || null)) {
+      diffs.push({ train: t.train_no, tag: 'mod', field: '曜日別運用 (operation_dict)', before: orig.operation_dict ? '設定あり' : 'なし', after: t.operation_dict ? '設定あり' : 'なし' });
     }
 
     const origRule = orig.operation_rule || {};
     const curRule = t.operation_rule || {};
+    if ((origRule.service_type || 'regular') !== (curRule.service_type || 'regular')) {
+      diffs.push({ train: t.train_no, tag: 'mod', field: '種別 (service_type)', before: origRule.service_type || 'regular', after: curRule.service_type || 'regular' });
+    }
     if (JSON.stringify(origRule.days_off || []) !== JSON.stringify(curRule.days_off || [])) {
       diffs.push({
         train: t.train_no,
@@ -1609,6 +1910,15 @@ function openDiffModal() {
         after: `${(t.schedule_variants || []).length}件`
       });
     }
+    if (JSON.stringify(orig.partial_cancellations || []) !== JSON.stringify(t.partial_cancellations || [])) {
+      diffs.push({
+        train: t.train_no,
+        tag: 'mod',
+        field: '区間運休 (partial_cancellations)',
+        before: `${(orig.partial_cancellations || []).length}件`,
+        after: `${(t.partial_cancellations || []).length}件`
+      });
+    }
     if (JSON.stringify(orig.stations || []) !== JSON.stringify(t.stations || [])) {
       diffs.push({
         train: t.train_no,
@@ -1622,16 +1932,16 @@ function openDiffModal() {
 
   if (diffs.length === 0) {
     if (summaryText) summaryText.textContent = '変更はありません (GitHub最新データと同一です)。';
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--text-secondary);">変更はありません</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--c-muted);">変更はありません</td></tr>`;
   } else {
     if (summaryText) summaryText.textContent = `合計 ${diffs.length} 箇所の変更が検出されました。`;
     tbody.innerHTML = diffs.map(d => `
       <tr>
-        <td style="font-weight:700;">${escapeHTML(d.train)}</td>
+        <td style="font-weight: 700;">${escapeHTML(d.train)}</td>
         <td><span class="diff-tag ${d.tag}">${d.tag === 'mod' ? '変更' : (d.tag === 'add' ? '追加' : '削除')}</span></td>
         <td>${escapeHTML(d.field)}</td>
-        <td style="color:var(--text-secondary); font-family:monospace;">${escapeHTML(d.before)}</td>
-        <td style="color:#30d158; font-family:monospace; font-weight:600;">${escapeHTML(d.after)}</td>
+        <td style="color: var(--c-muted); font-family: monospace;">${escapeHTML(d.before)}</td>
+        <td style="color: var(--c-accent); font-family: monospace; font-weight: 600;">${escapeHTML(d.after)}</td>
       </tr>
     `).join('');
   }
@@ -1646,6 +1956,12 @@ function closeDiffModal() {
 
 // --- GitHub Export (Push) ---
 async function exportTimetable() {
+  if (hasUnappliedFormEdits && currentTrainId) {
+    if (confirm('現在編集中の列車フォームに「未適用の入力」があります。\n先にメモリへ適用してからGitHubへ反映しますか？')) {
+      saveTrainData();
+    }
+  }
+
   if (timetableData.length === 0) {
     alert('データがありません');
     return;
@@ -1669,7 +1985,7 @@ async function exportTimetable() {
   const badge = document.getElementById('admin-sync-badge');
   const memo = document.getElementById('admin-sync-memo');
   if (badge) {
-    badge.className = 'status-badge sync-pushing';
+    badge.className = 'sync-indicator sync-pushing';
     badge.textContent = 'GitHubへ反映中...';
   }
   if (memo) memo.textContent = 'GAS経由でリポジトリにコミットしています';
@@ -1692,6 +2008,7 @@ async function exportTimetable() {
       originalTimetableData = JSON.parse(JSON.stringify(timetableData));
       dirtyTrainIds.clear();
       localStorage.removeItem(DRAFT_STORAGE_KEY);
+      markEditorUnapplied(false);
       updateSyncStatus();
       renderTrainList();
       alert('GitHubへの直接反映（プッシュ）が成功しました！\nGitHub Pagesのデプロイには約1〜2分かかります。');

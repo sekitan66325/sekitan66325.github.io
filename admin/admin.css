@@ -1,424 +1,727 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   管理者パネル専用追加スタイル
+   管理者パネル専用スタイル（3色ライト・2ペイン独立スクロール設計）
    ========================================================================== */
+.admin-shell {
+  max-width: 1240px;
+}
 
-/* ステータスバッジ（公開中 / 非表示中） */
-.admin-badge {
-  font-size: 0.75rem;
-  padding: 3px 8px;
-  border-radius: 12px;
+main.admin-shell {
+  padding-top: 16px;
+  padding-bottom: 28px;
+}
+
+.login-box {
+  max-width: 380px;
+  margin: 48px auto;
+}
+
+.login-card {
+  padding: 24px 20px;
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  background-color: var(--c-bg);
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--c-muted);
+  padding: 24px 12px;
+  font-size: 0.84rem;
+  list-style: none;
+}
+
+/* ===== ボタン & バッジ（3色準拠） ===== */
+.btn-admin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background-color: var(--c-bg);
+  border: 1px solid var(--c-border-strong);
+  border-radius: 2px;
+  color: var(--c-fg);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.btn-admin:hover:not(:disabled) {
+  background-color: var(--c-surface-hover);
+  border-color: var(--c-fg);
+}
+
+.btn-admin.btn-accent,
+.btn-admin.btn-success {
+  background-color: var(--c-accent);
+  border-color: var(--c-accent);
+  color: var(--c-bg);
   font-weight: 600;
 }
 
+.btn-admin.btn-accent:hover:not(:disabled),
+.btn-admin.btn-success:hover:not(:disabled) {
+  opacity: 0.88;
+  background-color: var(--c-accent);
+  border-color: var(--c-accent);
+}
+
+.btn-admin.btn-danger {
+  color: var(--c-muted);
+  border-color: var(--c-border);
+}
+
+.btn-admin.btn-danger:hover:not(:disabled) {
+  background-color: var(--c-fg);
+  border-color: var(--c-fg);
+  color: var(--c-bg);
+}
+
+.btn-compact {
+  padding: 2px 8px;
+  font-size: 0.75rem;
+}
+
+.btn-admin.btn-loading {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.admin-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 2px;
+  border: 1px solid var(--c-border);
+}
+
 .badge-visible {
-  background: rgba(48, 209, 88, 0.2);
-  color: #30d158;
-  border: 0.5px solid rgba(48, 209, 88, 0.4);
+  background-color: var(--c-accent-soft);
+  border-color: var(--c-accent-border);
+  color: var(--c-accent);
 }
 
 .badge-hidden {
-  background: rgba(255, 69, 58, 0.2);
-  color: #ff453a;
-  border: 0.5px solid rgba(255, 69, 58, 0.4);
+  background-color: var(--c-surface);
+  color: var(--c-muted);
 }
 
-/* 操作ボタンエリア */
 .admin-actions {
   display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 10px;
-}
-
-.btn-admin {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: background 0.15s, opacity 0.2s;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 8px;
-  min-width: 80px;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
 
-/* ローディング状態のボタン */
-.btn-admin.btn-loading {
-  pointer-events: none;
-  opacity: 0.75;
-}
-
-/* --- Checkbox Animations --- */
-.op-daysoff-cb, .edit-days-off-cb {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 4px;
-  background: rgba(0,0,0,0.2);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-  flex-shrink: 0;
-}
-
-.op-daysoff-cb::after, .edit-days-off-cb::after {
-  content: '';
-  position: absolute;
-  width: 5px;
-  height: 10px;
-  border-right: 2px solid white;
-  border-bottom: 2px solid white;
-  transform: scale(0) rotate(-45deg);
-  opacity: 0;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
-  top: 1px;
-}
-
-.op-daysoff-cb:checked, .edit-days-off-cb:checked {
-  background: #007aff;
-  border-color: #007aff;
-}
-
-.op-daysoff-cb:checked::after, .edit-days-off-cb:checked::after {
-  transform: scale(1) rotate(45deg);
-  opacity: 1;
-}
-
-.btn-admin.btn-loading {
-  pointer-events: none;
-  opacity: 0.75;
-  color: transparent;
-}
-.btn-admin.btn-loading::after {
-  content: "";
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  border-color: var(--text-secondary) transparent var(--text-secondary) transparent;
-  animation: btn-spin 0.7s linear infinite;
-  color: var(--text-primary);
-}
-@keyframes btn-spin {
-  to { transform: rotate(360deg); }
-}
-
-.btn-admin:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.btn-danger {
-  color: var(--color-error);
-  border-color: rgba(255, 69, 58, 0.3);
-}
-
-.btn-success {
-  color: #30d158;
-  border-color: rgba(48, 209, 88, 0.3);
-}
-
-/* 編集・操作ログカード */
-.log-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 10px;
-  font-size: 0.825rem;
-}
-
-.log-header {
-  display: flex;
-  justify-content: space-between;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
-
-.log-change {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 8px;
-  border-radius: 6px;
-  margin-top: 6px;
-  font-family: inherit;
-  white-space: pre-wrap;
-}
-
-/* セレクトボックスのオプションが見えない問題の修正 */
-select.form-input option {
-  background-color: #2b2b2b;
-  color: #ffffff;
-}
-
-/* --- Added for UI Revamp --- */
-#train-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 16px;
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.train-editor-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.op-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  padding: 16px;
-  transition: background 0.2s;
-}
-.op-card:hover {
-  background: rgba(255,255,255,0.06);
-}
-
-.op-day-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.op-day-row:last-child { border-bottom: none; }
-
-/* Root & Body Scrollbar Normalization */
-html {
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-body {
-  overflow: visible;
-}
-
-.btn-admin.active { background: var(--text-link); color: #fff; }
-
-/* Admin Tab Transitions */
-#main-container { position: relative; }
-.view-panel {
-  min-height: auto;
-  padding-bottom: 40px;
-  flex: none;
-  width: 100%;
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-  transition: opacity 0.3s var(--smooth-easing), transform 0.3s var(--spring-easing), visibility 0.3s;
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  visibility: hidden;
-}
-.view-panel.show {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-  position: relative;
-  visibility: visible;
-}
-
-/* Hover glow for inputs and buttons */
-.btn-admin:hover:not(:disabled) {
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
-}
-.form-input {
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-.form-input:focus {
-  border-color: var(--text-link) !important;
-  box-shadow: 0 0 0 2px rgba(9, 132, 227, 0.3) !important;
-}
-
-/* ===== Train List & Editor Layout ===== */
-.train-list-sidebar {
-  flex: 1;
-  max-width: 300px;
-  background: var(--bg-card);
-  border-radius: 8px;
-  padding: 16px;
-  height: fit-content;
-}
-
-.train-editor-container {
-  flex: 2;
-  background: var(--bg-card);
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-card);
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-/* ==========================================================================
-   Admin Overhaul Components
-   ========================================================================== */
-
-/* Top Action & Sync Status Bar */
+/* ===== 同期ステータスバー & ナビタブ ===== */
 .admin-status-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 10px 16px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  margin-bottom: 20px;
+  gap: 10px 16px;
+  padding: 8px 14px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  margin-bottom: 12px;
 }
 
-.status-badge {
-  display: inline-flex;
+.status-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-bar-actions {
+  display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.sync-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  border: 1px solid var(--c-border-strong);
+}
+
+.sync-indicator.sync-ok {
+  background-color: var(--c-bg);
+  color: var(--c-muted);
+}
+
+.sync-indicator.sync-dirty {
+  background-color: var(--c-accent);
+  border-color: var(--c-accent);
+  color: var(--c-bg);
+}
+
+.sync-indicator.sync-pushing {
+  background-color: var(--c-accent-soft);
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+.sync-memo {
+  font-size: 0.78rem;
+  color: var(--c-muted);
+}
+
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  border-bottom: 1px solid var(--c-border);
+  margin-bottom: 14px;
+}
+
+.admin-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 8px 14px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--c-muted);
+  cursor: pointer;
+}
+
+.admin-tab:hover {
+  color: var(--c-fg);
+  background-color: var(--c-surface);
+}
+
+.admin-tab.active {
+  color: var(--c-accent);
+  font-weight: 700;
+  border-bottom-color: var(--c-accent);
+}
+
+.view-panel {
+  display: none;
+}
+
+.view-panel.show {
+  display: block;
+}
+
+/* ===== 操作ログ ===== */
+.log-card {
+  border-bottom: 1px solid var(--c-border);
+  padding: 12px 4px;
+  font-size: 0.82rem;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  color: var(--c-muted);
+  margin-bottom: 4px;
+}
+
+.log-change {
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  padding: 8px 10px;
+  border-radius: 2px;
+  margin-top: 6px;
+  white-space: pre-wrap;
+  font-size: 0.78rem;
+}
+
+/* ==========================================================================
+   運行データ管理：2ペイン独立スクロールワークスペース
+   ========================================================================== */
+.workspace-caption-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+  color: var(--c-muted);
+}
+
+.workspace-shortcut-hint {
+  font-variant-numeric: tabular-nums;
+  padding: 1px 6px;
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  background-color: var(--c-surface);
+}
+
+.trains-workspace {
+  display: grid;
+  grid-template-columns: 295px minmax(0, 1fr);
+  height: calc(100vh - 185px);
+  min-height: 540px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 2px;
+  background-color: var(--c-bg);
+  overflow: hidden;
+}
+
+/* 左ペイン：列車一覧 */
+.train-list-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--c-border-strong);
+  background-color: var(--c-bg);
+}
+
+.train-sidebar-head {
+  padding: 10px 10px 0;
+  background-color: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  flex-shrink: 0;
+}
+
+.train-search-input {
+  padding: 5px 8px;
   font-size: 0.8rem;
+}
+
+.train-filter-bar {
+  display: flex;
+  gap: 4px;
+  margin-top: 7px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  flex: 1;
+  min-width: max-content;
+  padding: 3px 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  background-color: var(--c-bg);
+  color: var(--c-muted);
+  cursor: pointer;
+}
+
+.filter-chip:hover {
+  color: var(--c-fg);
+  border-color: var(--c-fg);
+}
+
+.filter-chip.active {
+  background-color: var(--c-accent);
+  border-color: var(--c-accent);
+  color: var(--c-bg);
   font-weight: 600;
-  letter-spacing: 0.02em;
 }
 
-.status-badge.sync-ok {
-  background: rgba(48, 209, 88, 0.15);
-  color: #30d158;
-  border: 1px solid rgba(48, 209, 88, 0.3);
+.train-list-col-head {
+  display: grid;
+  grid-template-columns: 74px 1fr 56px;
+  gap: 6px;
+  padding: 6px 4px 5px;
+  margin-top: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--c-muted);
 }
 
-.status-badge.sync-dirty {
-  background: rgba(255, 159, 10, 0.15);
-  color: #ff9f0a;
-  border: 1px solid rgba(255, 159, 10, 0.3);
+.train-list-col-head em {
+  font-style: normal;
+  font-weight: 400;
+  margin-left: 4px;
 }
 
-.status-badge.sync-pushing {
-  background: rgba(10, 132, 255, 0.15);
-  color: #0a84ff;
-  border: 1px solid rgba(10, 132, 255, 0.3);
+.train-list-col-head span:last-child {
+  text-align: right;
 }
 
-/* Day Toggle Pills */
+.train-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.train-list-item {
+  display: grid;
+  grid-template-columns: 74px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--c-border);
+  cursor: pointer;
+  font-size: 0.8rem;
+  background-color: var(--c-bg);
+  transition: background-color 0.1s;
+}
+
+.train-list-item:hover {
+  background-color: var(--c-surface-hover);
+}
+
+.train-list-item.selected {
+  background-color: var(--c-accent-soft);
+  border-left: 3px solid var(--c-accent);
+  padding-left: 7px;
+}
+
+.tli-no {
+  font-weight: 700;
+  color: var(--c-fg);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.tli-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0 3px;
+  border: 1px solid var(--c-accent-border);
+  color: var(--c-accent);
+  border-radius: 2px;
+}
+
+.tli-route {
+  font-size: 0.76rem;
+  color: var(--c-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tli-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  font-size: 0.74rem;
+  color: var(--c-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dirty-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background-color: var(--c-accent);
+}
+
+/* 右ペイン：列車エディタ */
+.train-editor-pane {
+  height: 100%;
+  overflow-y: auto;
+  background-color: var(--c-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--c-muted);
+  font-size: 0.88rem;
+}
+
+.editor-sticky-bar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background-color: var(--c-bg);
+  border-bottom: 1px solid var(--c-border);
+  padding: 12px 20px 0;
+}
+
+.editor-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.editor-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.editor-train-title {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--c-fg);
+  margin: 0;
+}
+
+.editor-train-id {
+  font-size: 0.78rem;
+  color: var(--c-muted);
+  font-weight: 400;
+}
+
+.editor-step-btns {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.editor-apply-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.unapplied-hint {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--c-accent);
+}
+
+.editor-subtabs {
+  display: flex;
+  gap: 4px;
+}
+
+.editor-subtab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--c-muted);
+  cursor: pointer;
+}
+
+.editor-subtab:hover {
+  color: var(--c-fg);
+  background-color: var(--c-surface);
+}
+
+.editor-subtab.active {
+  color: var(--c-accent);
+  font-weight: 700;
+  border-bottom-color: var(--c-accent);
+}
+
+.editor-body {
+  padding: 18px 20px 28px;
+}
+
+.editor-section {
+  display: none;
+}
+
+.editor-section.active {
+  display: block;
+}
+
+.editor-block-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--c-fg);
+  padding-bottom: 6px;
+  margin: 18px 0 12px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.editor-block-title:first-child {
+  margin-top: 0;
+}
+
+.train-editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+
+.train-editor-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.field-note {
+  font-size: 0.73rem;
+  color: var(--c-accent);
+  margin-bottom: 4px;
+}
+
+/* 曜日トグル & プリセット */
 .day-pills-group {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
-  margin-top: 6px;
 }
 
 .day-toggle-pill {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-secondary);
+  padding: 5px 11px;
+  border-radius: 2px;
+  border: 1px solid var(--c-border-strong);
+  background-color: var(--c-bg);
+  color: var(--c-muted);
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  transition: all 0.15s ease;
   user-select: none;
 }
 
 .day-toggle-pill:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  border-color: var(--c-fg);
+  color: var(--c-fg);
 }
 
 .day-toggle-pill.active {
-  background: #2563eb;
-  border-color: #3b82f6;
-  color: #ffffff;
+  background-color: var(--c-accent);
+  border-color: var(--c-accent);
+  color: var(--c-bg);
 }
 
 .day-toggle-pill.holiday.active {
-  background: #dc2626;
-  border-color: #ef4444;
-  color: #ffffff;
+  background-color: var(--c-fg);
+  border-color: var(--c-fg);
+  color: var(--c-bg);
 }
 
 .preset-pills {
   display: flex;
   gap: 6px;
   margin-top: 6px;
+  flex-wrap: wrap;
 }
 
 .preset-pill {
-  padding: 3px 8px;
-  font-size: 0.75rem;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: transparent;
-  color: var(--text-secondary);
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  border-radius: 2px;
+  border: 1px solid var(--c-border);
+  background-color: var(--c-surface);
+  color: var(--c-muted);
   cursor: pointer;
 }
 
 .preset-pill:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  border-color: var(--c-fg);
+  color: var(--c-fg);
 }
 
-/* Dirty Indicator on Train List */
-.train-list-item {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  padding: 10px 12px;
-  border-radius: 6px;
+/* 日付チップ */
+.chip-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.date-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  border-radius: 2px;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.date-chip-remove {
+  background: none;
+  border: none;
+  color: var(--c-muted);
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.date-chip-remove:hover {
+  color: var(--c-fg);
+}
+
+/* エディタ内テーブル & 変更ダイヤカード */
+.editor-table-box {
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  background-color: var(--c-bg);
+}
+
+.editor-table-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  background-color: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
 }
 
-.train-list-item:hover {
-  background: rgba(255, 255, 255, 0.07);
+.editor-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
 }
 
-.train-list-item.selected {
-  border-color: #2563eb;
-  background: rgba(37, 99, 235, 0.12);
+.editor-table th {
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--c-muted);
+  background-color: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
 }
 
-.train-list-item .dirty-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ff9f0a;
+.editor-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--c-border);
+  vertical-align: middle;
 }
 
-/* Variants Section */
+.editor-table tr:last-child td {
+  border-bottom: none;
+}
+
+.editor-table .form-input {
+  padding: 4px 7px;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .variant-card {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--border-subtle);
-  border-radius: 6px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 2px;
   padding: 12px;
+  background-color: var(--c-surface);
   margin-bottom: 12px;
 }
 
@@ -426,88 +729,229 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-/* Diff Modal Table */
+.variant-scroll {
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--c-border);
+  background-color: var(--c-bg);
+  border-radius: 2px;
+}
+
+/* ===== 運用ベース管理 & シミュレーション & 差分モーダル ===== */
+.inline-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.op-add-input,
+.sim-date-field {
+  width: 148px;
+  padding: 5px 8px;
+  font-size: 0.82rem;
+}
+
+.sim-date-label {
+  font-size: 0.82rem;
+  color: var(--c-muted);
+}
+
+.op-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 14px;
+}
+
+.op-card {
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  padding: 14px;
+  background-color: var(--c-bg);
+}
+
+.op-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--c-border);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.op-card-head h3 {
+  font-size: 0.96rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.op-day-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.op-day-label {
+  width: 26px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--c-muted);
+}
+
+.sim-summary-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  font-size: 0.84rem;
+}
+
+.table-wrap {
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  overflow-x: auto;
+  background-color: var(--c-bg);
+}
+
+.sim-table,
 .diff-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
-  margin-top: 12px;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.diff-table th, .diff-table td {
+.sim-table th,
+.diff-table th {
+  background-color: var(--c-surface);
   padding: 8px 10px;
-  border-bottom: 1px solid var(--border-subtle);
+  color: var(--c-muted);
+  font-weight: 600;
   text-align: left;
+  border-bottom: 1px solid var(--c-border-strong);
 }
 
+.sim-table td,
+.diff-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.sim-badge,
 .diff-tag {
   display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 1px 6px;
+  border-radius: 2px;
   font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid var(--c-border);
+  background-color: var(--c-surface);
+  color: var(--c-fg);
+}
+
+.sim-badge.sl,
+.sim-badge.variant,
+.sim-badge.extra,
+.diff-tag.mod,
+.diff-tag.add {
+  border-color: var(--c-accent-border);
+  background-color: var(--c-accent-soft);
+  color: var(--c-accent);
+}
+
+.diff-modal-content {
+  max-width: 760px;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.diff-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.diff-modal-title {
+  font-size: 1rem;
   font-weight: 700;
 }
 
-.diff-tag.mod { background: rgba(255, 159, 10, 0.2); color: #ff9f0a; }
-.diff-tag.add { background: rgba(48, 209, 88, 0.2); color: #30d158; }
-.diff-tag.del { background: rgba(255, 69, 58, 0.2); color: #ff453a; }
-
-/* Simulation Table */
-.sim-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  margin-top: 12px;
+.diff-summary-text {
+  font-size: 0.82rem;
+  color: var(--c-muted);
+  margin-bottom: 8px;
 }
 
-.sim-table th {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 8px 10px;
-  color: var(--text-secondary);
-  font-weight: 600;
-  text-align: left;
+.diff-table-scroll {
+  overflow-y: auto;
+  flex: 1;
+  border: 1px solid var(--c-border);
 }
 
-.sim-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+.diff-modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--c-border);
 }
 
-.sim-badge {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.sim-badge.regular { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
-.sim-badge.sl { background: rgba(217, 119, 6, 0.2); color: #f59e0b; }
-.sim-badge.variant { background: rgba(147, 51, 234, 0.2); color: #c084fc; }
-
-/* Inline Feedback Toast */
 .admin-toast {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: #1e293b;
-  border: 1px solid #334155;
-  color: #f8fafc;
-  padding: 10px 18px;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  font-size: 0.85rem;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--c-fg);
+  color: var(--c-bg);
+  border: 1px solid var(--c-fg);
+  padding: 9px 16px;
+  border-radius: 2px;
+  font-size: 0.82rem;
   font-weight: 500;
   z-index: 9999;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.2s, transform 0.2s;
+  display: none;
   pointer-events: none;
 }
 
 .admin-toast.show {
-  opacity: 1;
-  transform: translateY(0);
+  display: block;
+}
+
+@media (max-width: 880px) {
+  .trains-workspace {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+  }
+
+  .train-list-sidebar {
+    max-height: 240px;
+    border-right: none;
+    border-bottom: 1px solid var(--c-border-strong);
+  }
+
+  .train-editor-pane {
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .train-editor-grid,
+  .train-editor-grid-4 {
+    grid-template-columns: 1fr;
+  }
 }

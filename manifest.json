@@ -4,8 +4,8 @@
   "description": "真岡鐵道車両運用資料ライブラリ・目撃掲示板",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "assets/apple-touch-icon.png",

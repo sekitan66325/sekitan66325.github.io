@@ -3,15 +3,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>真岡鐵道 情報ポータル - 列車走行位置・運行情報・運用掲示板</title>
-  <meta name="description" content="真岡鐵道（真岡線）の車両運用情報、モオカ14形・SLもおか等の運用表、目撃情報掲示板、リアルタイム列車走行位置・運行状況をまとめた非公式情報ポータルです。">
-  <meta name="keywords" content="真岡鐵道, 真岡線, 運用, 運用表, 列車走行位置, 目撃情報, モオカ14, SLもおか, 運行状況, ダイヤ">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>真岡鐵道 情報ポータル</title>
+  <meta name="description" content="真岡鐵道（真岡線）の列車走行位置・時刻表、現地目撃情報掲示板、モオカ14形・SLもおかの車両運用資料をまとめた非公式情報ポータルです。">
+  <meta name="keywords" content="真岡鐵道, 真岡線, 運用, 運用表, 列車走行位置, 目撃情報, モオカ14, SLもおか, 時刻表, ダイヤ">
   <link rel="canonical" href="https://sekitan66325.github.io/">
 
-  <!-- OGP (Open Graph / SNS共有設定) -->
-  <meta property="og:title" content="真岡鐵道 情報ポータル - 列車走行位置・運行情報・運用掲示板">
-  <meta property="og:description" content="真岡鐵道（真岡線）の車両運用情報、モオカ14形・SLもおか等の運用表、目撃情報掲示板、リアルタイム列車走行位置・運行状況をまとめた非公式情報ポータルです。">
+  <meta property="og:title" content="真岡鐵道 情報ポータル">
+  <meta property="og:description" content="真岡鐵道（真岡線）の列車走行位置・時刻表、現地目撃情報掲示板、車両運用資料をまとめた非公式情報ポータルです。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sekitan66325.github.io/">
   <meta property="og:image" content="https://sekitan66325.github.io/assets/moka14.png">
@@ -19,7 +18,6 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@sekitan66325">
 
-  <!-- 構造化データ (JSON-LD) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -40,12 +38,12 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 </head>
 
-<body class="theme-dark">
+<body>
   <header class="site-header">
     <div class="header-inner">
-      <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
-        <h1 class="logo" style="margin:0; font-size:1.15rem;"><a href="index.html" style="color:inherit; text-decoration:none;">真岡鐵道 情報ポータル</a></h1>
-        <nav class="global-nav">
+      <div class="header-brand-nav">
+        <h1 class="logo"><a href="index.html">真岡鐵道 情報ポータル</a></h1>
+        <nav class="global-nav" aria-label="メインナビゲーション">
           <a href="index.html" class="nav-link active">トップ</a>
           <a href="train-state/index.html" class="nav-link">列車走行位置</a>
           <a href="operation-board/index.html" class="nav-link">目撃掲示板</a>
@@ -55,49 +53,42 @@
     </div>
   </header>
 
-  <main class="container portal-container">
-    <div>
-      <h1 class="hero-title" style="font-size: 1.8rem; margin-bottom: 6px;">真岡鐵道 情報ポータル</h1>
-      <p class="hero-subtitle">下館〜真岡〜茂木間を結ぶ真岡線の運行状況、リアルタイム列車走行位置、運用調査データまとめ</p>
+  <main class="container">
+    <div class="portal-intro">
+      <h2 class="hero-title">真岡鐵道 情報ポータル</h2>
+      <p class="hero-subtitle">下館〜真岡〜茂木間の列車走行位置・ダイヤ、目撃情報、車両運用記録をまとめた非公式情報サイトです。</p>
     </div>
 
     <div class="portal-grid">
       <a href="train-state/index.html" class="portal-card">
-        <span class="card-category">REALTIME POSITION</span>
-        <h2>列車走行位置・運行状況</h2>
-        <p>現行ダイヤと連動した列車の現在位置、駅の発着時刻、ダイヤグラム（運行図表）をリアルタイムに確認できます。</p>
+        <h2>列車走行位置・時刻表</h2>
+        <p>現行ダイヤに基づく列車の現在位置、ダイヤグラム（運行図表）、路線時刻表を確認できます。</p>
       </a>
 
       <a href="operation-board/index.html" class="portal-card">
-        <span class="card-category">COMMUNITY BOARD</span>
-        <h2>運用・目撃情報掲示板</h2>
-        <p>モオカ14形やSLもおか（C12 66・DE10）の現地目撃情報のリアルタイム共有、編成確認、過去ログ検索が可能です。</p>
+        <h2>目撃情報掲示板</h2>
+        <p>モオカ14形やSLもおか（C12 66・DE10）の現地目撃情報の共有、編成確認、過去ログ検索を行えます。</p>
       </a>
 
       <a href="database/unyou/index.html" class="portal-card">
-        <span class="card-category">DOCUMENT ARCHIVE</span>
-        <h2>車両運用資料・アーカイブ</h2>
-        <p>定期・臨時運用の行路表、編成表、毎日の運用記録をまとめた月別運用報告書（PDF）を閲覧・保存できます。</p>
+        <h2>車両運用資料</h2>
+        <p>定期・臨時運用の行路表および毎日の運用記録をまとめた月別運用報告書（PDF）を閲覧できます。</p>
       </a>
     </div>
 
-    <!-- 書籍紹介セクション -->
     <section class="content-section">
       <h2 class="section-title">『真岡鐵道ダイヤ全録』シリーズ</h2>
-      <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
-        臨時ダイヤが施行された際、通常ダイヤのフォーマットに合わせた形で公開するよりも一冊の資料としてまとめたほうが合理的であると考え、運転時刻から運用までを体系的にまとめた運用調査の集大成です。
+      <p class="section-desc">
+        臨時ダイヤ施行時の運転時刻から車両運用までを体系的に記録した私家版資料集です。
       </p>
 
-      <!-- 既刊・シリーズ作品リスト -->
       <ul class="list-container">
-
-        <!-- 1冊目 -->
         <li class="list-item">
           <a href="https://sekitan66325.booth.pm/items/8501007" class="btn-link" target="_blank" rel="noopener">
             <div class="item-left-block">
               <div class="item-text-meta">
                 <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026年春 陶器市臨時ダイヤ編ー</span>
-                <span class="card-tag">BOOTH<br>初版 2026年6月12日</span>
+                <span class="card-tag">BOOTH / 初版 2026年6月12日</span>
               </div>
             </div>
             <div class="item-right-block">
@@ -106,33 +97,28 @@
           </a>
         </li>
 
-        <!-- 2冊目（画像付きカード） -->
         <li class="list-item">
           <a href="https://sekitan66325.booth.pm/items/8682952" class="btn-link-card" target="_blank" rel="noopener">
-            <!-- 上段：タイトル、ステータス、矢印 -->
             <div class="card-header-row">
               <div class="item-text-meta">
                 <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー</span>
-                <span class="card-tag">C108 / BOOTH<br>初版 2026年8月16日</span>
+                <span class="card-tag">C108・BOOTH / 初版 2026年8月16日</span>
               </div>
               <div class="item-right-block">
-                <!-- ステータスバッジを追加 -->
-                <span class="status-badge">発売中</span>
+                <span class="status-badge">頒布中</span>
                 <span class="chevron-right"></span>
               </div>
             </div>
 
-            <!-- 下段：解説・告知画像 -->
             <div class="card-banner-wrapper">
               <img src="assets/zenroku/2026hanabi.png" alt="私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー" class="card-banner-img">
             </div>
           </a>
 
-          <!-- 誌面訂正・正誤表PDFリンク -->
           <div class="card-errata-wrapper">
             <a href="book/zenroku/2026hanabi/errata.pdf" class="card-errata-link" target="_blank" rel="noopener">
               <div class="errata-left">
-                <span class="errata-badge">誌面訂正</span>
+                <span class="errata-badge">正誤表</span>
                 <span class="errata-title">『花火臨時編』誌面訂正とお詫び・正誤表 (PDF)</span>
               </div>
               <div class="item-right-block">
@@ -142,13 +128,12 @@
           </div>
         </li>
 
-        <!-- 3冊目 -->
         <li class="list-item">
           <a href="https://note.com/sekitan66325/n/ndb16fc170dab" class="btn-link" target="_blank" rel="noopener">
             <div class="item-left-block">
               <div class="item-text-meta">
                 <span class="item-label">私家版 真岡鐵道ダイヤ全録 Shortー2026年8月23日編ー</span>
-                <span class="card-tag">note<br>2026年8月25日投稿</span>
+                <span class="card-tag">note / 2026年8月25日公開</span>
               </div>
             </div>
             <div class="item-right-block">
@@ -162,7 +147,7 @@
             <div class="item-left-block">
               <div class="item-text-meta">
                 <span class="item-label">私家版 真岡鐵道ダイヤ全録 Shortー2026秋減車編ー</span>
-                <span class="card-tag">note<br>2026年9月1日投稿</span>
+                <span class="card-tag">note / 2026年9月1日公開</span>
               </div>
             </div>
             <div class="item-right-block">
@@ -170,105 +155,31 @@
             </div>
           </a>
         </li>
-
       </ul>
     </section>
 
-    <!-- SNS・お問い合わせ セクション -->
-    <section class="content-section" style="margin-top: 40px;">
-      <h2 class="section-title">各種SNS・お問い合わせ</h2>
-      <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
-        最新情報の告知や活動内容の共有、お問い合わせについては以下の各リンクからお願いいたします。
-      </p>
-
-      <ul class="list-container">
-        <!-- X (Twitter) -->
-        <li class="list-item">
-          <a href="https://x.com/sekitan66325" class="btn-link" target="_blank" rel="noopener">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label" style="font-weight: bold;">X</span>
-                <span class="card-tag" style="color: #1da1f2;">@sekitan66325</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
-
-        <!-- note -->
-        <li class="list-item">
-          <a href="https://note.com/sekitan66325" class="btn-link" target="_blank" rel="noopener">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label" style="font-weight: bold;">note</span>
-                <span class="card-tag" style="color: #41c9b4;">sekitan66325</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
-
-        <!-- Instagram -->
-        <li class="list-item">
-          <a href="https://www.instagram.com/sekitan66325/?hl=ja" class="btn-link" target="_blank" rel="noopener">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label" style="font-weight: bold;">Instagram</span>
-                <span class="card-tag" style="color: #e1306c;">sekitan66325</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
-
-        <!-- BOOTH -->
-        <li class="list-item">
-          <a href="https://sekitan66325.booth.pm/" class="btn-link" target="_blank" rel="noopener">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label" style="font-weight: bold;">BOOTH</span>
-                <span class="card-tag" style="color: #fc4d50;">オンライン頒布・グッズ</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
-
-        <!-- Email -->
-        <li class="list-item">
-          <a href="mailto:sekitan.info@gmail.com" class="btn-link">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label" style="font-weight: bold;">メール</span>
-                <span class="card-tag" style="color: #007aff;">sekitan.info@gmail.com</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
+    <section class="content-section">
+      <h2 class="section-title">外部リンク・お問い合わせ</h2>
+      <p class="section-desc">更新告知や記事公開、個別のお問い合わせは以下の各窓口をご利用ください。</p>
+      <ul class="inline-links-list">
+        <li><a href="https://x.com/sekitan66325" target="_blank" rel="noopener noreferrer">X (@sekitan66325)</a></li>
+        <li><a href="https://note.com/sekitan66325" target="_blank" rel="noopener noreferrer">note</a></li>
+        <li><a href="https://www.instagram.com/sekitan66325/?hl=ja" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+        <li><a href="https://sekitan66325.booth.pm/" target="_blank" rel="noopener noreferrer">BOOTH</a></li>
+        <li><a href="mailto:sekitan.info@gmail.com">メール (sekitan.info@gmail.com)</a></li>
       </ul>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <ul class="footer-links" style="list-style:none; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; padding:0;">
-        <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X (@sekitan66325)</a></li>
-        <li><a href="https://note.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">note</a></li>
-        <li><a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank" rel="noopener noreferrer">BOOTH</a></li>
-        <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">お問い合わせ</a></li>
+      <ul class="footer-links">
+        <li><a href="index.html" class="footer-link">トップ</a></li>
+        <li><a href="train-state/index.html" class="footer-link">列車走行位置</a></li>
+        <li><a href="operation-board/index.html" class="footer-link">目撃掲示板</a></li>
+        <li><a href="database/unyou/index.html" class="footer-link">車両運用資料</a></li>
       </ul>
-      <p class="copyright" style="font-size:0.8rem; color:var(--text-secondary); margin:0;">© 真岡鐵道 非公式情報ポータル 2026</p>
+      <p class="copyright">© 2026 せきたん / 真岡鐵道 非公式情報ポータル</p>
     </div>
   </footer>
 
@@ -281,7 +192,6 @@
 
     gtag('config', 'G-0GM4B0FTW9');
   </script>
-
 </body>
 
 </html>
