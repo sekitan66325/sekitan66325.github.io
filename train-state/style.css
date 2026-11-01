@@ -4,8 +4,8 @@
    列車走行位置・ダイヤグラム・時刻表 専用スタイル
    ========================================================================== */
 :root {
-  --rail-color: #2fb344;
-  --rail-color-soft: rgba(47, 179, 68, 0.16);
+  --rail-color: #64748b;
+  --rail-color-soft: rgba(100, 116, 139, 0.18);
 
   /* 列車種別カラー（従来様式） */
   --train-local: #007aff;
@@ -122,7 +122,7 @@ main.container {
 }
 
 .status-normal .notice-icon {
-  background-color: var(--rail-color);
+  background-color: #2fb344;
 }
 
 .status-delay .notice-icon {
@@ -623,60 +623,43 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   padding: 4px 16px 4px 6px;
 }
 
-/* 列車カード：外枠・背景・文字は無彩色に統一し、種別色は矢印ブロックのみに集約 */
+/* 列車カード：五角形方向アイコン＋シンプルな白ラベルカード */
 .pos-train-card {
   display: inline-flex;
-  align-items: stretch;
-  background-color: #ffffff;
-  border: 1px solid #d5dce6;
-  border-radius: 3px;
-  overflow: hidden;
+  align-items: center;
+  gap: 6px;
   cursor: pointer;
   white-space: nowrap;
-  transition: border-color 0.12s, background-color 0.12s;
 }
 
-.pos-train-card:hover {
-  border-color: #94a3b8;
-  background-color: #f8fafc;
-}
-
-/* 進行方向＆種別インジケーター（レール側ブロックのみに種別色を効果的に配する） */
+/* 進行方向＆種別を示す五角形アイコン（レール脇に配置） */
 .pos-train-shield {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  min-height: 26px;
+  width: 22px;
+  height: 25px;
   flex-shrink: 0;
-  background-color: var(--train-local);
-}
-
-.type-sl .pos-train-shield {
-  background-color: var(--train-sl);
-}
-
-.type-extra .pos-train-shield {
-  background-color: var(--train-extra);
-}
-
-.type-empty .pos-train-shield {
-  background-color: var(--train-empty);
 }
 
 .pos-train-shield svg {
-  width: 12px;
-  height: 12px;
+  width: 100%;
+  height: 100%;
   display: block;
 }
 
-/* 列車情報ボディ（余計な色文字・色枠を排してすっきり表示） */
+/* 列車情報ボディ（余計な色文字・色枠を排した白カード） */
 .pos-train-info {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 8px;
-  background-color: transparent;
+  padding: 4px 8px;
+  background-color: #ffffff;
+  border: 1px solid #d5dce6;
+  border-radius: 4px;
+  transition: border-color 0.12s, background-color 0.12s;
+}
+
+.pos-train-card:hover .pos-train-info {
+  border-color: #94a3b8;
+  background-color: #f8fafc;
 }
 
 .pos-train-no {
@@ -1146,18 +1129,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   }
 
   .pos-train-shield {
-    width: 16px;
-    min-height: 22px;
-  }
-
-  .pos-train-shield svg {
-    width: 10px;
-    height: 10px;
+    width: 19px;
+    height: 22px;
   }
 
   .pos-train-info {
-    padding: 2px 4px;
-    gap: 3px;
+    padding: 3px 6px;
+    gap: 4px;
   }
 
   .pos-train-no {

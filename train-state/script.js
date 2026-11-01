@@ -676,9 +676,15 @@ function renderNotice() {
 }
 
 function shieldSVG(type, direction) {
-  const d = direction === "down" ? "M3 9 L8 4 L13 9" : "M3 5 L8 10 L13 5";
-  return `<svg viewBox="0 0 16 14" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="${d}" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  const st = getTrainTypeStyle(type);
+  const transform = direction === "up" ? `transform="rotate(180 12 13.5)"` : "";
+  return `<svg viewBox="0 0 24 27" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g ${transform}>
+      <path d="M12 1.5 L22.5 10.5 L22.5 23.5 Q22.5 25.5 20.5 25.5 L3.5 25.5 Q1.5 25.5 1.5 23.5 L1.5 10.5 Z"
+            fill="${st.stroke}"/>
+      <path d="M7.5 16.5 L12 11.5 L16.5 16.5"
+            fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
   </svg>`;
 }
 
