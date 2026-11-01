@@ -1170,7 +1170,8 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular"
+      "service_type": "regular",
+      "days_off": []
     },
     "stations": [
       {
@@ -1258,6 +1259,13 @@
         "arr": "16:53",
         "dep": null
       }
+    ],
+    "partial_cancellations": [
+      {
+        "date": "2026-10-31~2026-11-03",
+        "actual_start": "M01",
+        "actual_end": "M07"
+      }
     ]
   },
   {
@@ -1267,7 +1275,8 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular"
+      "service_type": "regular",
+      "days_off": []
     },
     "stations": [
       {
@@ -1354,6 +1363,13 @@
         "code": "M17",
         "arr": "17:23",
         "dep": null
+      }
+    ],
+    "partial_cancellations": [
+      {
+        "date": "2026-10-31~2026-11-03",
+        "actual_start": "M07",
+        "actual_end": "M17"
       }
     ]
   },
@@ -4400,7 +4416,11 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular"
+      "service_type": "regular",
+      "days_off": [],
+      "dates_off": [
+        "2026-10-31~2026-11-03"
+      ]
     },
     "stations": [
       {
@@ -4447,7 +4467,11 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular"
+      "service_type": "regular",
+      "days_off": [],
+      "dates_off": [
+        "2026-10-31~2026-11-03"
+      ]
     },
     "stations": [
       {
