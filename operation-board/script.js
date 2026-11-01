@@ -96,7 +96,7 @@ async function fetchBoardData() {
     renderBoardPosts();
   } catch (error) {
     console.error('データ取得エラー:', error);
-    boardList.innerHTML = `<li style="padding: 24px; text-align: center; color: var(--color-error, #ff453a); font-size: 0.85rem; list-style: none;">データの取得に失敗しました。</li>`;
+    boardList.innerHTML = `<li style="padding: 20px 4px; color: var(--c-muted); font-size: 0.85rem; list-style: none;">データの取得に失敗しました。</li>`;
   }
 }
 
