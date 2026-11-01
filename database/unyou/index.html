@@ -3,22 +3,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-  <!-- 検索用タイトル -->
-  <title>車両運用資料・アーカイブ - 真岡鐵道 情報ポータル</title>
-
-  <!-- 検索結果用説明文 -->
-  <meta name="description"
-    content="真岡鐵道（真岡線）の車両運用情報・運用表。モオカ14形、SLもおか（C12 66・50系客車）、DE10 1535の定期・臨時行路表や月別運用報告書PDFを閲覧・ダウンロードできます。">
-
-  <!-- キーワード設定 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>車両運用資料 - 真岡鐵道 情報ポータル</title>
+  <meta name="description" content="真岡鐵道（真岡線）の車両運用表・月別運用報告書。モオカ14形、SLもおか（C12 66・50系客車）、DE10 1535の行路表PDFを閲覧できます。">
   <meta name="keywords" content="真岡鐵道, 真岡線, 運用表, 運用報告書, 車両運用, モオカ14形, SLもおか, C12 66, DE10 1535">
   <link rel="canonical" href="https://sekitan66325.github.io/database/unyou/">
 
-  <!-- OGPタグ -->
-  <meta property="og:title" content="車両運用資料・アーカイブ - 真岡鐵道 情報ポータル">
-  <meta property="og:description" content="真岡鐵道（モオカ14形・SLもおか・DE10）の定期行路表・月別運用報告書PDFダウンロード。">
+  <meta property="og:title" content="車両運用資料 - 真岡鐵道 情報ポータル">
+  <meta property="og:description" content="真岡鐵道（モオカ14形・SLもおか・DE10）の定期行路表・月別運用報告書PDF。">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://sekitan66325.github.io/database/unyou/">
   <meta property="og:image" content="https://sekitan66325.github.io/assets/moka14.png">
@@ -26,7 +18,6 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@sekitan66325">
 
-  <!-- 構造化データ (JSON-LD BreadcrumbList) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -57,9 +48,9 @@
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
-        <h1 class="logo" style="margin:0; font-size:1.15rem;"><a href="../../index.html" style="color:inherit; text-decoration:none;">真岡鐵道 情報ポータル</a></h1>
-        <nav class="global-nav">
+      <div class="header-brand-nav">
+        <h1 class="logo"><a href="../../index.html">真岡鐵道 情報ポータル</a></h1>
+        <nav class="global-nav" aria-label="メインナビゲーション">
           <a href="../../index.html" class="nav-link">トップ</a>
           <a href="../../train-state/index.html" class="nav-link">列車走行位置</a>
           <a href="../../operation-board/index.html" class="nav-link">目撃掲示板</a>
@@ -70,18 +61,16 @@
   </header>
 
   <main class="container">
-
     <section class="notice-section">
       <strong>閲覧にあたっての注意事項</strong>
-      <p>本情報は有志の目撃情報および調査を基に作成した非公式データです。真岡鐵道株式会社様への問い合わせはおやめください。</p>
+      <p>本資料は有志の目撃情報および独自調査を基に作成した非公式データです。真岡鐵道株式会社様への問い合わせはお控えください。</p>
     </section>
 
     <section class="content-section">
-      <h1 class="section-title" style="font-size: 1.25rem; margin-bottom: 8px;">現行ダイヤ運用表（2023年3月18日改正）</h1>
-      <p class="section-desc" style="margin-bottom: 16px;">真岡鐵道各列車の運用行路表・編成表（PDF）です。アイコンをタップして閲覧・保存できます。</p>
+      <h2 class="section-title">現行ダイヤ運用表（2023年3月18日改正）</h2>
+      <p class="section-desc">各車両の運用行路表・編成表（PDF）です。</p>
 
       <ul class="list-container">
-
         <li class="list-item">
           <a href="202303/moka14.pdf" class="btn-link" target="_blank">
             <div class="item-left-block">
@@ -90,8 +79,7 @@
                 <img src="../../assets/moka14b.png" alt="モオカ14形 気動車" class="train-icon">
               </div>
               <div class="item-text-meta">
-                <span class="item-label">モオカ14形<span class="size-badge"
-                    data-file-size="202303/moka14.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">モオカ14形<span class="size-badge" data-file-size="202303/moka14.pdf">[PDF/--KB]</span></span>
                 <span class="card-tag">定期列車 / 普通列車</span>
               </div>
             </div>
@@ -109,8 +97,7 @@
                 <img src="../../assets/moka50.png" alt="50系客車" class="train-icon coach">
               </div>
               <div class="item-text-meta">
-                <span class="item-label">C12 66・50系<span class="size-badge"
-                    data-file-size="202303/sl-pc.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">C12 66・50系<span class="size-badge" data-file-size="202303/sl-pc.pdf">[PDF/--KB]</span></span>
                 <span class="card-tag">特定日運行 / SLもおか</span>
               </div>
             </div>
@@ -127,8 +114,7 @@
                 <img src="../../assets/de10j1.png" alt="DE10 1535 ディーゼル機関車" class="train-icon loco-dl">
               </div>
               <div class="item-text-meta">
-                <span class="item-label">DE10 1535<span class="size-badge"
-                    data-file-size="202303/dl.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">DE10 1535<span class="size-badge" data-file-size="202303/dl.pdf">[PDF/--KB]</span></span>
                 <span class="card-tag">特定日運行 / 回送・補機</span>
               </div>
             </div>
@@ -137,22 +123,19 @@
             </div>
           </a>
         </li>
-
       </ul>
     </section>
 
     <section class="content-section">
       <h2 class="section-title">月別 運用報告書アーカイブ</h2>
-      <p class="section-desc">当月分の報告書は、毎日未明（3:40頃）に前日までの記録を記入して更新します。</p>
+      <p class="section-desc">当月分の報告書は、毎日未明（3:40頃）に前日までの記録を反映して更新します。</p>
 
       <ul class="list-container">
-
         <li class="list-item">
           <a href="202611.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年11月分 運用報告書<span class="size-badge"
-                    data-file-size="202611.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年11月分 運用報告書<span class="size-badge" data-file-size="202611.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -166,8 +149,7 @@
           <a href="202610.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年10月分 運用報告書<span class="size-badge"
-                    data-file-size="202610.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年10月分 運用報告書<span class="size-badge" data-file-size="202610.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -180,8 +162,7 @@
           <a href="202609.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年9月分 運用報告書<span class="size-badge"
-                    data-file-size="202609.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年9月分 運用報告書<span class="size-badge" data-file-size="202609.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -194,8 +175,7 @@
           <a href="202608.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年8月分 運用報告書<span class="size-badge"
-                    data-file-size="202608.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年8月分 運用報告書<span class="size-badge" data-file-size="202608.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -208,8 +188,7 @@
           <a href="202607.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年7月分 運用報告書<span class="size-badge"
-                    data-file-size="202607.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年7月分 運用報告書<span class="size-badge" data-file-size="202607.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -222,8 +201,7 @@
           <a href="202606.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年6月分 運用報告書<span class="size-badge"
-                    data-file-size="202606.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年6月分 運用報告書<span class="size-badge" data-file-size="202606.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -236,8 +214,7 @@
           <a href="202605.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年5月分 運用報告書<span class="size-badge"
-                    data-file-size="202605.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年5月分 運用報告書<span class="size-badge" data-file-size="202605.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -250,8 +227,7 @@
           <a href="202604.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年4月分 運用報告書<span class="size-badge"
-                    data-file-size="202604.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年4月分 運用報告書<span class="size-badge" data-file-size="202604.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -264,8 +240,7 @@
           <a href="202603.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年3月分 運用報告書<span class="size-badge"
-                    data-file-size="202603.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年3月分 運用報告書<span class="size-badge" data-file-size="202603.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -278,8 +253,7 @@
           <a href="202602.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年2月分 運用報告書<span class="size-badge"
-                    data-file-size="202602.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年2月分 運用報告書<span class="size-badge" data-file-size="202602.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -292,8 +266,7 @@
           <a href="202601.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2026年1月分 運用報告書<span class="size-badge"
-                    data-file-size="202601.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2026年1月分 運用報告書<span class="size-badge" data-file-size="202601.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -306,8 +279,7 @@
           <a href="202512.pdf" class="report-btn" target="_blank">
             <div class="item-left-block">
               <div class="item-text-meta">
-                <span class="item-label">2025年12月分 運用報告書<span class="size-badge"
-                    data-file-size="202512.pdf">[PDF/--KB]</span></span>
+                <span class="item-label">2025年12月分 運用報告書<span class="size-badge" data-file-size="202512.pdf">[PDF/--KB]</span></span>
               </div>
             </div>
             <div class="item-right-block">
@@ -315,26 +287,26 @@
             </div>
           </a>
         </li>
-
       </ul>
     </section>
 
     <section class="notice-section acknowledgement-section">
       <strong>運用情報の収集と御礼</strong>
-      <p>Xでも「真岡鐵道」、「真岡線」、「真岡線運用」、「モオカ14」等で検索を行い、情報を運用調査に反映させていただいております。<br>個別に情報を提供していただいている方を含め、厚く御礼申し上げます。</p>
+      <p>目撃情報掲示板やSNS上の投稿等を参考に運用調査へ反映しております。日頃より情報を提供いただいている皆様に厚く御礼申し上げます。</p>
     </section>
-
   </main>
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <ul class="footer-links" style="list-style:none; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; padding:0;">
-        <li><a href="../../index.html" class="footer-link">真岡鐵道 情報ポータル</a></li>
+      <ul class="footer-links">
+        <li><a href="../../index.html" class="footer-link">トップ</a></li>
+        <li><a href="../../train-state/index.html" class="footer-link">列車走行位置</a></li>
+        <li><a href="../../operation-board/index.html" class="footer-link">目撃掲示板</a></li>
+        <li><a href="index.html" class="footer-link">車両運用資料</a></li>
         <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X (@sekitan66325)</a></li>
-        <li><a href="https://sekitan66325.booth.pm/" class="footer-link" target="_blank" rel="noopener noreferrer">BOOTH</a></li>
         <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">お問い合わせ</a></li>
       </ul>
-      <p class="copyright" style="font-size:0.8rem; color:var(--text-secondary); margin:0;">© 真岡鐵道 非公式情報ポータル 2026</p>
+      <p class="copyright">© 2026 せきたん / 真岡鐵道 非公式情報ポータル</p>
     </div>
   </footer>
 
