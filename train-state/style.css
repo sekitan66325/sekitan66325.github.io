@@ -76,31 +76,31 @@ main.container {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 11px 15px;
+  padding: 10px 16px;
   margin-bottom: 16px;
   background-color: var(--c-bg);
   border: 1px solid var(--c-border);
-  border-left: 4px solid var(--c-border-strong);
-  border-radius: 6px;
+  border-left: 4px solid var(--rail-color);
+  border-radius: 4px;
 }
 
 .notice-bar.status-normal {
-  background-color: #edfbf0;
-  border-color: #b7ebc4;
-  border-left-color: var(--rail-color);
+  background-color: #f0fdf4;
+  border-color: #dcfce7;
+  border-left-color: #22c55e;
 }
 
 .notice-bar.status-delay {
-  background-color: #fff4e6;
-  border-color: #ffd8a8;
-  border-left-color: #f76707;
+  background-color: #fff7ed;
+  border-color: #ffedd5;
+  border-left-color: #f97316;
 }
 
 .notice-bar.status-unknown,
 .notice-bar.status-loading {
-  background-color: #fff9db;
-  border-color: #ffec99;
-  border-left-color: #f59f00;
+  background-color: #fefce8;
+  border-color: #fef9c3;
+  border-left-color: #eab308;
 }
 
 .notice-left {
@@ -111,13 +111,13 @@ main.container {
 }
 
 .notice-icon {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 800;
   color: #ffffff;
   background-color: #94a3b8;
@@ -125,29 +125,37 @@ main.container {
 }
 
 .status-normal .notice-icon {
-  background-color: var(--rail-color);
+  background-color: #22c55e;
 }
 
 .status-delay .notice-icon {
-  background-color: #f76707;
+  background-color: #f97316;
 }
 
 .status-unknown .notice-icon,
 .status-loading .notice-icon {
-  background-color: #f59f00;
+  background-color: #eab308;
 }
 
 .notice-copy {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
 }
 
 .notice-copy strong {
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: var(--c-fg);
+}
+
+.status-normal .notice-copy strong {
+  color: #166534;
+}
+
+.status-delay .notice-copy strong {
+  color: #9a3412;
 }
 
 .notice-copy span {
@@ -332,9 +340,9 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   flex-wrap: wrap;
   gap: 14px;
   align-items: center;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
-  color: var(--c-muted);
+  color: #475569;
 }
 
 .legend span {
@@ -345,9 +353,9 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .dot {
   display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
 }
 
 .dot.local {
@@ -422,63 +430,66 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* ==========================================================================
-   1. 列車走行位置ビュー（左右対称3カラムGridで中央路線軸を完全一致）
+   1. 列車走行位置ビュー（洗練されたモダン交通インフォメーション設計）
    ========================================================================== */
 .position-card {
   background-color: var(--c-bg);
   border: 1px solid var(--c-border);
-  border-radius: 6px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .position-time {
-  padding: 10px 16px;
+  padding: 9px 18px;
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
   border-bottom: 1px solid var(--c-border);
-  background-color: var(--c-surface);
+  background-color: #ffffff;
 }
 
 .position-time strong {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--c-fg);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
   font-variant-numeric: tabular-nums;
 }
 
 .position-time small {
-  font-size: 0.76rem;
-  color: var(--c-muted);
+  font-size: 0.74rem;
+  color: #64748b;
 }
 
-/* トラック見出し行：下の駅行と同一の3カラムGrid */
+/* トラック見出し行（3カラムGridで完全左右対称） */
 .position-track-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
   align-items: center;
   position: relative;
-  padding: 7px 0;
-  background-color: #eef2f7;
+  padding: 8px 0;
+  background-color: #f8fafc;
   border-bottom: 1px solid var(--c-border);
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  color: var(--c-muted);
+  color: #64748b;
 }
 
 .pth-station {
   position: absolute;
-  left: 16px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
+  color: #475569;
 }
 
 .pth-down {
   grid-column: 1;
   text-align: right;
   padding-right: 10px;
-  padding-left: 104px;
-  color: #1d4ed8;
+  padding-left: 108px;
+  color: #0369a1;
 }
 
 .pth-rail {
@@ -489,13 +500,14 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   grid-column: 3;
   text-align: left;
   padding-left: 10px;
-  padding-right: 16px;
+  padding-right: 18px;
   color: #0f766e;
 }
 
 .position-body {
-  padding: 10px 0 14px;
+  padding: 6px 0 16px;
   position: relative;
+  background-color: #ffffff;
 }
 
 .pos-station-row,
@@ -507,37 +519,59 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   padding: 0;
 }
 
+/* 駅行：背景は清潔な白、下に繊細な区切り線 */
 .pos-station-row {
-  min-height: 48px;
-  background-color: #f6f8fb;
-  border-top: 1px solid #e9eef5;
-  border-bottom: 1px solid #e9eef5;
+  min-height: 50px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
 }
 
+/* 駅間行：背景は白、ボーダーなしですっきり */
 .pos-between-row {
-  min-height: 42px;
+  min-height: 38px;
   background-color: #ffffff;
 }
 
+/* 駅名列（左側） */
 .pos-station-name-col {
   position: absolute;
-  left: 16px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
   width: 90px;
   text-align: left;
-  font-weight: 700;
-  font-size: 0.92rem;
-  color: var(--c-fg);
   z-index: 5;
   pointer-events: none;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
-.pos-station-row.can-exchange .pos-station-name-col {
-  font-weight: 800;
+.pos-st-code {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
-/* 中央路線カラム（常に50%中央に完全固定） */
+.pos-st-name {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+/* 交換可能駅・主要駅の強調 */
+.pos-station-row.can-exchange .pos-st-name {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.pos-station-row.can-exchange .pos-st-code {
+  color: var(--rail-color);
+}
+
+/* 中央路線レール（常に完全中央固定） */
 .pos-rail-area {
   grid-column: 2;
   position: relative;
@@ -552,7 +586,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .pos-rail-area::before {
   content: "";
   position: absolute;
-  width: 5px;
+  width: 4px;
   left: 50%;
   transform: translateX(-50%);
   top: 0;
@@ -563,28 +597,29 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .pos-rail-area.rail-first::before {
   top: 50%;
-  border-radius: 3px 3px 0 0;
+  border-radius: 2px 2px 0 0;
 }
 
 .pos-rail-area.rail-last::before {
   bottom: 50%;
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 2px 2px;
 }
 
+/* 駅ノード（丸） */
 .pos-station-dot {
-  width: 14px;
-  height: 14px;
+  width: 11px;
+  height: 11px;
   background-color: #ffffff;
-  border: 3px solid var(--rail-color);
+  border: 2.5px solid var(--rail-color);
   border-radius: 50%;
   z-index: 2;
   flex-shrink: 0;
 }
 
 .pos-station-row.can-exchange .pos-station-dot {
-  width: 16px;
-  height: 16px;
-  border-width: 3.5px;
+  width: 15px;
+  height: 15px;
+  border-width: 3px;
 }
 
 .pos-station-row.is-exchanging .pos-station-dot {
@@ -604,117 +639,149 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .pos-trains-down {
   grid-column: 1;
   justify-content: flex-end;
-  padding: 5px 6px 5px 108px;
+  padding: 4px 6px 4px 108px;
 }
 
 .pos-trains-up {
   grid-column: 3;
   justify-content: flex-start;
-  padding: 5px 16px 5px 6px;
+  padding: 4px 16px 4px 6px;
 }
 
+/* 一体型モダン列車カード（4px角丸・清潔な白地） */
 .pos-train-card {
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  align-items: stretch;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  overflow: hidden;
   cursor: pointer;
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  transition: border-color 0.12s, box-shadow 0.12s, transform 0.08s;
 }
 
-.pos-train-shield {
-  width: 25px;
-  height: 27px;
-  flex-shrink: 0;
+.pos-train-card:hover {
+  border-color: var(--c-accent);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+  transform: translateY(-1px);
 }
 
-.pos-train-shield svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.pos-train-info {
-  background-color: #ffffff;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 5px;
-  padding: 4px 9px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: border-color 0.12s, background-color 0.12s;
-}
-
-.pos-train-card.type-local .pos-train-info {
+.pos-train-card.type-local {
   border-color: rgba(0, 122, 255, 0.45);
 }
 
-.pos-train-card.type-sl .pos-train-info {
-  border-color: rgba(240, 140, 0, 0.65);
-  background-color: #fffdf7;
+.pos-train-card.type-sl {
+  border-color: rgba(240, 140, 0, 0.6);
+  background-color: #fffdfa;
 }
 
-.pos-train-card.type-extra .pos-train-info {
-  border-color: rgba(255, 59, 48, 0.55);
+.pos-train-card.type-extra {
+  border-color: rgba(255, 59, 48, 0.5);
   background-color: #fffafb;
 }
 
-.pos-train-card.type-empty .pos-train-info {
+.pos-train-card.type-empty {
   border-color: #cbd5e1;
   background-color: #f8fafc;
 }
 
-.pos-train-card:hover .pos-train-info {
-  border-color: var(--c-accent);
-  background-color: #f0f7ff;
+/* 進行方向＆種別インジケーター（レール側ブロック） */
+.pos-train-shield {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-height: 27px;
+  flex-shrink: 0;
+  background-color: var(--train-local);
+}
+
+.type-sl .pos-train-shield {
+  background-color: var(--train-sl);
+}
+
+.type-extra .pos-train-shield {
+  background-color: var(--train-extra);
+}
+
+.type-empty .pos-train-shield {
+  background-color: var(--train-empty);
+}
+
+.pos-train-shield svg {
+  width: 13px;
+  height: 13px;
+  display: block;
+}
+
+/* 列車情報ボディ */
+.pos-train-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background-color: transparent;
 }
 
 .pos-train-no {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 800;
-  color: var(--c-fg);
+  color: #0f172a;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
-.pos-train-card.type-sl .pos-train-no {
+.type-sl .pos-train-no {
   color: #b45309;
 }
 
-.pos-train-card.type-extra .pos-train-no {
+.type-extra .pos-train-no {
   color: #c92a2a;
 }
 
 .pos-train-dest {
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--c-muted);
+  color: #475569;
 }
 
+/* 状態バッジ（淡い背景＋濃い文字の洗練されたSubtle Badge） */
 .pos-stopped-badge {
-  display: inline-block;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background-color: var(--rail-color);
-  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  border-radius: 3px;
   font-size: 0.66rem;
-  font-weight: 700;
+  font-weight: 600;
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
 }
 
 .pos-stopped-badge.badge-origin {
-  background-color: #007aff;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
 }
 
 .pos-stopped-badge.badge-arrived {
-  background-color: #64748b;
+  background-color: #f1f5f9;
+  color: #475569;
+  border-color: #e2e8f0;
 }
 
 .pos-delay-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: 1px 5px;
-  border-radius: 4px;
-  background-color: #ff3b30;
-  color: #ffffff;
+  border-radius: 3px;
   font-size: 0.66rem;
   font-weight: 700;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
 }
 
 /* ==========================================================================
@@ -1103,37 +1170,84 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
   .pth-station,
   .pos-station-name-col {
-    width: 68px;
-    font-size: 0.8rem;
+    width: 54px;
     left: 6px;
   }
 
+  /* スマホでは駅コードを非表示にして駅名をすっきり広く確保 */
+  .pos-st-code {
+    display: none;
+  }
+
+  .pos-st-name {
+    font-size: 0.8rem;
+  }
+
   .pth-down {
-    padding-left: 74px;
-    font-size: 0.7rem;
+    padding-left: 62px;
+    padding-right: 6px;
+    font-size: 0.68rem;
+  }
+
+  .pth-rail {
+    width: 24px;
   }
 
   .pth-up {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .pos-station-row,
+  .pos-between-row,
+  .position-track-head {
+    grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  }
+
+  .pos-rail-area {
+    width: 24px;
   }
 
   .pos-trains-down {
-    padding: 4px 4px 4px 74px;
+    padding: 3px 2px 3px 62px;
   }
 
   .pos-trains-up {
-    padding: 4px 6px 4px 4px;
+    padding: 3px 6px 3px 2px;
+  }
+
+  .pos-train-card {
+    max-width: 100%;
   }
 
   .pos-train-shield {
-    width: 22px;
-    height: 24px;
+    width: 16px;
+    min-height: 22px;
+  }
+
+  .pos-train-shield svg {
+    width: 10px;
+    height: 10px;
   }
 
   .pos-train-info {
-    flex-direction: column;
-    gap: 1px;
-    padding: 3px 6px;
+    padding: 2px 4px;
+    gap: 3px;
+  }
+
+  .pos-train-no {
+    font-size: 0.74rem;
+  }
+
+  .pos-train-dest {
+    font-size: 0.65rem;
+  }
+
+  .pos-stopped-badge,
+  .pos-delay-badge {
+    font-size: 0.58rem;
+    padding: 0 3px;
   }
 
   .diagram-legend {

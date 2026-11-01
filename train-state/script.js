@@ -676,15 +676,9 @@ function renderNotice() {
 }
 
 function shieldSVG(type, direction) {
-  const st = getTrainTypeStyle(type);
-  const transform = direction === "down" ? `transform="rotate(180 15 17)"` : "";
-  return `<svg viewBox="0 0 30 34" xmlns="http://www.w3.org/2000/svg">
-    <g ${transform}>
-      <path d="M15 1 L28 7 L28 18 Q28 28 15 33 Q2 28 2 18 L2 7 Z"
-            fill="${st.stroke}" stroke="rgba(0,0,0,0.18)" stroke-width="1"/>
-      <path d="M10 13.5 L15 19.5 L20 13.5"
-            fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
+  const d = direction === "down" ? "M3 9 L8 4 L13 9" : "M3 5 L8 10 L13 5";
+  return `<svg viewBox="0 0 16 14" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="${d}" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`;
 }
 
@@ -705,7 +699,10 @@ function renderStations() {
     stRow.dataset.station = s.code;
 
     stRow.innerHTML = `
-      <div class="pos-station-name-col">${formatStationName(s.name)}</div>
+      <div class="pos-station-name-col">
+        <span class="pos-st-code">${s.code}</span>
+        <span class="pos-st-name">${formatStationName(s.name)}</span>
+      </div>
       <div class="pos-trains-container pos-trains-down" id="pos-down-${s.code}"></div>
       <div class="pos-rail-area ${i === 0 ? 'rail-first' : ''} ${i === stationsReversed.length - 1 ? 'rail-last' : ''}"><div class="pos-station-dot"></div></div>
       <div class="pos-trains-container pos-trains-up" id="pos-up-${s.code}"></div>
@@ -863,7 +860,7 @@ function renderPosition() {
 function createTrainCard(t) {
   const type = getTrainType(t);
   const card = document.createElement("div");
-  card.className = `pos-train-card type-${type}`;
+  card.className = `pos-train-card type-${type} dir-${t.direction}`;
 
   const isStopped = t.result.state === "STOPPED" || t.result.state === "ARRIVED" || t.result.state === "PRE_DEPARTURE";
 
