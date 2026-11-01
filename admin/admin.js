@@ -1735,8 +1735,8 @@ function runSimulation() {
     summary.innerHTML = `
       <div><strong>日付:</strong> ${escapeHTML(dateStr)} (${escapeHTML(dayLabel)})</div>
       <div><strong>全列車数:</strong> ${timetableData.length}本</div>
-      <div><strong style="color: var(--c-accent);">運転:</strong> ${operating.length}本</div>
-      <div><strong style="color: var(--c-muted);">運休:</strong> ${suspended.length}本</div>
+      <div><strong style="color: #1b7a2e;">運転:</strong> ${operating.length}本</div>
+      <div><strong style="color: var(--c-red);">運休:</strong> ${suspended.length}本</div>
     `;
   }
 
@@ -1941,7 +1941,7 @@ function openDiffModal() {
         <td><span class="diff-tag ${d.tag}">${d.tag === 'mod' ? '変更' : (d.tag === 'add' ? '追加' : '削除')}</span></td>
         <td>${escapeHTML(d.field)}</td>
         <td style="color: var(--c-muted); font-family: monospace;">${escapeHTML(d.before)}</td>
-        <td style="color: var(--c-accent); font-family: monospace; font-weight: 600;">${escapeHTML(d.after)}</td>
+        <td style="color: #1b7a2e; font-family: monospace; font-weight: 600;">${escapeHTML(d.after)}</td>
       </tr>
     `).join('');
   }

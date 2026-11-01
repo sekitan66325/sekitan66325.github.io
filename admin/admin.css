@@ -71,14 +71,15 @@ main.admin-shell {
 }
 
 .btn-admin.btn-danger {
-  color: var(--c-muted);
-  border-color: var(--c-border);
+  color: var(--c-red);
+  border-color: var(--c-red-border);
+  background-color: var(--c-bg);
 }
 
 .btn-admin.btn-danger:hover:not(:disabled) {
-  background-color: var(--c-fg);
-  border-color: var(--c-fg);
-  color: var(--c-bg);
+  background-color: var(--c-red);
+  border-color: var(--c-red);
+  color: #ffffff;
 }
 
 .btn-compact {
@@ -96,19 +97,20 @@ main.admin-shell {
   font-size: 0.72rem;
   font-weight: 600;
   padding: 1px 6px;
-  border-radius: 2px;
+  border-radius: 3px;
   border: 1px solid var(--c-border);
 }
 
 .badge-visible {
-  background-color: var(--c-accent-soft);
-  border-color: var(--c-accent-border);
-  color: var(--c-accent);
+  background-color: var(--c-green-soft);
+  border-color: var(--c-green-border);
+  color: #1b7a2e;
 }
 
 .badge-hidden {
-  background-color: var(--c-surface);
-  color: var(--c-muted);
+  background-color: var(--c-red-soft);
+  border-color: var(--c-red-border);
+  color: var(--c-red);
 }
 
 .admin-actions {
@@ -125,10 +127,10 @@ main.admin-shell {
   align-items: center;
   flex-wrap: wrap;
   gap: 10px 16px;
-  padding: 8px 14px;
-  background-color: var(--c-surface);
+  padding: 9px 14px;
+  background-color: var(--c-bg);
   border: 1px solid var(--c-border);
-  border-radius: 2px;
+  border-radius: 4px;
   margin-bottom: 12px;
 }
 
@@ -149,22 +151,23 @@ main.admin-shell {
 .sync-indicator {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 2px;
+  padding: 2px 9px;
+  border-radius: 4px;
   font-size: 0.76rem;
   font-weight: 700;
   border: 1px solid var(--c-border-strong);
 }
 
 .sync-indicator.sync-ok {
-  background-color: var(--c-bg);
-  color: var(--c-muted);
+  background-color: var(--c-green-soft);
+  border-color: var(--c-green-border);
+  color: #1b7a2e;
 }
 
 .sync-indicator.sync-dirty {
-  background-color: var(--c-accent);
-  border-color: var(--c-accent);
-  color: var(--c-bg);
+  background-color: var(--c-orange-soft);
+  border-color: #ffc078;
+  color: #b45309;
 }
 
 .sync-indicator.sync-pushing {
@@ -422,8 +425,8 @@ main.admin-shell {
   display: inline-block;
   width: 7px;
   height: 7px;
-  border-radius: 2px;
-  background-color: var(--c-accent);
+  border-radius: 50%;
+  background-color: var(--c-orange);
 }
 
 /* 右ペイン：列車エディタ */
@@ -859,14 +862,35 @@ main.admin-shell {
   color: var(--c-fg);
 }
 
-.sim-badge.sl,
-.sim-badge.variant,
-.sim-badge.extra,
-.diff-tag.mod,
-.diff-tag.add {
+.sim-badge.regular {
   border-color: var(--c-accent-border);
   background-color: var(--c-accent-soft);
   color: var(--c-accent);
+}
+
+.sim-badge.sl,
+.sim-badge.variant {
+  border-color: #ffc078;
+  background-color: var(--c-orange-soft);
+  color: #b45309;
+}
+
+.sim-badge.extra {
+  border-color: var(--c-red-border);
+  background-color: var(--c-red-soft);
+  color: var(--c-red);
+}
+
+.diff-tag.mod {
+  border-color: var(--c-accent-border);
+  background-color: var(--c-accent-soft);
+  color: var(--c-accent);
+}
+
+.diff-tag.add {
+  border-color: var(--c-green-border);
+  background-color: var(--c-green-soft);
+  color: #1b7a2e;
 }
 
 .diff-modal-content {
