@@ -464,12 +464,16 @@ function getTrainType(train) {
   if (train.operation_rule?.service_type === "deadhead") return "empty";
   return "local";
 }
-function getTrainTypeColor(type) {
+function getTrainTypeStyle(type) {
   switch (type) {
-    case "sl": return "var(--train-sl)";
-    case "extra": return "var(--train-extra)";
-    case "empty": return "var(--train-empty)";
-    default: return "var(--train-local)";
+    case "sl":
+      return { stroke: "var(--c-accent)", width: 2.8, dash: "", filled: true };
+    case "extra":
+      return { stroke: "var(--c-accent)", width: 2.0, dash: "6,3", filled: false };
+    case "empty":
+      return { stroke: "var(--c-muted)", width: 1.4, dash: "2,3", filled: false };
+    default:
+      return { stroke: "var(--c-fg)", width: 1.9, dash: "", filled: true };
   }
 }
 
@@ -580,7 +584,6 @@ function effectiveTrains() {
 
 function renderNotice() {
   const box = $("#notice");
-  const icon = $("#notice-icon");
   const title = $("#notice-title");
   const updated = $("#notice-updated");
   const link = $("#notice-link");
@@ -588,8 +591,7 @@ function renderNotice() {
   const warningModal = $("#warning-modal");
 
   if (!DATA.status) {
-    box.className = "notice-section status-loading";
-    icon.textContent = "…";
+    box.className = "notice-bar status-loading";
     title.textContent = "公式運行情報を取得しています…";
     updated.textContent = "取得中…";
     link.classList.add("hidden");
@@ -600,7 +602,7 @@ function renderNotice() {
   const statusCode = n.status_code || "unknown";
 
   box.className =
-    "notice-section " +
+    "notice-bar " +
     (
       statusCode === "delay" || statusCode === "suspend"
         ? "status-delay"
@@ -608,13 +610,6 @@ function renderNotice() {
           ? "status-unknown"
           : "status-normal"
     );
-
-  icon.textContent =
-    statusCode === "delay" || statusCode === "suspend"
-      ? "!"
-      : statusCode === "unknown"
-        ? "?"
-        : "";
 
   if (statusCode === "delay" || statusCode === "suspend") {
     if (banner) banner.classList.remove("hidden");
@@ -669,12 +664,15 @@ function renderNotice() {
     }`;
 }
 
-function shieldSVG(fillColor, direction) {
+function shieldSVG(type, direction) {
+  const st = getTrainTypeStyle(type);
+  const fill = st.filled ? st.stroke : "var(--c-bg)";
+  const dashAttr = type === "empty" ? `stroke-dasharray="2,2"` : "";
   const rotation = direction === "down" ? "rotate(180)" : "";
   const transform = rotation ? `transform="${rotation}" transform-origin="15 17"` : "";
   return `<svg viewBox="0 0 30 34" xmlns="http://www.w3.org/2000/svg">
-    <path d="M15 1 L28 7 L28 18 Q28 28 15 33 Q2 28 2 18 L2 7 Z"
-          fill="${fillColor}" stroke="rgba(0,0,0,.15)" stroke-width="1" ${transform}/>
+    <path d="M15 2 L27 9 L27 29 L3 29 L3 9 Z"
+          fill="${fill}" stroke="${st.stroke}" stroke-width="2" ${dashAttr} ${transform}/>
   </svg>`;
 }
 
@@ -689,11 +687,9 @@ function renderStations() {
   const stationsReversed = [...DATA.stations].reverse();
 
   stationsReversed.forEach((s, i) => {
-    // 1. Station Row
     const stRow = document.createElement("div");
     stRow.className = "pos-station-row";
     stRow.dataset.station = s.code;
-    stRow.style.animationDelay = `${i * 0.05}s`;
 
     stRow.innerHTML = `
       <div class="pos-station-name-col">${formatStationName(s.name)}</div>
@@ -703,12 +699,10 @@ function renderStations() {
     `;
     host.appendChild(stRow);
 
-    // 2. Between Row (if not the last station)
     if (i < stationsReversed.length - 1) {
       const nextS = stationsReversed[i + 1];
       const bwRow = document.createElement("div");
       bwRow.className = "pos-between-row";
-      bwRow.style.animationDelay = `${i * 0.05 + 0.025}s`;
       bwRow.dataset.from = s.code;
       bwRow.dataset.to = nextS.code;
 
@@ -859,11 +853,10 @@ function createTrainCard(t) {
 
   const isStopped = t.result.state === "STOPPED" || t.result.state === "ARRIVED" || t.result.state === "PRE_DEPARTURE";
   const type = getTrainType(t);
-  const shieldColor = getTrainTypeColor(type);
 
   const shield = document.createElement("div");
   shield.className = "pos-train-shield";
-  shield.innerHTML = shieldSVG(shieldColor, t.direction);
+  shield.innerHTML = shieldSVG(type, t.direction);
 
   const info = document.createElement("div");
   info.className = "pos-train-info";
@@ -901,8 +894,8 @@ function renderDiagram() {
   const width = 4500, left = 82, topPad = 38, bottomPad = 55;
 
   const container = $("#diagram-scroll");
-  const availableHeight = window.innerHeight - container.getBoundingClientRect().top - 90;
-  const containerHeight = Math.max(availableHeight, 400);
+  const availableHeight = window.innerHeight - container.getBoundingClientRect().top - 40;
+  const containerHeight = Math.max(availableHeight, 420);
   container.style.height = containerHeight + "px";
 
   const chartHeight = containerHeight - topPad - bottomPad;
@@ -924,7 +917,8 @@ function renderDiagram() {
 
   for (let m = 300; m <= 1740; m += 60) {
     const x = timeX(m);
-    svg.appendChild(svgEl("line", { x1: x, y1: 0, x2: x, y2: height, stroke: "var(--svg-grid-line)", "stroke-width": m % 360 === 300 ? 1.2 : .5 }));
+    const isMajor = m % 360 === 300;
+    svg.appendChild(svgEl("line", { x1: x, y1: 0, x2: x, y2: height, stroke: isMajor ? "var(--svg-grid-line-major)" : "var(--svg-grid-line)", "stroke-width": isMajor ? 1 : 0.7 }));
     const txt = svgEl("text", { x: x + 3, y: 20, fill: "var(--svg-grid-text)", "font-size": "11" });
     txt.textContent = formatServiceTime(m); svg.appendChild(txt);
   }
@@ -934,7 +928,7 @@ function renderDiagram() {
     const isTerminal = i === 0 || i === stationsReversed.length - 1;
     const isExchange = s.can_exchange || isTerminal;
     const y = yOf(s.code);
-    svg.appendChild(svgEl("line", { x1: left, y1: y, x2: width, y2: y, stroke: isExchange ? "var(--svg-station-line)" : "var(--svg-station-line-alt)", "stroke-width": isExchange ? 1.2 : .7 }));
+    svg.appendChild(svgEl("line", { x1: left, y1: y, x2: width, y2: y, stroke: isExchange ? "var(--svg-station-line)" : "var(--svg-station-line-alt)", "stroke-width": isExchange ? 1 : 0.7 }));
     const label = svgEl("text", { x: 8, y: y + 4, fill: isExchange ? "var(--svg-station-text)" : "var(--svg-station-text-alt)", "font-size": "11", "font-weight": isExchange ? 600 : 400 });
     label.textContent = formatStationName(s.name); svg.appendChild(label);
   });
@@ -950,9 +944,13 @@ function renderDiagram() {
     if (pts.length < 2) return;
 
     const type = getTrainType(t);
-    const schedColor = getTrainTypeColor(type);
-    const path = svgEl("polyline", { points: pts.map(p => p.join(",")).join(" "), fill: "none", stroke: schedColor, "stroke-width": 1.5, "opacity": .6, "stroke-dasharray": "4,4", "data-train-id": t.train_id });
-    path.style.cursor = "pointer"; path.addEventListener("click", () => openTrainModal(t)); svg.appendChild(path);
+    const tStyle = getTrainTypeStyle(type);
+    const hasOverride = t.actual.some(s => s.delay_minutes || s.is_cancelled);
+
+    if (hasOverride) {
+      const path = svgEl("polyline", { points: pts.map(p => p.join(",")).join(" "), fill: "none", stroke: tStyle.stroke, "stroke-width": 1.2, opacity: 0.35, "stroke-dasharray": "3,3", "data-train-id": t.train_id });
+      path.style.cursor = "pointer"; path.addEventListener("click", () => openTrainModal(t)); svg.appendChild(path);
+    }
 
     const actPts = [];
     t.actual.filter(s => !s.is_cancelled).forEach(s => {
@@ -960,14 +958,24 @@ function renderDiagram() {
       if (s.dep_actual != null && s.dep_actual !== s.arr_actual) actPts.push([timeX(s.dep_actual), yOf(s.code)]);
     });
     if (actPts.length > 1) {
-      const ap = svgEl("polyline", { points: actPts.map(p => `${p[0]},${p[1]}`).join(" "), fill: "none", stroke: schedColor, "stroke-width": 3, "opacity": .9, "data-train-id": t.train_id, "stroke-linecap": "round", "stroke-linejoin": "round" });
+      const polyAttrs = {
+        points: actPts.map(p => `${p[0]},${p[1]}`).join(" "),
+        fill: "none",
+        stroke: tStyle.stroke,
+        "stroke-width": tStyle.width,
+        "data-train-id": t.train_id,
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round"
+      };
+      if (tStyle.dash) polyAttrs["stroke-dasharray"] = tStyle.dash;
+      const ap = svgEl("polyline", polyAttrs);
       ap.style.cursor = "pointer"; ap.addEventListener("click", () => openTrainModal(t)); svg.appendChild(ap);
     }
 
     const targetPoints = [];
     if (pts.length > 1) {
       targetPoints.push({ x: pts[0][0], y: pts[0][1], nextX: pts[1][0], nextY: pts[1][1] });
-      const mokaCode = DATA.stations.find(s => s.name === "逵溷ｲ｡")?.code;
+      const mokaCode = DATA.stations.find(s => s.name === "真岡")?.code;
       if (mokaCode && t.stations[0].code !== mokaCode) {
         const mokaY = yOf(mokaCode);
         const mokaPtIdx = pts.findLastIndex(p => Math.abs(p[1] - mokaY) < 1);
@@ -1035,12 +1043,11 @@ function renderTimetable() {
 
   const destRow = document.createElement("tr");
   destRow.className = "tt-header-row tt-dest";
-  destRow.innerHTML = `<th>陦悟・</th>` + trains.map(t => `<th>${formatStationName(t.destination)}</th>`).join("");
+  destRow.innerHTML = `<th>行先</th>` + trains.map(t => `<th>${formatStationName(t.destination)}</th>`).join("");
   th.appendChild(destRow);
 
-  orderedStations.forEach((s, i) => {
+  orderedStations.forEach((s) => {
     const tr = document.createElement("tr");
-    tr.style.animationDelay = `${i * 0.03}s`;
     const stCell = document.createElement("td");
 
     let isStart = false;
@@ -1053,10 +1060,9 @@ function renderTimetable() {
       isEnd = (s.code === "M17");
     }
 
-    let labelsHTML = `<span>逹</span><span>逋ｺ</span>`;
+    let labelsHTML = `<span>着</span><span>発</span>`;
     if (isStart) labelsHTML = `<span>発</span>`;
-    if (isEnd) labelsHTML = `<span>逹</span>`;
-
+    if (isEnd) labelsHTML = `<span>着</span>`;
     stCell.innerHTML = `<div class="tt-st-cell"><strong>${formatStationName(s.name)}</strong><div class="tt-st-labels">${labelsHTML}</div></div>`;
     tr.appendChild(stCell);
 
@@ -1106,36 +1112,45 @@ function renderTimetable() {
 }
 
 function openTrainModal(t) {
-  let statusHTML = "";
+  let statusText = "";
+  let isAccentStatus = false;
   if (t.actual.some(s => s.is_cancelled)) {
-    statusHTML = `<span style="color:#d32f2f;font-weight:bold;">区間運休</span>`;
+    statusText = "区間運休";
+    isAccentStatus = true;
   } else {
-    const stateText = {
+    statusText = {
       RUNNING: "駅間走行中",
       STOPPED: "駅停車中",
       ARRIVED: "終着駅着",
       PRE_DEPARTURE: "始発駅停車中",
       OUT_OF_SERVICE: "運転時間外"
     }[t.result.state] || "不明";
-    statusHTML = `<span>${stateText}</span>`;
+    if (t.result.state === "RUNNING" || t.result.state === "STOPPED") {
+      isAccentStatus = true;
+    }
   }
   let formation = [];
   const opIds = getTrainOperations(t, state.serviceDate);
   opIds.forEach(id => {
-    if (DATA.status.operations[id] && DATA.status.operations[id].formation) {
+    if (DATA.status && DATA.status.operations && DATA.status.operations[id] && DATA.status.operations[id].formation) {
       formation = formation.concat(DATA.status.operations[id].formation);
     }
   });
-  const displayOpId = opIds.join('＋');
+  const displayOpId = opIds.join('＋') || "—";
 
   $("#modal-body").innerHTML = `
-    <span class="modal-kicker">TRAIN DETAIL / ${t.train_id}</span>
+    <span class="modal-kicker">列車詳細 (${t.train_id})</span>
     <h3 class="modal-title">${t.train_no}</h3>
-    <div class="modal-badges"><span class="badge ${t.direction === "up" ? "blue" : ""}">${t.direction === "up" ? "上り" : "下り"}</span><span class="badge">${formatStationName(t.destination)}行</span><span class="badge ${t.result.state === "STOPPED" ? "orange" : ""}">${statusHTML}</span></div>
-    <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${displayOpId}</strong></div><!-- <div class="detail-cell"><small>遅延</small><strong>${t.override.delay_minutes || 0}分</strong></div> --></div>
+    <div class="modal-badges">
+      <span class="badge">${t.direction === "up" ? "上り" : "下り"}</span>
+      <span class="badge">${formatStationName(t.destination)}行</span>
+      <span class="badge ${isAccentStatus ? "accent" : ""}">${statusText}</span>
+      ${t.variant_label ? `<span class="badge accent">${t.variant_label}</span>` : ""}
+    </div>
+    <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${displayOpId}</strong></div></div>
     ${formation.length ? `<div class="formation"><h4>編成</h4><div class="formation-list">${formation.map(x => `<span>${x}</span>`).join("")}</div></div>` : ""}
     ${t.override.memo ? `<div class="memo">${t.override.memo}</div>` : ""}
-    <div class="station-detail"><h4>各駅の詳細時刻</h4>${t.stations.map(st => {
+    <div class="station-detail"><h4>各駅の発着時刻</h4>${t.stations.map(st => {
     let a = st.arr;
     let d = st.dep;
     if (t.direction === "down" && st.code === "M01") a = null;
@@ -1234,7 +1249,7 @@ async function loadData() {
       service_date: state.serviceDate,
       official_info: {
         status_code: "unknown",
-        text: "蜈ｬ蠑城°陦梧ュ蝣ｱ繧貞叙蠕励〒縺阪∪縺帙ｓ縺ｧ縺励◆",
+        text: "公式運行情報を取得できませんでした",
         link_url: "",
         has_detail: false,
         fetched_at: null
@@ -1260,28 +1275,13 @@ async function loadData() {
 }
 
 function renderAll() { renderPosition(); renderDiagram(); renderTimetable() }
-$$(".view-tab,.tab-btn").forEach(b => b.addEventListener("click", (e) => {
-  if (window._isDraggingForClick) {
-    e.preventDefault();
-    e.stopPropagation();
-    return;
-  }
+$$(".view-tab").forEach(b => b.addEventListener("click", () => {
   setView(b.dataset.view);
 }));
 function setView(v) {
   state.view = v;
   $$(".view-tab").forEach(b => b.classList.toggle("active", b.dataset.view === v));
-  $$(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.view === v));
   $$(".view-panel").forEach(p => p.classList.toggle("active", p.id === "view-" + v));
-
-  const activeBtn = document.querySelector(`.floating-tab-bar .tab-btn[data-view="${v}"]`);
-  if (activeBtn) {
-    const glider = document.getElementById("tab-glider");
-    if (glider) {
-      glider.style.width = activeBtn.offsetWidth + "px";
-      glider.style.transform = "translateX(" + (activeBtn.offsetLeft - 4) + "px)";
-    }
-  }
 
   if (v === "position") renderPosition();
   if (v === "diagram") renderDiagram();
@@ -1328,86 +1328,14 @@ $("#now-btn").addEventListener("click", () => {
   $("#diagram-scroll").dataset.didAutoScroll = "";
   renderAll()
 });
-$$(".seg-btn").forEach(b => b.addEventListener("click", () => { const d = b.dataset.dir; if (b.classList.contains("tt-dir")) { state.timetableDir = d; $$(".tt-dir").forEach(x => x.classList.toggle("active", x === b)); renderTimetable() } else { state.diagramDir = d; $$(".diagram-tools .seg-btn:not(.tt-dir)").forEach(x => x.classList.toggle("active", x === b)); renderDiagram() } }));
+$$(".seg-btn").forEach(b => b.addEventListener("click", () => { const d = b.dataset.dir; if (b.classList.contains("tt-dir")) { state.timetableDir = d; $$(".tt-dir").forEach(x => x.classList.toggle("active", x === b)); renderTimetable() } else { state.diagramDir = d; $$(".dir-filter").forEach(x => x.classList.toggle("active", x === b)); renderDiagram() } }));
 $("#modal-close").onclick = () => $("#train-modal").classList.add("hidden"); $("#train-modal").addEventListener("click", e => { if (e.target.id === "train-modal") $("#train-modal").classList.add("hidden") });
 
 var STATIONS_FALLBACK = [];
 
 setInterval(updateClock, 1000);
 
-// 蛻晄悄迥ｶ諷九〒縺ｯ縺ｾ縺GAS縺九ｉ蜿門ｾ励〒縺阪※縺・↑縺・◆繧〉enderNotice()縺ｯ縺薙％縺ｧ縺ｯ蜻ｼ縺ｰ縺ｪ縺・
-
 loadData();
 
-// Init glider correctly on load
 window.addEventListener("load", () => setView(state.view || "position"));
-
-// Tab Bar Drag Logic
-var tabBar = document.querySelector('.floating-tab-bar');
-var glider = document.getElementById('tab-glider');
-var tabs = Array.from(document.querySelectorAll('.floating-tab-bar .tab-btn'));
-
-if (tabBar && glider) {
-  let isDragging = false;
-  let startX = 0;
-  let currentX = 0;
-  let dragStartTime = 0;
-
-  const startDrag = (e) => {
-    isDragging = true;
-    glider.style.transition = 'none'; // Disable transition while dragging
-    startX = e.touches ? e.touches[0].clientX : e.clientX;
-    currentX = startX;
-    dragStartTime = Date.now();
-  };
-
-  const moveDrag = (e) => {
-    if (!isDragging) return;
-    currentX = e.touches ? e.touches[0].clientX : e.clientX;
-    const barRect = tabBar.getBoundingClientRect();
-    let offsetX = currentX - barRect.left - (glider.clientWidth / 2);
-
-    const maxOffset = barRect.width - glider.clientWidth - 4;
-    offsetX = Math.max(4, Math.min(offsetX, maxOffset)); // clamp inside bar
-
-    glider.style.transform = `translateX(${offsetX}px)`;
-  };
-
-  const endDrag = (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    glider.style.transition = ''; // Restore CSS transition
-
-    if (Math.abs(currentX - startX) > 5) {
-      window._isDraggingForClick = true;
-      setTimeout(() => window._isDraggingForClick = false, 100);
-    }
-
-    const barRect = tabBar.getBoundingClientRect();
-    const gliderCenter = currentX - barRect.left;
-
-    // Find closest tab
-    let closestTab = tabs[0];
-    let minDistance = Infinity;
-
-    tabs.forEach(tab => {
-      const tabRect = tab.getBoundingClientRect();
-      const tabCenter = tabRect.left - barRect.left + tabRect.width / 2;
-      const distance = Math.abs(gliderCenter - tabCenter);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestTab = tab;
-      }
-    });
-
-    setView(closestTab.dataset.view);
-  };
-
-  tabBar.addEventListener('mousedown', startDrag);
-  tabBar.addEventListener('touchstart', startDrag, { passive: true });
-  window.addEventListener('mousemove', moveDrag);
-  window.addEventListener('mouseup', endDrag);
-  window.addEventListener('touchmove', moveDrag, { passive: true });
-  window.addEventListener('touchend', endDrag);
-}
 
