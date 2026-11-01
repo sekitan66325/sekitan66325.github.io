@@ -699,10 +699,7 @@ function renderStations() {
     stRow.dataset.station = s.code;
 
     stRow.innerHTML = `
-      <div class="pos-station-name-col">
-        <span class="pos-st-code">${s.code}</span>
-        <span class="pos-st-name">${formatStationName(s.name)}</span>
-      </div>
+      <div class="pos-station-name-col">${formatStationName(s.name)}</div>
       <div class="pos-trains-container pos-trains-down" id="pos-down-${s.code}"></div>
       <div class="pos-rail-area ${i === 0 ? 'rail-first' : ''} ${i === stationsReversed.length - 1 ? 'rail-last' : ''}"><div class="pos-station-dot"></div></div>
       <div class="pos-trains-container pos-trains-up" id="pos-up-${s.code}"></div>
