@@ -456,12 +456,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   color: #64748b;
 }
 
-/* トラック見出し行（3カラムGridで完全左右対称・装飾色を排したニュートラル表記） */
+/* トラック見出し行（4カラムGrid：駅名列＋下り1fr＋レール＋上り1frで下り/上り幅を完全対称化） */
 .position-track-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+  grid-template-columns: 76px minmax(0, 1fr) 28px minmax(0, 1fr);
   align-items: center;
-  position: relative;
   padding: 7px 0;
   background-color: #ffffff;
   border-bottom: 1px solid var(--c-border);
@@ -471,30 +470,27 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .pth-station {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
+  grid-column: 1;
+  padding-left: 14px;
   color: #64748b;
 }
 
 .pth-down {
-  grid-column: 1;
+  grid-column: 2;
   text-align: right;
-  padding-right: 10px;
-  padding-left: 108px;
+  padding-right: 8px;
   color: #64748b;
 }
 
 .pth-rail {
-  grid-column: 2;
+  grid-column: 3;
 }
 
 .pth-up {
-  grid-column: 3;
+  grid-column: 4;
   text-align: left;
-  padding-left: 10px;
-  padding-right: 18px;
+  padding-left: 8px;
+  padding-right: 12px;
   color: #64748b;
 }
 
@@ -507,7 +503,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .pos-station-row,
 .pos-between-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+  grid-template-columns: 76px minmax(0, 1fr) 28px minmax(0, 1fr);
   align-items: center;
   position: relative;
   padding: 0;
@@ -525,19 +521,15 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   background-color: #ffffff;
 }
 
-/* 駅名列（左側・余計な色文字なし） */
+/* 駅名列（第1カラム・余計な色文字なし） */
 .pos-station-name-col {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 86px;
+  grid-column: 1;
+  padding-left: 14px;
   text-align: left;
-  z-index: 5;
-  pointer-events: none;
   font-size: 0.88rem;
   font-weight: 500;
   color: #475569;
+  white-space: nowrap;
 }
 
 /* 交換可能駅・起終点のみ文字ウェイトで強調 */
@@ -546,9 +538,9 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   color: #0f172a;
 }
 
-/* 中央路線レール（常に完全中央固定） */
+/* 中央路線レール（下り列と上り列の完全中央に固定） */
 .pos-rail-area {
-  grid-column: 2;
+  grid-column: 3;
   position: relative;
   width: 28px;
   height: 100%;
@@ -609,34 +601,44 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   gap: 6px;
   flex-wrap: wrap;
   min-height: 34px;
+  min-width: 0;
 }
 
 .pos-trains-down {
-  grid-column: 1;
+  grid-column: 2;
   justify-content: flex-end;
-  padding: 4px 6px 4px 104px;
+  padding: 4px 6px 4px 4px;
 }
 
 .pos-trains-up {
-  grid-column: 3;
+  grid-column: 4;
   justify-content: flex-start;
-  padding: 4px 16px 4px 6px;
+  padding: 4px 12px 4px 6px;
 }
 
-/* 列車カード：五角形方向アイコン＋シンプルな白ラベルカード */
+/* 列車カード：五角形方向アイコンを常にレール側へ固定し、ステッカー部のみ折り返し許容 */
 .pos-train-card {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  white-space: nowrap;
+  max-width: 100%;
+  min-width: 0;
 }
 
-/* 進行方向＆種別を示す五角形アイコン（レール脇に配置） */
+.pos-train-card.dir-down {
+  justify-content: flex-end;
+}
+
+.pos-train-card.dir-up {
+  justify-content: flex-start;
+}
+
+/* 進行方向＆種別を示す五角形アイコン（レール脇に固定・縮小禁止） */
 .pos-train-shield {
   width: 22px;
   height: 25px;
-  flex-shrink: 0;
+  flex: 0 0 22px;
 }
 
 .pos-train-shield svg {
@@ -645,16 +647,23 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   display: block;
 }
 
-/* 列車情報ボディ（余計な色文字・色枠を排した白カード） */
+/* 列車情報ボディ（幅不足時は内部で自然に折り返し、五角形アイコンを決して押し出さない） */
 .pos-train-info {
   display: flex;
   align-items: center;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 3px 6px;
   padding: 4px 8px;
+  min-width: 0;
+  flex: 0 1 auto;
   background-color: #ffffff;
   border: 1px solid #d5dce6;
   border-radius: 4px;
   transition: border-color 0.12s, background-color 0.12s;
+}
+
+.pos-train-card.dir-down .pos-train-info {
+  justify-content: flex-end;
 }
 
 .pos-train-card:hover .pos-train-info {
@@ -667,12 +676,14 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   font-weight: 700;
   color: #0f172a;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .pos-train-dest {
   font-size: 0.72rem;
   font-weight: 500;
   color: #475569;
+  white-space: nowrap;
 }
 
 /* 状態タグ：枠線・色付きを廃止し、控えめなグレースケールピルに統一 */
@@ -685,6 +696,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   font-weight: 600;
   background-color: #eef2f6;
   color: #475569;
+  white-space: nowrap;
 }
 
 /* 遅延時のみ赤バッジで注意喚起 */
@@ -697,6 +709,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   font-weight: 700;
   background-color: #fee2e2;
   color: #dc2626;
+  white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -1063,6 +1076,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 @media (max-width: 720px) {
+  main.container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
   .toolbar {
     flex-direction: column;
     align-items: flex-start;
@@ -1083,72 +1101,69 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     text-align: center;
   }
 
-  .pth-station,
-  .pos-station-name-col {
-    width: 54px;
-    left: 6px;
-    font-size: 0.8rem;
-  }
-
-  .pth-down {
-    padding-left: 62px;
-    padding-right: 6px;
-    font-size: 0.68rem;
-  }
-
-  .pth-rail {
-    width: 24px;
-  }
-
-  .pth-up {
-    font-size: 0.68rem;
-    padding-left: 6px;
-    padding-right: 6px;
-  }
-
   .pos-station-row,
   .pos-between-row,
   .position-track-head {
-    grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+    grid-template-columns: 42px minmax(0, 1fr) 16px minmax(0, 1fr);
   }
 
+  .pth-station,
+  .pos-station-name-col {
+    padding-left: 5px;
+    font-size: 0.74rem;
+  }
+
+  .pth-down {
+    padding-right: 4px;
+    font-size: 0.64rem;
+  }
+
+  .pth-rail,
   .pos-rail-area {
-    width: 24px;
+    width: 16px;
+  }
+
+  .pth-up {
+    font-size: 0.64rem;
+    padding-left: 4px;
+    padding-right: 4px;
   }
 
   .pos-trains-down {
-    padding: 3px 2px 3px 62px;
+    padding: 3px 3px 3px 2px;
   }
 
   .pos-trains-up {
-    padding: 3px 6px 3px 2px;
+    padding: 3px 2px 3px 3px;
   }
 
   .pos-train-card {
+    gap: 3px;
     max-width: 100%;
   }
 
   .pos-train-shield {
-    width: 19px;
-    height: 22px;
+    width: 16px;
+    height: 19px;
+    flex: 0 0 16px;
   }
 
   .pos-train-info {
-    padding: 3px 6px;
-    gap: 4px;
+    padding: 2px 5px;
+    gap: 2px 3px;
   }
 
   .pos-train-no {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
   }
 
   .pos-train-dest {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
   }
 
   .pos-stopped-badge,
   .pos-delay-badge {
-    font-size: 0.58rem;
+    font-size: 0.56rem;
     padding: 0 3px;
   }
 
