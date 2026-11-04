@@ -39,10 +39,12 @@
   }
   </script>
 
-  <link rel="stylesheet" href="../../style.css?v=5">
+  <link rel="stylesheet" href="../../style.css?v=6">
+  <link rel="stylesheet" href="../../admin/datepicker.css?v=20261101d">
   <link rel="icon" href="../../assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
   <link rel="manifest" href="../../manifest.json">
+  <script defer src="../../admin/datepicker.js?v=20261101d"></script>
 </head>
 
 <body>
@@ -64,6 +66,38 @@
     <section class="notice-section">
       <strong>閲覧にあたっての注意事項</strong>
       <p>本資料は有志の目撃情報および独自調査を基に作成した非公式データです。真岡鐵道株式会社様への問い合わせはお控えください。</p>
+    </section>
+
+    <!-- 本日の車両運用充当・ステータス（新設） -->
+    <section class="content-section" id="daily-operation-section">
+      <div class="operation-section-header">
+        <h2 class="section-title">車両運用充当・現況ステータス</h2>
+        <p class="section-desc">
+          指定日における各運用行路への充当車両および車庫・検査状況の一覧です。
+        </p>
+      </div>
+
+      <div class="daily-op-toolbar">
+        <div class="op-date-controls">
+          <button type="button" class="btn-secondary op-nav-btn" id="op-prev-btn">前日</button>
+          <label class="date-control date-picker-control op-date-picker-control">
+            <input type="text" id="op-date-input" data-is-datepicker="true" value="2026-10-01" placeholder="YYYY-MM-DD">
+          </label>
+          <button type="button" class="btn-secondary op-nav-btn" id="op-next-btn">翌日</button>
+          <button type="button" class="btn-secondary op-today-btn" id="op-today-btn">最新</button>
+        </div>
+
+        <div class="seg-group op-view-switcher" role="tablist">
+          <button type="button" class="seg-btn active" id="btn-view-ops" data-view="ops">運用行路別</button>
+          <button type="button" class="seg-btn" id="btn-view-vehs" data-view="vehs">車両ステータス別</button>
+        </div>
+      </div>
+
+      <div id="daily-op-content" class="daily-op-container">
+        <div class="empty-message">運用データを読み込んでいます...</div>
+      </div>
+
+      <div id="daily-op-notes" class="daily-op-notes" style="display: none;"></div>
     </section>
 
     <section class="content-section">
@@ -320,7 +354,8 @@
     gtag('config', 'G-0GM4B0FTW9');
   </script>
 
-  <script src="script.js"></script>
+  <script src="../../config.js?v=20261104"></script>
+  <script src="script.js?v=20261104"></script>
 </body>
 
 </html>
