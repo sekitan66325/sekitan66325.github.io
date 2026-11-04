@@ -972,6 +972,45 @@ main.container {
   flex-shrink: 0;
 }
 
+.seg-group {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--c-bg);
+}
+
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--c-bg);
+  border: none;
+  border-right: 1px solid var(--c-border-strong);
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--c-muted);
+  cursor: pointer;
+  line-height: 1.4;
+  transition: background-color 0.12s, color 0.12s;
+}
+
+.seg-btn:last-child {
+  border-right: none;
+}
+
+.seg-btn:hover:not(.active) {
+  color: var(--c-fg);
+  background-color: var(--c-surface-hover);
+}
+
+.seg-btn.active {
+  background-color: var(--c-accent);
+  color: #ffffff;
+}
+
 .op-table-wrap {
   background-color: var(--c-bg);
   border: 1px solid var(--c-border);
