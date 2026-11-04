@@ -285,6 +285,42 @@ main.container {
   line-height: 1.55;
 }
 
+.discord-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 20px;
+  padding: 16px 18px;
+  background-color: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-left: 4px solid var(--c-accent);
+  border-radius: 4px;
+}
+
+.discord-card-body {
+  flex: 1;
+  min-width: 240px;
+}
+
+.discord-card-title {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--c-fg);
+  margin-bottom: 4px;
+}
+
+.discord-card-desc {
+  font-size: 0.84rem;
+  color: var(--c-muted);
+  line-height: 1.6;
+}
+
+.discord-card-action {
+  flex-shrink: 0;
+}
+
 /* ==========================================================================
    5. リスト・資料アーカイブ（罫線区切り）
    ========================================================================== */
@@ -895,6 +931,14 @@ main.container {
   .portal-grid {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+
+  .discord-card-action {
+    width: 100%;
+  }
+
+  .discord-card-action .btn-primary {
+    width: 100%;
   }
 
   .container,
