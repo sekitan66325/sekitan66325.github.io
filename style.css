@@ -958,14 +958,31 @@ main.container {
 }
 
 .op-date-picker-control {
-  padding: 5px 26px 5px 8px;
-  width: 130px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 2px;
+  background-color: var(--c-bg);
+  padding: 0 24px 0 6px;
+  width: 115px;
+  height: 29px;
+  box-sizing: border-box;
+  cursor: pointer;
 }
 
 .op-date-picker-control input {
   width: 100%;
   font-size: 0.82rem;
   text-align: center;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--c-fg);
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
 }
 
 .op-view-switcher {
