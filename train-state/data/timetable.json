@@ -1170,8 +1170,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1259,13 +1258,6 @@
         "arr": "16:53",
         "dep": null
       }
-    ],
-    "partial_cancellations": [
-      {
-        "date": "2026-10-31~2026-11-03",
-        "actual_start": "M01",
-        "actual_end": "M07"
-      }
     ]
   },
   {
@@ -1275,8 +1267,7 @@
     "direction": "down",
     "destination": "茂木",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": []
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -1363,13 +1354,6 @@
         "code": "M17",
         "arr": "17:23",
         "dep": null
-      }
-    ],
-    "partial_cancellations": [
-      {
-        "date": "2026-10-31~2026-11-03",
-        "actual_start": "M07",
-        "actual_end": "M17"
       }
     ]
   },
@@ -2246,9 +2230,7 @@
         2,
         3,
         4,
-        5,
-        6,
-        0
+        5
       ]
     },
     "stations": [
@@ -2362,9 +2344,7 @@
         2,
         3,
         4,
-        5,
-        6,
-        0
+        5
       ]
     },
     "stations": [
@@ -4416,11 +4396,7 @@
     "direction": "up",
     "destination": "下館",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_off": [
-        "2026-10-31~2026-11-03"
-      ]
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4467,11 +4443,7 @@
     "direction": "up",
     "destination": "真岡",
     "operation_rule": {
-      "service_type": "regular",
-      "days_off": [],
-      "dates_off": [
-        "2026-10-31~2026-11-03"
-      ]
+      "service_type": "regular"
     },
     "stations": [
       {
@@ -4678,9 +4650,7 @@
         2,
         3,
         4,
-        5,
-        6,
-        0
+        5
       ]
     },
     "stations": [
@@ -4794,9 +4764,7 @@
         2,
         3,
         4,
-        5,
-        6,
-        0
+        5
       ]
     },
     "stations": [
