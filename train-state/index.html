@@ -39,8 +39,8 @@
   }
   </script>
 
-  <link rel="stylesheet" href="../style.css?v=20261101d">
-  <link rel="stylesheet" href="style.css?v=20261101d">
+  <link rel="stylesheet" href="../style.css?v=20261105c">
+  <link rel="stylesheet" href="style.css?v=20261105c">
   <link rel="stylesheet" href="../admin/datepicker.css?v=20261101d">
   <link rel="icon" href="../assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
@@ -106,6 +106,7 @@
       <button type="button" class="view-tab active" data-view="position">走行位置</button>
       <button type="button" class="view-tab" data-view="diagram">ダイヤグラム</button>
       <button type="button" class="view-tab" data-view="timetable">路線時刻表</button>
+      <button type="button" class="view-tab" data-view="station">各駅時刻表・駅情報</button>
     </nav>
 
     <!-- 1. 列車走行位置ビュー -->
@@ -180,6 +181,44 @@
         </div>
       </div>
     </section>
+
+    <!-- 4. 各駅時刻表・駅情報ビュー -->
+    <section id="view-station" class="view-panel">
+      <div class="panel-head">
+        <h2>各駅時刻表・駅情報</h2>
+        <div class="st-nav-controls">
+          <button type="button" class="btn-secondary st-nav-btn" id="st-prev-btn" title="前の駅">← 前の駅</button>
+          <button type="button" class="btn-secondary st-nav-btn" id="st-next-btn" title="次の駅">次の駅 →</button>
+        </div>
+      </div>
+
+      <!-- 全17駅クイックセレクター -->
+      <div class="station-selector-wrap">
+        <div class="station-selector-bar" id="station-selector-bar" role="tablist" aria-label="駅選択"></div>
+      </div>
+
+      <!-- 駅情報カード -->
+      <div class="station-info-card" id="station-info-card"></div>
+
+      <!-- 各駅発車時刻表セクション -->
+      <div class="station-timetable-section">
+        <div class="st-tt-toolbar">
+          <div class="st-tt-title-wrap">
+            <h3 class="st-tt-title" id="st-tt-title">発車時刻表</h3>
+            <span class="st-tt-date" id="st-tt-date">2026年--月--日</span>
+          </div>
+          <div class="seg-group st-dir-filter" role="tablist">
+            <button type="button" class="seg-btn active" data-stdir="all">すべて</button>
+            <button type="button" class="seg-btn" data-stdir="down">下り（茂木方面）</button>
+            <button type="button" class="seg-btn" data-stdir="up">上り（下館方面）</button>
+          </div>
+        </div>
+
+        <div class="station-timetable-wrap">
+          <div id="station-timetable-content" class="station-timetable-content"></div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <div class="modal-overlay hidden" id="train-modal">
@@ -225,8 +264,8 @@
     gtag('config', 'G-0GM4B0FTW9');
   </script>
 
-  <script src="../config.js?v=20261101d"></script>
-  <script src="script.js?v=20261101d"></script>
+  <script src="../config.js?v=20261105c"></script>
+  <script src="script.js?v=20261105c"></script>
 </body>
 
 </html>

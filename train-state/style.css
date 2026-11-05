@@ -1171,3 +1171,527 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     display: none;
   }
 }
+
+/* ==========================================================================
+   充当車両表示・各駅時刻表 & 駅情報ビュー スタイル (2026 Light Theme & Modern Design)
+   ========================================================================== */
+
+/* 1. 走行位置：駅名クリック可能表示 */
+.clickable-station {
+  cursor: pointer;
+  transition: color 0.15s ease, text-decoration 0.15s ease;
+  user-select: none;
+}
+.clickable-station:hover {
+  color: #006633 !important;
+  text-decoration: underline;
+}
+
+/* 2. 走行位置：列車カード内の充当車両バッジ */
+.pos-veh-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 2px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #065f46;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.pos-veh-badge--op {
+  background: rgba(100, 116, 139, 0.12);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.25);
+}
+
+/* 3. 路線時刻表：充当車両行 */
+.tt-veh-cell {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #047857;
+  line-height: 1.3;
+  white-space: nowrap;
+  padding: 6px 4px !important;
+  background: rgba(16, 185, 129, 0.08);
+}
+.tt-op-badge {
+  font-size: 0.68rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* 4. モーダル：編成・車両アイコン */
+.formation-car {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+  color: #1e293b;
+}
+.formation-icon {
+  width: 26px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* 5. 各駅時刻表・駅情報ビュー (#view-station) */
+#view-station {
+  padding-bottom: 24px;
+}
+
+.st-nav-controls {
+  display: flex;
+  gap: 8px;
+}
+.st-nav-btn {
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 3px;
+  border: 1px solid var(--c-border, #dce2ea);
+  background: #ffffff;
+  color: var(--c-fg, #18181b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.st-nav-btn:hover:not(:disabled) {
+  background: var(--c-surface-hover, #eef2f7);
+  border-color: #006633;
+  color: #006633;
+}
+.st-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 駅セレクターバー */
+.station-selector-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 0 14px;
+  margin-bottom: 12px;
+  scrollbar-width: thin;
+}
+.station-selector-bar {
+  display: flex;
+  gap: 6px;
+  min-width: max-content;
+}
+.st-sel-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  min-width: 58px;
+  background: #ffffff;
+  border: 1px solid var(--c-border, #dce2ea);
+  border-radius: 3px;
+  cursor: pointer;
+  color: var(--c-muted, #525866);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.st-sel-btn:hover {
+  border-color: #006633;
+  color: #006633;
+  background: #f0fdf4;
+}
+.st-sel-btn.active {
+  background: #006633;
+  color: #ffffff !important;
+  border-color: #006633;
+  box-shadow: 0 2px 6px rgba(0, 102, 51, 0.25);
+}
+.st-sel-btn.active .st-sel-code,
+.st-sel-btn.active .st-sel-name {
+  color: #ffffff !important;
+}
+.st-sel-code {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+.st-sel-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+/* 駅情報カード */
+.station-info-card {
+  background: #ffffff;
+  border: 1px solid var(--c-border, #dce2ea);
+  border-radius: 4px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+.st-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--c-border, #dce2ea);
+  margin-bottom: 14px;
+}
+.st-title-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.st-code-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 32px;
+  background: #006633;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+.st-names {
+  display: flex;
+  flex-direction: column;
+}
+.st-main-name {
+  font-size: 1.45rem;
+  font-weight: 800;
+  margin: 0;
+  color: #0f172a;
+  line-height: 1.2;
+}
+.st-sub-name {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 2px;
+  font-weight: 500;
+}
+.st-exchange-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 3px;
+}
+.st-exchange-badge.exchange-yes {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+.st-exchange-badge.exchange-no {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+.st-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.st-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.st-meta-lbl {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+}
+.st-meta-val {
+  font-size: 0.88rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+.st-meta-val strong {
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 700;
+}
+.st-meta-val.muted {
+  color: #94a3b8;
+}
+.st-tag-conn {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 2px;
+  margin-right: 4px;
+}
+.st-highlights {
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.st-hl-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #006633;
+}
+.st-hl-text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #334155;
+}
+
+/* 発車時刻表セクション */
+.station-timetable-section {
+  margin-top: 14px;
+}
+.st-tt-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.st-tt-title-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.st-tt-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  color: #0f172a;
+}
+.st-tt-date {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
+}
+.station-timetable-wrap {
+  background: #ffffff;
+  border: 1px solid var(--c-border, #dce2ea);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+.st-tt-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.st-tt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+.st-tt-table th {
+  background: #f8fafc;
+  padding: 10px 12px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #475569;
+  border-bottom: 1px solid var(--c-border, #dce2ea);
+  white-space: nowrap;
+}
+.st-tt-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  color: #1e293b;
+}
+.st-tt-row {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.st-tt-row:hover {
+  background: #edf5ff;
+}
+.st-tt-row:last-child td {
+  border-bottom: none;
+}
+.st-tt-time {
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #0f172a;
+}
+.st-dir-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 2px;
+  margin-right: 6px;
+}
+.st-dir-badge.dir-down {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+.st-dir-badge.dir-up {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+.st-dest-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.st-type-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+.st-type-badge.type-local {
+  background: #f1f5f9;
+  color: #475569;
+}
+.st-type-badge.type-sl {
+  background: #b45309;
+  color: #ffffff;
+}
+.st-type-badge.type-extra {
+  background: #b91c1c;
+  color: #ffffff;
+}
+.st-trainno-text {
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+}
+.st-op-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 2px;
+  color: #475569;
+}
+.st-tt-veh-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 2px;
+  color: #047857;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+.st-tt-veh-icon {
+  width: 22px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.st-tt-veh-unassigned {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+.st-status-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.st-status-badge.status-normal {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.st-status-badge.status-current {
+  background: #059669;
+  color: #ffffff;
+}
+.st-status-badge.status-current.pulse {
+  animation: stPulse 1.8s infinite;
+}
+@keyframes stPulse {
+  0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.6); }
+  70% { box-shadow: 0 0 0 6px rgba(5, 150, 105, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+}
+.st-status-badge.status-running {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+.st-status-badge.status-departed {
+  background: #f8fafc;
+  color: #94a3b8;
+  font-weight: 500;
+}
+.st-status-badge.status-cancel {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.st-tt-empty {
+  padding: 36px 16px;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+/* モバイル対応最適化 (max-width: 600px) */
+@media (max-width: 600px) {
+  .view-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+  .view-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .view-tab {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+  }
+  .st-info-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .st-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .st-tt-table th, .st-tt-table td {
+    padding: 8px 8px;
+    font-size: 0.75rem;
+  }
+  .st-tt-time {
+    font-size: 0.9rem;
+  }
+}

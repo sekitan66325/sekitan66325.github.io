@@ -1,7 +1,295 @@
 var $ = (s, root = document) => root.querySelector(s);
 var $$ = (s, root = document) => [...root.querySelectorAll(s)];
-var DATA = { stations: [], timetable: [], prevTimetable: [], status: null };
-var state = { view: "position", serviceDate: "2026-08-15", currentMinutes: null, liveClock: true, diagramDir: "all", timetableDir: "up" };
+var DATA = { stations: [], timetable: [], prevTimetable: [], status: null, operationVehicles: {} };
+var state = {
+  view: "position",
+  serviceDate: "2026-11-05",
+  currentMinutes: null,
+  liveClock: true,
+  diagramDir: "all",
+  timetableDir: "up",
+  selectedStationCode: "M07",
+  stationDirFilter: "all"
+};
+
+// 車両アイコンパスの取得
+function getVehicleIconSrc(vehicleId) {
+  if (!vehicleId) return "../assets/moka14.png";
+  const id = vehicleId.trim();
+  if (id.includes("キハ20") || id.includes("247")) return "../assets/j52.png";
+  if (id.includes("C12")) return "../assets/c12mk.png";
+  if (id.includes("DE10")) return "../assets/de10j1.png";
+  if (id.includes("50") || id.includes("オハ")) return "../assets/moka50.png";
+  return "../assets/moka14.png";
+}
+
+function getSpreadsheetId() {
+  if (typeof CONFIG !== "undefined" && CONFIG.UNYOU_SPREADSHEET_ID) {
+    return CONFIG.UNYOU_SPREADSHEET_ID;
+  }
+  if (typeof window !== "undefined" && window.CONFIG && window.CONFIG.UNYOU_SPREADSHEET_ID) {
+    return window.CONFIG.UNYOU_SPREADSHEET_ID;
+  }
+  return "1tzgW4fok2NkcoO2816NcEYSw7zv_jeobifrPIqh4vQY";
+}
+
+// CSVパーサー（引用符・改行・カンマ対応）
+function parseSpreadsheetCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const next = text[i + 1];
+    if (inQuotes) {
+      if (c === '"' && next === '"') {
+        cell += '"';
+        i++;
+      } else if (c === '"') {
+        inQuotes = false;
+      } else {
+        cell += c;
+      }
+    } else {
+      if (c === '"') {
+        inQuotes = true;
+      } else if (c === ',') {
+        row.push(cell);
+        cell = "";
+      } else if (c === '\r') {
+        if (next === '\n') i++;
+        row.push(cell);
+        rows.push(row);
+        row = [];
+        cell = "";
+      } else if (c === '\n') {
+        row.push(cell);
+        rows.push(row);
+        row = [];
+        cell = "";
+      } else {
+        cell += c;
+      }
+    }
+  }
+  if (cell || row.length > 0) {
+    row.push(cell);
+    rows.push(row);
+  }
+  return rows;
+}
+
+// スプレッドシートCSVパース
+function parseSpreadsheetMonthCsv(year, month, csvText) {
+  const rows = parseSpreadsheetCSV(csvText);
+  if (rows.length === 0) return null;
+
+  let vColIdx = 1;
+  let currentDayCols = {};
+  const vehicles = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r || r.length === 0 || r.every(c => !c || c.trim() === "")) continue;
+
+    const firstCell = (r[0] || "").trim();
+    if (firstCell.startsWith("◆") || firstCell.startsWith("※") || firstCell.startsWith("（") || firstCell.startsWith("(")) {
+      continue;
+    }
+
+    for (let c = 0; c < r.length; c++) {
+      if ((r[c] || "").includes("車両番号")) {
+        vColIdx = c;
+        break;
+      }
+    }
+
+    let hasDates = false;
+    const newDayCols = {};
+    for (let c = 0; c < r.length; c++) {
+      const parts = (r[c] || "").trim().split("/");
+      if (parts[0] && /^\d+$/.test(parts[0])) {
+        const dNum = parseInt(parts[0], 10);
+        if (dNum >= 1 && dNum <= 31) {
+          newDayCols[dNum] = c;
+          hasDates = true;
+        }
+      }
+    }
+
+    if (hasDates) {
+      currentDayCols = newDayCols;
+      continue;
+    }
+
+    if (r.length > vColIdx) {
+      const vid = (r[vColIdx] || "").trim();
+      if (!vid || vid === "車両番号" || vid.includes("形式") || vid.endsWith("月")) {
+        continue;
+      }
+
+      let vObj = vehicles.find(v => v.id === vid);
+      if (!vObj) {
+        vObj = { id: vid, records: {} };
+        vehicles.push(vObj);
+      }
+
+      Object.keys(currentDayCols).forEach(dStr => {
+        const d = parseInt(dStr, 10);
+        const colIdx = currentDayCols[d];
+        if (colIdx < r.length) {
+          const val = (r[colIdx] || "").trim();
+          if (val) {
+            vObj.records[dStr] = val;
+          }
+        }
+      });
+    }
+  }
+
+  return { year, month, vehicles };
+}
+
+const operationMonthCache = {};
+
+// 組み込みフォールバックデータ
+const EMBEDDED_FALLBACK_202610 = {"year": 2026, "month": 10, "vehicles": [{"id": "モオカ14-1", "records": {"1": "A4", "2": "A2", "3": "A6", "4": "A1", "5": "A4", "6": "真岡", "7": "A3", "8": "真岡", "9": "A4", "10": "A12/A5", "11": "A3", "12": "A12/A5", "13": "A13/A22", "14": "A2/A31", "15": "A11/(A6)", "16": "(A1)", "17": "真岡", "18": "A2/A31", "19": "A11/A6", "20": "A1", "21": "A12", "22": "真岡", "23": "A4", "24": "A12/A5", "25": "A3", "26": "A4", "27": "A12", "28": "A3", "29": "陶器市", "30": "陶器市", "31": "陶器市"}}, {"id": "モオカ14-2", "records": {"1": "合同訓練", "2": "真岡", "3": "真岡", "4": "真岡", "5": "DC検修3", "6": "DC検修3", "7": "DC検修3", "8": "DC検修3", "9": "DC検修3", "10": "DC検修3", "11": "DC検修3", "12": "DC検修3", "13": "DC検修3", "14": "真岡", "15": "真岡", "16": "真岡", "17": "A6", "18": "A1", "19": "真岡", "20": "A4", "21": "A12/A5", "22": "A13/A22", "23": "A2", "24": "A6", "25": "A1", "26": "真岡", "27": "A1", "28": "A3", "29": "A4", "30": "陶器市", "31": "陶器市"}}, {"id": "モオカ14-3", "records": {"1": "変A13", "2": "A4", "3": "A2", "4": "A6", "5": "A1", "6": "A4", "7": "A4", "8": "A12/A5", "9": "A13/A22", "10": "A2", "11": "A6", "12": "A1", "13": "A3", "14": "真岡", "15": "A4", "16": "A12/A5", "17": "A3", "18": "A12/A5", "19": "A13/A22", "20": "A2/A31", "21": "A11/A6", "22": "A1", "23": "A3", "24": "真岡", "25": "A4", "26": "A4", "27": "A12/A5", "28": "A13/A22", "29": "A2/A31", "30": "A11/A6", "31": "陶器市"}}, {"id": "モオカ14-4", "records": {"1": "A2/A31", "2": "A11/A6", "3": "A1/A5", "4": "A3", "5": "A12/A5", "6": "変A13", "7": "A2/A31", "8": "A11/A6", "9": "A1", "10": "真岡", "11": "A2", "12": "A6", "13": "A1", "14": "A3", "15": "(真岡)", "16": "(真岡)", "17": "A4", "18": "真岡", "19": "A3", "20": "真岡", "21": "A4", "22": "A12/A5", "23": "A13/A22", "24": "A2", "25": "A6", "26": "A1", "27": "陶器市", "28": "陶器市", "29": "陶器市", "30": "陶器市", "31": "陶器市"}}, {"id": "モオカ14-5", "records": {"1": "A1", "2": "A3", "3": "A12", "4": "真岡", "5": "真岡", "6": "A3", "7": "A12/A5", "8": "A13/A22", "9": "A2", "10": "A6", "11": "A1/A5", "12": "A3", "13": "A12/A5", "14": "A13/(A6)", "15": "(A1)", "16": "(A3)", "17": "真岡", "18": "DC検修3", "19": "DC検修3", "20": "DC検修3", "21": "DC検修3", "22": "DC検修3", "23": "DC検修3", "24": "DC検修3", "25": "DC検修3", "26": "DC検修3", "27": "DC検修3", "28": "DC検修3", "29": "DC検修3", "30": "DC検修3", "31": "DC検修3"}}, {"id": "モオカ14-6", "records": {"1": "A11/A6", "2": "A1", "3": "真岡", "4": "A4", "5": "A2/A31", "6": "A11/A6", "7": "A1/A63", "8": "A3", "9": "真岡", "10": "(A4)", "11": "A4", "12": "真岡", "13": "真岡", "14": "A4", "15": "A12/A5", "16": "A13/A22", "17": "A2", "18": "A6", "19": "A1", "20": "A3", "21": "真岡", "22": "A4", "23": "A12/A5", "24": "A3", "25": "A12/A5", "26": "A13/A22", "27": "A2/A31", "28": "A11/A6", "29": "A1", "30": "陶器市", "31": "陶器市"}}, {"id": "モオカ14-7", "records": {"1": "真岡", "2": "真岡", "3": "真岡", "4": "A2/A31", "5": "A11/A6", "6": "A1/A63", "7": "真岡", "8": "A4", "9": "A12/A5", "10": "A3", "11": "A12", "12": "真岡", "13": "A2/A31", "14": "A11/(A22)", "15": "A2/A31", "16": "A11/A6", "17": "A1", "18": "A4", "19": "A4", "20": "A12/A5", "21": "A13/A22", "22": "A2/A31", "23": "A11/A6", "24": "A1", "25": "真岡", "26": "A2/A31", "27": "A11/A6", "28": "A1/A5", "29": "A13/A22", "30": "A2/A31", "31": "陶器市"}}, {"id": "モオカ14-8", "records": {"1": "A3", "2": "A12/A5", "3": "A3", "4": "A12/A5", "5": "変A13", "6": "A2/A31", "7": "A11/A6", "8": "A1/A63", "9": "A3", "10": "(真岡)", "11": "真岡", "12": "A2/A31", "13": "A11/A6", "14": "A1", "15": "A3", "16": "A4", "17": "A12/A5", "18": "A3", "19": "A12/A5", "20": "A13/A22", "21": "A2/A31", "22": "A11/A6", "23": "A1", "24": "真岡", "25": "A2/A31", "26": "A11/A6", "27": "A1", "28": "A4", "29": "陶器市", "30": "陶器市", "31": "陶器市"}}, {"id": "モオカ14-9", "records": {"1": "A12/A5", "2": "変A13", "3": "A4", "4": "真岡", "5": "A3", "6": "A12/A5", "7": "A13/A22", "8": "A2/A31", "9": "A11/A6", "10": "A1", "11": "真岡", "12": "A4", "13": "A4", "14": "A12/A5", "15": "A13/A22", "16": "A2", "17": "真岡", "18": "真岡", "19": "A2/A31", "20": "A11/A6", "21": "A1", "22": "A3", "23": "真岡", "24": "A4", "25": "真岡", "26": "真岡", "27": "A4", "28": "A12/A5", "29": "A13/A22", "30": "陶器市", "31": "陶器市"}}, {"id": "C12 66", "records": {"1": "OM(全検)", "2": "OM(全検)", "3": "OM(全検)", "4": "OM(全検)", "5": "OM(全検)", "6": "OM(全検)", "7": "OM(全検)", "8": "OM(全検)", "9": "OM(全検)", "10": "OM(全検)", "11": "OM(全検)", "12": "OM(全検)", "13": "OM(全検)", "14": "OM(全検)", "15": "OM(全検)", "16": "OM(全検)", "17": "OM(全検)", "18": "OM(全検)", "19": "OM(全検)", "20": "OM(全検)", "21": "OM(全検)", "22": "OM(全検)", "23": "OM(全検)", "24": "OM(全検)", "25": "OM(全検)", "26": "OM(全検)", "27": "OM(全検)", "28": "OM(全検)", "29": "OM(全検)", "30": "OM(全検)", "31": "OM(全検)"}}, {"id": "DE10 1535", "records": {"1": "SL庫", "2": "SL庫", "3": "SL庫", "4": "SL庫", "5": "SL庫", "6": "SL庫", "7": "SL庫", "8": "SL庫", "9": "SL庫", "10": "SL庫", "11": "SL庫", "12": "SL庫", "13": "SL庫", "14": "真岡", "15": "真岡", "16": "真岡", "17": "真岡", "18": "真岡", "19": "真岡", "20": "真岡", "21": "真岡", "22": "真岡", "23": "真岡", "24": "真岡", "25": "展示", "26": "真岡", "27": "真岡", "28": "真岡", "29": "真岡", "30": "真岡", "31": "真岡"}}, {"id": "オハ50 11", "records": {"1": "下2", "2": "下2", "3": "下2", "4": "下2", "5": "下2", "6": "下2", "7": "下2", "8": "下2", "9": "下2", "10": "下2", "11": "下2", "12": "下2", "13": "下2", "14": "下2", "15": "下2", "16": "下2", "17": "下2", "18": "下2", "19": "下2", "20": "下2", "21": "下2", "22": "下2", "23": "下2", "24": "下2", "25": "下2", "26": "下2", "27": "下2", "28": "下2", "29": "下2", "30": "下2", "31": "下2"}}, {"id": "オハ50 22", "records": {"1": "下2", "2": "下2", "3": "下2", "4": "下2", "5": "下2", "6": "下2", "7": "下2", "8": "下2", "9": "下2", "10": "下2", "11": "下2", "12": "下2", "13": "下2", "14": "下2", "15": "下2", "16": "下2", "17": "下2", "18": "下2", "19": "下2", "20": "下2", "21": "下2", "22": "下2", "23": "下2", "24": "下2", "25": "下2", "26": "下2", "27": "下2", "28": "下2", "29": "下2", "30": "下2", "31": "下2"}}, {"id": "オハフ50 33", "records": {"1": "下2", "2": "下2", "3": "下2", "4": "下2", "5": "下2", "6": "下2", "7": "下2", "8": "下2", "9": "下2", "10": "下2", "11": "下2", "12": "下2", "13": "下2", "14": "下2", "15": "下2", "16": "下2", "17": "下2", "18": "下2", "19": "下2", "20": "下2", "21": "下2", "22": "下2", "23": "下2", "24": "下2", "25": "下2", "26": "下2", "27": "下2", "28": "下2", "29": "下2", "30": "下2", "31": "下2"}}, {"id": "キハ20 247", "records": {"1": "新庫", "2": "新庫", "3": "新庫", "4": "新庫", "5": "新庫", "6": "新庫", "7": "新庫", "8": "新庫", "9": "新庫", "10": "新庫", "11": "新庫", "12": "新庫", "13": "新庫", "14": "新庫", "15": "新庫", "16": "新庫", "17": "新庫", "18": "新庫", "19": "新庫", "20": "構内試運転", "21": "新庫", "22": "新庫", "23": "新庫", "24": "新庫", "25": "構内走行", "26": "新庫", "27": "新庫", "28": "新庫", "29": "新庫", "30": "新庫", "31": "新庫"}}]};
+
+const EMBEDDED_FALLBACK_202611 = {"year": 2026, "month": 11, "vehicles": [{"id": "モオカ14-1", "records": {"1": "陶器市", "2": "陶器市", "3": "陶器市", "4": "真岡", "5": "", "6": "", "7": "", "8": "", "9": "", "10": "", "11": "", "12": "", "13": "", "14": "", "15": "", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}, {"id": "モオカ14-2", "records": {"1": "陶器市", "2": "陶器市", "3": "陶器市", "4": "A3", "5": "", "6": "", "7": "", "8": "", "9": "", "10": "", "11": "", "12": "", "13": "", "14": "", "15": "", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}, {"id": "モオカ14-3", "records": {"1": "陶器市", "2": "陶器市", "3": "陶器市", "4": "A11", "5": "", "6": "", "7": "", "8": "", "9": "", "10": "", "11": "", "12": "", "13": "", "14": "", "15": "", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}, {"id": "モオカ14-4", "records": {"1": "陶器市", "2": "陶器市", "3": "陶器市", "4": "A4", "5": "A12/A5", "6": "", "7": "", "8": "", "9": "", "10": "", "11": "", "12": "", "13": "", "14": "", "15": "", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}, {"id": "モオカ14-5", "records": {"1": "新庫", "2": "新庫", "3": "新庫", "4": "新庫", "5": "新庫", "6": "新庫", "7": "新庫", "8": "新庫", "9": "新庫", "10": "新庫", "11": "新庫", "12": "新庫", "13": "新庫", "14": "新庫", "15": "新庫", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}, {"id": "モオカ14-6", "records": {"1": "陶器市", "2": "陶器市", "3": "陶器市", "4": "A13", "5": "", "6": "", "7": "", "8": "", "9": "", "10": "", "11": "", "12": "", "13": "", "14": "", "15": "", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}, {"id": "モオカ14-7", "records": {"1": "陶器市", "2": "陶器市", "3": "陶器市", "4": "A1", "5": "", "6": "", "7": "", "8": "", "9": "", "10": "", "11": "", "12": "", "13": "", "14": "", "15": "", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}, {"id": "モオカ14-8", "records": {"1": "陶器市", "2": "陶器市", "3": "陶器市", "4": "A2", "5": "", "6": "", "7": "", "8": "", "9": "", "10": "", "11": "", "12": "", "13": "", "14": "", "15": "", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}, {"id": "モオカ14-9", "records": {"1": "陶器市", "2": "陶器市", "3": "陶器市", "4": "A12", "5": "", "6": "", "7": "", "8": "", "9": "", "10": "", "11": "", "12": "", "13": "", "14": "", "15": "", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}, {"id": "C12 66", "records": {"1": "OM(全検)", "2": "OM(全検)", "3": "OM(全検)", "4": "OM(全検)", "5": "OM(全検)", "6": "OM(全検)", "7": "OM(全検)", "8": "OM(全検)", "9": "OM(全検)", "10": "OM(全検)", "11": "OM(全検)", "12": "OM(全検)", "13": "OM(全検)", "14": "OM(全検)", "15": "OM(全検)", "16": "OM(全検)", "17": "OM(全検)", "18": "OM(全検)", "19": "OM(全検)", "20": "OM(全検)", "21": "OM(全検)", "22": "OM(全検)", "23": "OM(全検)", "24": "OM(全検)", "25": "OM(全検)", "26": "OM(全検)", "27": "OM(全検)", "28": "OM(全検)", "29": "OM(全検)", "30": "OM(全検)"}}, {"id": "DE10 1535", "records": {"1": "SL庫", "2": "SL庫", "3": "SL庫", "4": "SL庫", "5": "SL庫", "6": "SL庫", "7": "SL庫", "8": "SL庫", "9": "SL庫", "10": "SL庫", "11": "SL庫", "12": "SL庫", "13": "SL庫", "14": "真岡", "15": "真岡", "16": "真岡", "17": "真岡", "18": "真岡", "19": "真岡", "20": "真岡", "21": "真岡", "22": "真岡", "23": "真岡", "24": "真岡", "25": "真岡", "26": "真岡", "27": "真岡", "28": "真岡", "29": "真岡", "30": "真岡"}}, {"id": "オハ50 11", "records": {"1": "下二", "2": "下二", "3": "下二", "4": "下二", "5": "下二", "6": "下二", "7": "下二", "8": "下二", "9": "真岡", "10": "真岡", "11": "真岡", "12": "真岡", "13": "真岡", "14": "真岡", "15": "真岡", "16": "真岡", "17": "真岡", "18": "真岡", "19": "真岡", "20": "真岡", "21": "真岡", "22": "真岡", "23": "真岡", "24": "真岡", "25": "真岡", "26": "真岡", "27": "真岡", "28": "真岡", "29": "真岡", "30": "真岡"}}, {"id": "オハ50 22", "records": {"1": "下二", "2": "下二", "3": "下二", "4": "下二", "5": "下二", "6": "下二", "7": "下二", "8": "下二", "9": "真岡", "10": "真岡", "11": "真岡", "12": "真岡", "13": "真岡", "14": "真岡", "15": "真岡", "16": "真岡", "17": "真岡", "18": "真岡", "19": "真岡", "20": "真岡", "21": "真岡", "22": "真岡", "23": "真岡", "24": "真岡", "25": "真岡", "26": "真岡", "27": "真岡", "28": "真岡", "29": "真岡", "30": "真岡"}}, {"id": "オハフ50 33", "records": {"1": "下二", "2": "下二", "3": "下二", "4": "下二", "5": "下二", "6": "下二", "7": "下二", "8": "下二", "9": "真岡", "10": "真岡", "11": "真岡", "12": "真岡", "13": "真岡", "14": "真岡", "15": "真岡", "16": "真岡", "17": "真岡", "18": "真岡", "19": "真岡", "20": "真岡", "21": "真岡", "22": "真岡", "23": "真岡", "24": "真岡", "25": "真岡", "26": "真岡", "27": "真岡", "28": "真岡", "29": "真岡", "30": "真岡"}}, {"id": "キハ20 247", "records": {"1": "下五", "2": "下五", "3": "下五", "4": "下五", "5": "下五", "6": "下五", "7": "", "8": "", "9": "", "10": "", "11": "", "12": "", "13": "", "14": "", "15": "", "16": "", "17": "", "18": "", "19": "", "20": "", "21": "", "22": "", "23": "", "24": "", "25": "", "26": "", "27": "", "28": "", "29": "", "30": ""}}]};
+
+// 月別運用データの取得
+async function fetchOperationMonthData(year, month) {
+  const sheetName = `${year}${String(month).padStart(2, "0")}`;
+  if (operationMonthCache[sheetName]) {
+    return operationMonthCache[sheetName];
+  }
+
+  const spreadsheetId = getSpreadsheetId();
+  if (spreadsheetId) {
+    const csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}&t=${Date.now()}`;
+    try {
+      const res = await fetch(csvUrl);
+      if (res.ok) {
+        const text = await res.text();
+        if (!text.trim().startsWith("<!DOCTYPE") && !text.includes("<html")) {
+          const parsed = parseSpreadsheetMonthCsv(year, month, text);
+          if (parsed && parsed.vehicles.length > 0) {
+            operationMonthCache[sheetName] = parsed;
+            return parsed;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[TrainState] スプレッドシート運用データ取得エラー:", err);
+    }
+  }
+
+  // フォールバック
+  if (sheetName === "202610") return EMBEDDED_FALLBACK_202610;
+  if (sheetName === "202611") return EMBEDDED_FALLBACK_202611;
+
+  return null;
+}
+
+// 指定日における「運用番号 ↔ 充当車両」マップの構築
+async function buildDailyVehicleMap(serviceDate) {
+  if (!serviceDate) return;
+  const parts = serviceDate.split("-");
+  if (parts.length !== 3) return;
+
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const day = parseInt(parts[2], 10);
+
+  const monthData = await fetchOperationMonthData(year, month);
+  const dayOpVehicles = {};
+
+  if (monthData && monthData.vehicles) {
+    monthData.vehicles.forEach(v => {
+      const raw = v.records ? (v.records[String(day)] || "") : "";
+      if (!raw) return;
+
+      // "A1", "A12/A5", "A11/(A6)", "変A13" 等から運用トークンを抽出
+      const matches = raw.match(/A\d+/g);
+      if (matches) {
+        matches.forEach(token => {
+          if (!dayOpVehicles[token]) dayOpVehicles[token] = [];
+          if (!dayOpVehicles[token].includes(v.id)) {
+            dayOpVehicles[token].push(v.id);
+          }
+        });
+      }
+
+      // SL運行関連（C12 66, DE10 1535, 50系客車）の特別処理
+      if (raw.includes("601") || raw.includes("SL") || raw.includes("もおか")) {
+        if (!dayOpVehicles["A601"]) dayOpVehicles["A601"] = [];
+        if (!dayOpVehicles["A601"].includes(v.id)) {
+          dayOpVehicles["A601"].push(v.id);
+        }
+      }
+    });
+  }
+
+  DATA.operationVehicles = dayOpVehicles;
+}
+
+async function syncDailyOperations(serviceDate) {
+  try {
+    await buildDailyVehicleMap(serviceDate);
+  } catch (err) {
+    console.error("[TrainState] 日別運用同期エラー:", err);
+  }
+}
+
+// 列車に対応する充当車両ID配列の取得
+function getTrainAssignedVehicles(train, serviceDate) {
+  if (!train || !train.operation_id) return [];
+  const opStr = train.operation_id;
+  const tokens = opStr.split(/[,/\s]+/).filter(Boolean);
+  const result = [];
+
+  tokens.forEach(tok => {
+    // 1. 直接一致
+    if (DATA.operationVehicles[tok]) {
+      DATA.operationVehicles[tok].forEach(vid => {
+        if (!result.includes(vid)) result.push(vid);
+      });
+    }
+
+    // 2. 相互乗り入れ・前日/半日運用の互換マッチング
+    // 真岡鐵道ダイヤ規約: A12は午前・A5は午後、A11は午前・A6は午後
+    if (tok === "A5" && DATA.operationVehicles["A12"]) {
+      DATA.operationVehicles["A12"].forEach(vid => {
+        if (!result.includes(vid)) result.push(vid);
+      });
+    } else if (tok === "A6" && DATA.operationVehicles["A11"]) {
+      DATA.operationVehicles["A11"].forEach(vid => {
+        if (!result.includes(vid)) result.push(vid);
+      });
+    } else if (tok === "A12" && DATA.operationVehicles["A5"]) {
+      DATA.operationVehicles["A5"].forEach(vid => {
+        if (!result.includes(vid)) result.push(vid);
+      });
+    } else if (tok === "A11" && DATA.operationVehicles["A6"]) {
+      DATA.operationVehicles["A6"].forEach(vid => {
+        if (!result.includes(vid)) result.push(vid);
+      });
+    }
+
+    // 3. SL運用の補正
+    if ((tok === "A601" || tok === "A301" || train.type === "sl") && result.length === 0) {
+      if (DATA.operationVehicles["A601"] && DATA.operationVehicles["A601"].length > 0) {
+        DATA.operationVehicles["A601"].forEach(vid => {
+          if (!result.includes(vid)) result.push(vid);
+        });
+      }
+    }
+  });
+
+  return result;
+}
+
 
 function formatStationName(name) {
   if (!name) return name;
@@ -705,11 +993,18 @@ function renderStations() {
     stRow.dataset.station = s.code;
 
     stRow.innerHTML = `
-      <div class="pos-station-name-col">${formatStationName(s.name)}</div>
+      <div class="pos-station-name-col clickable-station" title="${s.name}駅の時刻表・駅情報を見る">${formatStationName(s.name)}</div>
       <div class="pos-trains-container pos-trains-down" id="pos-down-${s.code}"></div>
       <div class="pos-rail-area ${i === 0 ? 'rail-first' : ''} ${i === stationsReversed.length - 1 ? 'rail-last' : ''}"><div class="pos-station-dot"></div></div>
       <div class="pos-trains-container pos-trains-up" id="pos-up-${s.code}"></div>
     `;
+    const nameCol = stRow.querySelector(".pos-station-name-col");
+    if (nameCol) {
+      nameCol.addEventListener("click", () => {
+        selectStation(s.code);
+        setView("station");
+      });
+    }
     host.appendChild(stRow);
 
     if (i < stationsReversed.length - 1) {
@@ -888,6 +1183,15 @@ function createTrainCard(t) {
   }
 
   infoHTML += `<span class="pos-train-dest">${t.destination}行</span>`;
+
+  // 充当車両バッジの付与
+  const assignedVehs = getTrainAssignedVehicles(t, state.serviceDate);
+  if (assignedVehs && assignedVehs.length > 0) {
+    const vehLabel = assignedVehs.join(" ");
+    infoHTML += `<span class="pos-veh-badge" title="充当車両: ${vehLabel}">${vehLabel}</span>`;
+  } else if (t.operation_id) {
+    infoHTML += `<span class="pos-veh-badge pos-veh-badge--op" title="運用番号: ${t.operation_id}">${t.operation_id}</span>`;
+  }
   info.innerHTML = infoHTML;
 
   if (t.direction === "down") {
@@ -1095,6 +1399,15 @@ function renderTimetable() {
   destRow.innerHTML = `<th>行先</th>` + trains.map(t => `<th>${formatStationName(t.destination)}</th>`).join("");
   th.appendChild(destRow);
 
+  const vehRow = document.createElement("tr");
+  vehRow.className = "tt-header-row tt-vehicle";
+  vehRow.innerHTML = `<th>充当車両</th>` + trains.map(t => {
+    const v = getTrainAssignedVehicles(t, state.serviceDate);
+    const label = v.length ? v.join("<br>") : (t.operation_id ? `<span class="tt-op-badge">${t.operation_id}</span>` : "—");
+    return `<th class="tt-veh-cell">${label}</th>`;
+  }).join("");
+  th.appendChild(vehRow);
+
   orderedStations.forEach((s, idx) => {
     const tr = document.createElement("tr");
     if (s.can_exchange || idx === 0 || idx === orderedStations.length - 1) {
@@ -1194,7 +1507,9 @@ function openTrainModal(t) {
       formation = formation.concat(DATA.status.operations[id].formation);
     }
   });
-  const displayOpId = opIds.join('＋') || "—";
+  const assignedVehicles = getTrainAssignedVehicles(t, state.serviceDate);
+  const effectiveCars = formation.length ? formation : assignedVehicles;
+  const displayOpId = opIds.join('＋') || (t.operation_id || "—");
 
   $("#modal-body").innerHTML = `
     <span class="modal-kicker">列車詳細 (${t.train_id})</span>
@@ -1206,8 +1521,23 @@ function openTrainModal(t) {
       <span class="badge ${statusBadgeColor}">${statusText}</span>
       ${t.variant_label ? `<span class="badge orange">${t.variant_label}</span>` : ""}
     </div>
-    <div class="detail-grid"><div class="detail-cell"><small>運用番号</small><strong>${displayOpId}</strong></div></div>
-    ${formation.length ? `<div class="formation"><h4>編成</h4><div class="formation-list">${formation.map(x => `<span>${x}</span>`).join("")}</div></div>` : ""}
+    <div class="detail-grid">
+      <div class="detail-cell"><small>運用番号</small><strong>${displayOpId}</strong></div>
+      <div class="detail-cell"><small>充当車両</small><strong>${assignedVehicles.length ? assignedVehicles.join(" + ") : "未定"}</strong></div>
+    </div>
+    ${effectiveCars.length ? `
+      <div class="formation">
+        <h4>充当車両・編成</h4>
+        <div class="formation-list">
+          ${effectiveCars.map(c => `
+            <span class="formation-car">
+              <img src="${getVehicleIconSrc(c)}" alt="${c}" class="formation-icon" onerror="this.style.display='none'">
+              <strong>${c}</strong>
+            </span>
+          `).join("")}
+        </div>
+      </div>
+    ` : ""}
     ${t.override.memo ? `<div class="memo">${t.override.memo}</div>` : ""}
     <div class="station-detail"><h4>各駅の発着時刻</h4>${t.stations.map(st => {
     let a = st.arr;
@@ -1329,14 +1659,55 @@ async function loadData() {
   const timeInputEl = $("#time-input");
   if (timeInputEl) timeInputEl.value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
+  // URLクエリパラメータの反映 (?view=station&station=M07&date=YYYY-MM-DD&time=HH:MM)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const paramDate = params.get('date');
+    const paramTime = params.get('time');
+    const paramView = params.get('view');
+    const paramStation = params.get('station');
+
+    if (paramDate && /^\d{4}-\d{2}-\d{2}$/.test(paramDate)) {
+      state.serviceDate = paramDate;
+      state.liveClock = false;
+      $("#date-input").value = state.serviceDate;
+    }
+    if (paramTime && /^\d{1,2}:\d{2}$/.test(paramTime)) {
+      state.liveClock = false;
+      const [h, m] = paramTime.split(':').map(Number);
+      state.currentMinutes = h * 60 + m;
+      if ($("#time-input")) $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+    if (paramStation) {
+      const matchSt = DATA.stations.find(s => s.code.toUpperCase() === paramStation.toUpperCase() || s.name === paramStation);
+      if (matchSt) state.selectedStationCode = matchSt.code;
+    }
+    if (paramView && ["position", "diagram", "timetable", "station"].includes(paramView)) {
+      state.view = paramView;
+    }
+  } catch (err) {
+    console.warn("URL params parsing error:", err);
+  }
+
+  await syncDailyOperations(state.serviceDate);
   renderNotice();
   renderAll();
+  setView(state.view);
 }
 
-function renderAll() { renderPosition(); renderDiagram(); renderTimetable() }
+function renderAll() {
+  if ($("#service-date-label")) $("#service-date-label").textContent = serviceDateLabel(state.serviceDate);
+  if ($("#date-title")) $("#date-title").textContent = serviceDateLabel(state.serviceDate);
+  renderPosition();
+  renderDiagram();
+  renderTimetable();
+  renderStationView();
+}
+
 $$(".view-tab").forEach(b => b.addEventListener("click", () => {
   setView(b.dataset.view);
 }));
+
 function setView(v) {
   state.view = v;
   $$(".view-tab").forEach(b => b.classList.toggle("active", b.dataset.view === v));
@@ -1345,6 +1716,7 @@ function setView(v) {
   if (v === "position") renderPosition();
   if (v === "diagram") renderDiagram();
   if (v === "timetable") renderTimetable();
+  if (v === "station") renderStationView();
 }
 
 var _resizeTimer;
@@ -1357,13 +1729,15 @@ var _resizeObs = new ResizeObserver(() => {
 });
 _resizeObs.observe(document.body);
 
-$("#date-input").addEventListener("change", e => {
+$("#date-input").addEventListener("change", async e => {
   state.serviceDate = e.target.value;
   state.liveClock = false;
   const timeInput = $("#time-input") ? $("#time-input").value : "12:00";
   const [h, m] = (timeInput || "12:00").split(":").map(Number);
   state.currentMinutes = h * 60 + m;
-  renderNotice(); renderAll()
+  await syncDailyOperations(state.serviceDate);
+  renderNotice();
+  renderAll();
 });
 const timeInputEl2 = $("#time-input");
 if (timeInputEl2) {
@@ -1372,10 +1746,11 @@ if (timeInputEl2) {
     const timeInput = e.target.value || "12:00";
     const [h, m] = timeInput.split(":").map(Number);
     state.currentMinutes = h * 60 + m;
-    renderNotice(); renderAll()
+    renderNotice();
+    renderAll();
   });
 }
-$("#now-btn").addEventListener("click", () => {
+$("#now-btn").addEventListener("click", async () => {
   state.liveClock = true;
   const c = normalizeToServiceContext(new Date());
   state.serviceDate = c.service_date;
@@ -1385,8 +1760,280 @@ $("#now-btn").addEventListener("click", () => {
   const m = state.currentMinutes % 60;
   if ($("#time-input")) $("#time-input").value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   $("#diagram-scroll").dataset.didAutoScroll = "";
-  renderAll()
+  await syncDailyOperations(state.serviceDate);
+  renderAll();
 });
+
+// 各駅時刻表の方向フィルターイベント設定
+$$(".st-dir-filter button").forEach(b => {
+  b.addEventListener("click", () => {
+    $$(".st-dir-filter button").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    state.stationDirFilter = b.dataset.stdir;
+    const station = DATA.stations.find(s => s.code === state.selectedStationCode) || DATA.stations[0];
+    if (station) renderStationTimetableContent(station);
+  });
+});
+
+// ==========================================
+// 4. 各駅時刻表・駅情報ビュー実装
+// ==========================================
+function selectStation(code) {
+  state.selectedStationCode = code;
+  renderStationView();
+}
+
+function renderStationView() {
+  const station = DATA.stations.find(s => s.code === state.selectedStationCode) || DATA.stations[0];
+  if (!station) return;
+
+  // 1. 駅セレクターバーの描画
+  const bar = $("#station-selector-bar");
+  if (bar) {
+    bar.innerHTML = DATA.stations.map(s => {
+      const isActive = s.code === station.code;
+      return `<button type="button" class="st-sel-btn ${isActive ? 'active' : ''}" data-code="${s.code}">
+        <span class="st-sel-code">${s.code}</span>
+        <span class="st-sel-name">${formatStationName(s.name)}</span>
+      </button>`;
+    }).join("");
+
+    bar.querySelectorAll(".st-sel-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectStation(btn.dataset.code);
+        btn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      });
+    });
+
+    const activeBtn = bar.querySelector(".st-sel-btn.active");
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
+    }
+  }
+
+  // 前の駅・次の駅ボタン
+  const currentIndex = DATA.stations.findIndex(s => s.code === station.code);
+  const prevBtn = $("#st-prev-btn");
+  const nextBtn = $("#st-next-btn");
+  if (prevBtn) {
+    prevBtn.disabled = currentIndex <= 0;
+    prevBtn.onclick = () => {
+      if (currentIndex > 0) selectStation(DATA.stations[currentIndex - 1].code);
+    };
+  }
+  if (nextBtn) {
+    nextBtn.disabled = currentIndex >= DATA.stations.length - 1;
+    nextBtn.onclick = () => {
+      if (currentIndex < DATA.stations.length - 1) selectStation(DATA.stations[currentIndex + 1].code);
+    };
+  }
+
+  // 2. 駅情報カードの描画
+  const infoCard = $("#station-info-card");
+  if (infoCard) {
+    const connHtml = (station.connections && station.connections.length)
+      ? station.connections.map(c => `<span class="st-tag st-tag-conn">${c}</span>`).join(" ")
+      : '<span class="st-meta-val muted">なし</span>';
+
+    infoCard.innerHTML = `
+      <div class="st-info-header">
+        <div class="st-title-group">
+          <span class="st-code-pill">${station.code}</span>
+          <div class="st-names">
+            <h3 class="st-main-name">${station.name}</h3>
+            <span class="st-sub-name">${station.kana || ''} / ${station.romaji || ''}</span>
+          </div>
+        </div>
+        <div class="st-exchange-badge ${station.can_exchange ? 'exchange-yes' : 'exchange-no'}">
+          ${station.can_exchange ? '列車交換可能駅' : '単線棒線駅'}
+        </div>
+      </div>
+      <div class="st-meta-grid">
+        <div class="st-meta-item">
+          <span class="st-meta-lbl">起点（下館）からの距離</span>
+          <span class="st-meta-val"><strong>${station.distance_km.toFixed(1)}</strong> km</span>
+        </div>
+        <div class="st-meta-item">
+          <span class="st-meta-lbl">所在地</span>
+          <span class="st-meta-val">${station.address || '—'}</span>
+        </div>
+        <div class="st-meta-item">
+          <span class="st-meta-lbl">駅設備・特徴</span>
+          <span class="st-meta-val">${station.features || '—'}</span>
+        </div>
+        <div class="st-meta-item">
+          <span class="st-meta-lbl">接続交通・のりかえ</span>
+          <div class="st-meta-val st-tags-wrap">${connHtml}</div>
+        </div>
+      </div>
+      ${station.highlights ? `
+        <div class="st-highlights">
+          <span class="st-hl-label">周辺案内・見どころ</span>
+          <span class="st-hl-text">${station.highlights}</span>
+        </div>
+      ` : ''}
+    `;
+  }
+
+  // 3. 発車時刻表の見出し更新
+  const ttTitle = $("#st-tt-title");
+  if (ttTitle) ttTitle.textContent = `${station.name}駅 発車時刻表`;
+  const ttDate = $("#st-tt-date");
+  if (ttDate) ttDate.textContent = `${state.serviceDate} 所定ダイヤ`;
+
+  renderStationTimetableContent(station);
+}
+
+function renderStationTimetableContent(station) {
+  const container = $("#station-timetable-content");
+  if (!container) return;
+
+  const allTrains = effectiveTrains();
+  const dirFilter = state.stationDirFilter || "all";
+
+  const departures = [];
+  allTrains.forEach(t => {
+    if (dirFilter !== "all" && t.direction !== dirFilter) return;
+
+    const stEntry = t.stations.find(s => s.code === station.code);
+    if (!stEntry) return;
+
+    if (stEntry.arr === "pass" || stEntry.dep === "pass" || stEntry.arr === "レ" || stEntry.dep === "レ") {
+      return;
+    }
+
+    const actual = t.actual ? t.actual.find(s => s.code === station.code) : null;
+    const isCancelled = actual?.is_cancelled || false;
+
+    let displayTime = null;
+    let isTerminatingHere = false;
+
+    if (t.direction === "down" && station.code === "M17") {
+      displayTime = stEntry.arr || stEntry.dep;
+      isTerminatingHere = true;
+    } else if (t.direction === "up" && station.code === "M01") {
+      displayTime = stEntry.arr || stEntry.dep;
+      isTerminatingHere = true;
+    } else if (t.direction === "down" && station.code === "M07" && !stEntry.dep && stEntry.arr) {
+      displayTime = stEntry.arr;
+      isTerminatingHere = true;
+    } else {
+      displayTime = stEntry.dep || stEntry.arr;
+    }
+
+    if (!displayTime || displayTime === "＝") return;
+
+    const timeMins = timeStringToMinutes(displayTime) ?? 9999;
+    const assignedVehicles = getTrainAssignedVehicles(t, state.serviceDate);
+
+    let statusText = "所定";
+    let statusClass = "status-normal";
+    if (isCancelled) {
+      statusText = "運休";
+      statusClass = "status-cancel";
+    } else if (t.result) {
+      const cur = state.currentMinutes;
+      const depMins = timeStringToMinutes(stEntry.dep || stEntry.arr);
+      if (t.result.station_code === station.code && (t.result.state === "STOPPED" || t.result.state === "PRE_DEPARTURE")) {
+        statusText = "当駅停車中";
+        statusClass = "status-current pulse";
+      } else if (depMins != null && cur != null && cur > depMins + 3) {
+        statusText = "発車済";
+        statusClass = "status-departed";
+      } else if (t.result.state === "RUNNING") {
+        statusText = "運行中";
+        statusClass = "status-running";
+      }
+    }
+
+    departures.push({
+      train: t,
+      time: displayTime,
+      timeMins,
+      isTerminatingHere,
+      assignedVehicles,
+      statusText,
+      statusClass
+    });
+  });
+
+  departures.sort((a, b) => a.timeMins - b.timeMins);
+
+  if (departures.length === 0) {
+    container.innerHTML = `<div class="st-tt-empty">該当する列車はありません。</div>`;
+    return;
+  }
+
+  let html = `
+    <div class="st-tt-table-wrap">
+      <table class="st-tt-table">
+        <thead>
+          <tr>
+            <th class="col-time">発車時刻</th>
+            <th class="col-dir">方面・行先</th>
+            <th class="col-type">種別</th>
+            <th class="col-trainno">列車番号</th>
+            <th class="col-op">運用</th>
+            <th class="col-veh">充当車両</th>
+            <th class="col-status">運行状況</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  departures.forEach(dep => {
+    const t = dep.train;
+    const type = getTrainType(t);
+    const typeStyle = getTrainTypeStyle(type);
+    const dirLabel = t.direction === "down" ? "下り" : "上り";
+    const dirClass = t.direction === "down" ? "dir-down" : "dir-up";
+    const destName = dep.isTerminatingHere ? `${formatStationName(t.destination)}着 (当駅止)` : `${formatStationName(t.destination)}行`;
+
+    let vehDisplayHTML = "";
+    if (dep.assignedVehicles && dep.assignedVehicles.length > 0) {
+      vehDisplayHTML = dep.assignedVehicles.map(v => `
+        <span class="st-tt-veh-pill">
+          <img src="${getVehicleIconSrc(v)}" alt="${v}" class="st-tt-veh-icon" onerror="this.style.display='none'">
+          <span>${v}</span>
+        </span>
+      `).join(" ");
+    } else {
+      vehDisplayHTML = `<span class="st-tt-veh-unassigned">未定</span>`;
+    }
+
+    html += `
+      <tr class="st-tt-row" data-trainid="${t.train_id}">
+        <td class="col-time"><span class="st-tt-time">${dep.time}</span></td>
+        <td class="col-dir">
+          <span class="st-dir-badge ${dirClass}">${dirLabel}</span>
+          <strong class="st-dest-text">${destName}</strong>
+        </td>
+        <td class="col-type"><span class="st-type-badge type-${type}">${typeStyle.shortLabel}</span></td>
+        <td class="col-trainno"><span class="st-trainno-text">${t.train_no}</span></td>
+        <td class="col-op"><span class="st-op-pill">${t.operation_id || '—'}</span></td>
+        <td class="col-veh">${vehDisplayHTML}</td>
+        <td class="col-status"><span class="st-status-badge ${dep.statusClass}">${dep.statusText}</span></td>
+      </tr>
+    `;
+  });
+
+  html += `
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  container.innerHTML = html;
+
+  container.querySelectorAll(".st-tt-row").forEach(row => {
+    row.addEventListener("click", () => {
+      const trainId = row.dataset.trainid;
+      const targetTrain = allTrains.find(t => t.train_id === trainId);
+      if (targetTrain) openTrainModal(targetTrain);
+    });
+  });
+}
+
 $$(".seg-btn").forEach(b => b.addEventListener("click", () => { const d = b.dataset.dir; if (b.classList.contains("tt-dir")) { state.timetableDir = d; $$(".tt-dir").forEach(x => x.classList.toggle("active", x === b)); renderTimetable() } else { state.diagramDir = d; $$(".dir-filter").forEach(x => x.classList.toggle("active", x === b)); renderDiagram() } }));
 $("#modal-close").onclick = () => $("#train-modal").classList.add("hidden"); $("#train-modal").addEventListener("click", e => { if (e.target.id === "train-modal") $("#train-modal").classList.add("hidden") });
 
