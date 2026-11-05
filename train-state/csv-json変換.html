@@ -113,7 +113,7 @@
           uniqueStations[uniqueStations.length - 1].dep = null;
         }
 
-        const actualDest = stationMap[t.dest] ? t.dest : (uniqueStations.length ? uniqueStations[uniqueStations.length - 1].name : "");
+        const actualDest = (uniqueStations.length ? uniqueStations[uniqueStations.length - 1].name : (stationMap[t.dest] ? t.dest : ""));
         let id = t.train_no && t.train_no !== "回送" ? t.train_no : `EX-${direction === 'up' ? 'U' : 'D'}${extraCount++}`;
 
         resultJSON.push({
