@@ -1,18 +1,19 @@
 @charset "UTF-8";
 
 /* ==========================================================================
+
    列車走行位置・ダイヤグラム・時刻表 専用スタイル
+
    ========================================================================== */
+
 :root {
   --rail-color: #64748b;
   --rail-color-soft: rgba(100, 116, 139, 0.18);
-
   /* 列車種別カラー（従来様式） */
   --train-local: #007aff;
   --train-sl: #f08c00;
   --train-extra: #ff3b30;
   --train-empty: #6e6e73;
-
   /* ダイヤグラム描画カラー */
   --svg-grid-line: #eaedf2;
   --svg-grid-line-major: #cbd5e1;
@@ -26,7 +27,9 @@
 }
 
 .container,
+
 .header-inner,
+
 .footer-inner {
   max-width: 1080px;
 }
@@ -51,7 +54,9 @@ main.container {
 }
 
 /* ===== バナー & 公式運行情報バー ===== */
+
 .offline-banner,
+
 .irregular-banner {
   padding: 8px 16px;
   text-align: center;
@@ -95,6 +100,7 @@ main.container {
 }
 
 .notice-bar.status-unknown,
+
 .notice-bar.status-loading {
   background-color: #ffffff;
   border-color: var(--c-border);
@@ -130,6 +136,7 @@ main.container {
 }
 
 .status-unknown .notice-icon,
+
 .status-loading .notice-icon {
   background-color: #94a3b8;
 }
@@ -170,6 +177,7 @@ main.container {
 }
 
 /* ===== 日付・時刻ツールバー ===== */
+
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -261,11 +269,13 @@ main.container {
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator,
+
 input[type="time"]::-webkit-calendar-picker-indicator {
   display: none !important;
 }
 
 /* ===== ビュー切替タブ ===== */
+
 .view-tabs {
   display: inline-flex;
   gap: 4px;
@@ -307,6 +317,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* ===== パネルヘッダ & 凡例 & セグメントボタン ===== */
+
 .panel-head {
   display: flex;
   justify-content: space-between;
@@ -424,8 +435,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* ==========================================================================
+
    1. 列車走行位置ビュー（洗練されたモダン交通インフォメーション設計）
+
    ========================================================================== */
+
 .position-card {
   background-color: var(--c-bg);
   border: 1px solid var(--c-border);
@@ -457,6 +471,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* トラック見出し行（4カラムGrid：駅名列＋下り1fr＋レール＋上り1frで下り/上り幅を完全対称化） */
+
 .position-track-head {
   display: grid;
   grid-template-columns: 76px minmax(0, 1fr) 28px minmax(0, 1fr);
@@ -501,6 +516,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .pos-station-row,
+
 .pos-between-row {
   display: grid;
   grid-template-columns: 76px minmax(0, 1fr) 28px minmax(0, 1fr);
@@ -510,18 +526,21 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 駅行：枠線を一切引かず、ごく淡い面のみで駅位置を自然に示す */
+
 .pos-station-row {
   min-height: 46px;
   background-color: #f8fafc;
 }
 
 /* 駅間行：清潔な白背景 */
+
 .pos-between-row {
   min-height: 38px;
   background-color: #ffffff;
 }
 
 /* 駅名列（第1カラム・余計な色文字なし） */
+
 .pos-station-name-col {
   grid-column: 1;
   padding-left: 14px;
@@ -533,12 +552,14 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 交換可能駅・起終点のみ文字ウェイトで強調 */
+
 .pos-station-row.can-exchange .pos-station-name-col {
   font-weight: 700;
   color: #0f172a;
 }
 
 /* 中央路線レール（下り列と上り列の完全中央に固定） */
+
 .pos-rail-area {
   grid-column: 3;
   position: relative;
@@ -573,6 +594,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 駅ノード（丸） */
+
 .pos-station-dot {
   width: 11px;
   height: 11px;
@@ -595,6 +617,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 列車カード配置コンテナ */
+
 .pos-trains-container {
   display: flex;
   align-items: center;
@@ -617,6 +640,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 列車カード：五角形方向アイコンを常にレール側へ固定し、ステッカー部のみ折り返し許容 */
+
 .pos-train-card {
   display: inline-flex;
   align-items: center;
@@ -635,6 +659,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 進行方向＆種別を示す五角形アイコン（レール脇に固定・縮小禁止） */
+
 .pos-train-shield {
   width: 22px;
   height: 25px;
@@ -648,6 +673,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 列車情報ボディ（幅不足時は内部で自然に折り返し、五角形アイコンを決して押し出さない） */
+
 .pos-train-info {
   display: flex;
   align-items: center;
@@ -687,6 +713,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 状態タグ：枠線・色付きを廃止し、控えめなグレースケールピルに統一 */
+
 .pos-stopped-badge {
   display: inline-flex;
   align-items: center;
@@ -700,6 +727,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 遅延時のみ赤バッジで注意喚起 */
+
 .pos-delay-badge {
   display: inline-flex;
   align-items: center;
@@ -713,8 +741,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* ==========================================================================
+
    2. ダイヤグラムビュー
+
    ========================================================================== */
+
 .diagram-shell {
   display: flex;
   align-items: flex-start;
@@ -763,8 +794,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* ==========================================================================
+
    3. 路線時刻表ビュー
+
    ========================================================================== */
+
 #timetable-table {
   border-collapse: separate;
   border-spacing: 0;
@@ -774,6 +808,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 #timetable-table th,
+
 #timetable-table td {
   padding: 6px 10px;
   border-bottom: 1px solid var(--c-border);
@@ -797,6 +832,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 #timetable-table th:first-child,
+
 #timetable-table td:first-child {
   position: sticky;
   left: 0;
@@ -822,6 +858,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 #timetable-table tbody tr:hover td,
+
 #timetable-table tbody tr:hover td:first-child {
   background-color: #edf5ff;
 }
@@ -908,8 +945,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* ==========================================================================
+
    4. 列車詳細モーダル
+
    ========================================================================== */
+
 .train-modal-content {
   position: relative;
   max-width: 460px;
@@ -1021,6 +1061,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .formation h4,
+
 .station-detail h4 {
   font-size: 0.78rem;
   font-weight: 700;
@@ -1076,6 +1117,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 @media (max-width: 720px) {
+
   main.container {
     padding-left: 10px;
     padding-right: 10px;
@@ -1102,12 +1144,15 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   }
 
   .pos-station-row,
+
   .pos-between-row,
+
   .position-track-head {
     grid-template-columns: 42px minmax(0, 1fr) 16px minmax(0, 1fr);
   }
 
   .pth-station,
+
   .pos-station-name-col {
     padding-left: 5px;
     font-size: 0.74rem;
@@ -1119,6 +1164,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   }
 
   .pth-rail,
+
   .pos-rail-area {
     width: 16px;
   }
@@ -1162,6 +1208,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   }
 
   .pos-stopped-badge,
+
   .pos-delay-badge {
     font-size: 0.56rem;
     padding: 0 3px;
@@ -1170,24 +1217,30 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   .diagram-legend {
     display: none;
   }
+
 }
 
 /* ==========================================================================
+
    充当車両表示・各駅時刻表 & 駅情報ビュー スタイル (2026 Light Theme & Modern Design)
+
    ========================================================================== */
 
 /* 1. 走行位置：駅名クリック可能表示 */
+
 .clickable-station {
   cursor: pointer;
   transition: color 0.15s ease, text-decoration 0.15s ease;
   user-select: none;
 }
+
 .clickable-station:hover {
   color: #006633 !important;
   text-decoration: underline;
 }
 
 /* 2. 走行位置：列車カード内の充当車両バッジ */
+
 .pos-veh-badge {
   display: inline-flex;
   align-items: center;
@@ -1201,6 +1254,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   letter-spacing: 0.3px;
   white-space: nowrap;
 }
+
 .pos-veh-badge--op {
   background: rgba(100, 116, 139, 0.12);
   color: #475569;
@@ -1208,6 +1262,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 3. 路線時刻表：充当車両行 */
+
 .tt-veh-cell {
   font-size: 0.72rem;
   font-weight: 700;
@@ -1217,6 +1272,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   padding: 6px 4px !important;
   background: rgba(16, 185, 129, 0.08);
 }
+
 .tt-op-badge {
   font-size: 0.68rem;
   color: #64748b;
@@ -1224,6 +1280,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 4. モーダル：編成・車両アイコン */
+
 .formation-car {
   display: inline-flex;
   align-items: center;
@@ -1237,6 +1294,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   font-size: 0.82rem;
   color: #1e293b;
 }
+
 .formation-icon {
   width: 26px;
   height: 18px;
@@ -1244,6 +1302,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 5. 各駅時刻表・駅情報ビュー (#view-station) */
+
 #view-station {
   padding-bottom: 24px;
 }
@@ -1252,6 +1311,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   display: flex;
   gap: 8px;
 }
+
 .st-nav-btn {
   padding: 6px 14px;
   font-size: 0.82rem;
@@ -1263,17 +1323,20 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   transition: all 0.15s ease;
 }
+
 .st-nav-btn:hover:not(:disabled) {
   background: var(--c-surface-hover, #eef2f7);
   border-color: #006633;
   color: #006633;
 }
+
 .st-nav-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
 /* 駅セレクターバー */
+
 .station-selector-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -1281,11 +1344,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   margin-bottom: 12px;
   scrollbar-width: thin;
 }
+
 .station-selector-bar {
   display: flex;
   gap: 6px;
   min-width: max-content;
 }
+
 .st-sel-btn {
   display: inline-flex;
   flex-direction: column;
@@ -1301,27 +1366,33 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   transition: all 0.15s ease;
   user-select: none;
 }
+
 .st-sel-btn:hover {
   border-color: #006633;
   color: #006633;
   background: #f0fdf4;
 }
+
 .st-sel-btn.active {
   background: #006633;
   color: #ffffff !important;
   border-color: #006633;
   box-shadow: 0 2px 6px rgba(0, 102, 51, 0.25);
 }
+
 .st-sel-btn.active .st-sel-code,
+
 .st-sel-btn.active .st-sel-name {
   color: #ffffff !important;
 }
+
 .st-sel-code {
   font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.5px;
   opacity: 0.9;
 }
+
 .st-sel-name {
   font-size: 0.78rem;
   font-weight: 700;
@@ -1330,6 +1401,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 駅情報カード */
+
 .station-info-card {
   background: #ffffff;
   border: 1px solid var(--c-border, #dce2ea);
@@ -1338,6 +1410,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   margin-bottom: 20px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
+
 .st-info-header {
   display: flex;
   justify-content: space-between;
@@ -1348,11 +1421,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   border-bottom: 1px solid var(--c-border, #dce2ea);
   margin-bottom: 14px;
 }
+
 .st-title-group {
   display: flex;
   align-items: center;
   gap: 14px;
 }
+
 .st-code-pill {
   display: inline-flex;
   align-items: center;
@@ -1366,10 +1441,18 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   border-radius: 3px;
   letter-spacing: 0.5px;
 }
+
 .st-names {
   display: flex;
   flex-direction: column;
 }
+
+.st-main-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .st-main-name {
   font-size: 1.45rem;
   font-weight: 800;
@@ -1377,57 +1460,132 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   color: #0f172a;
   line-height: 1.2;
 }
+
+.st-telegram-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 2px;
+  color: #475569;
+  letter-spacing: 0.5px;
+}
+
 .st-sub-name {
   font-size: 0.8rem;
   color: #64748b;
   margin-top: 2px;
   font-weight: 500;
 }
-.st-exchange-badge {
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 3px;
+
+.st-header-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
+
+.st-tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  width: 100%;
+}
+
+.st-type-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.st-type-pill.type-manned {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.st-type-pill.type-unmanned {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.st-exchange-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
 .st-exchange-badge.exchange-yes {
   background: #ecfdf5;
   color: #047857;
   border: 1px solid #a7f3d0;
 }
+
 .st-exchange-badge.exchange-no {
   background: #f8fafc;
   color: #64748b;
   border: 1px solid #e2e8f0;
 }
+
+.st-sl-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.st-sl-badge.sl-stops {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.st-sl-badge.sl-passes {
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+}
+
 .st-meta-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 14px;
   margin-bottom: 14px;
 }
+
 .st-meta-item {
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
+
 .st-meta-lbl {
   font-size: 0.72rem;
   font-weight: 600;
   color: #64748b;
 }
+
 .st-meta-val {
   font-size: 0.88rem;
   color: #1e293b;
   font-weight: 500;
 }
+
 .st-meta-val strong {
   font-size: 0.95rem;
   color: #0f172a;
   font-weight: 700;
 }
+
 .st-meta-val.muted {
   color: #94a3b8;
 }
+
 .st-tag-conn {
   display: inline-block;
   font-size: 0.75rem;
@@ -1437,32 +1595,72 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   color: #1d4ed8;
   border: 1px solid #bfdbfe;
   border-radius: 2px;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.st-tag-yes {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  border-radius: 2px;
   margin-right: 4px;
 }
-.st-highlights {
-  padding: 10px 14px;
+
+.st-tag-no {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 7px;
   background: #f8fafc;
+  color: #94a3b8;
   border: 1px solid #e2e8f0;
+  border-radius: 2px;
+  margin-right: 4px;
+}
+
+.st-desc-box {
+  padding: 10px 14px;
   border-radius: 3px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-top: 10px;
 }
-.st-hl-label {
+
+.st-features-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.st-highlights-box {
+  background: #fbfdfc;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #006633;
+}
+
+.st-box-label {
   font-size: 0.75rem;
   font-weight: 800;
   color: #006633;
 }
-.st-hl-text {
+
+.st-box-text {
   font-size: 0.85rem;
-  line-height: 1.5;
+  line-height: 1.55;
   color: #334155;
 }
 
 /* 発車時刻表セクション */
+
 .station-timetable-section {
   margin-top: 14px;
 }
+
 .st-tt-toolbar {
   display: flex;
   justify-content: space-between;
@@ -1471,22 +1669,26 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   gap: 12px;
   margin-bottom: 12px;
 }
+
 .st-tt-title-wrap {
   display: flex;
   align-items: baseline;
   gap: 10px;
 }
+
 .st-tt-title {
   font-size: 1.25rem;
   font-weight: 800;
   margin: 0;
   color: #0f172a;
 }
+
 .st-tt-date {
   font-size: 0.8rem;
   color: #64748b;
   font-weight: 500;
 }
+
 .station-timetable-wrap {
   background: #ffffff;
   border: 1px solid var(--c-border, #dce2ea);
@@ -1494,17 +1696,20 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
+
 .st-tt-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
+
 .st-tt-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
   text-align: left;
 }
+
 .st-tt-table th {
   background: #f8fafc;
   padding: 10px 12px;
@@ -1514,28 +1719,34 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   border-bottom: 1px solid var(--c-border, #dce2ea);
   white-space: nowrap;
 }
+
 .st-tt-table td {
   padding: 10px 12px;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
   color: #1e293b;
 }
+
 .st-tt-row {
   cursor: pointer;
   transition: background 0.15s ease;
 }
+
 .st-tt-row:hover {
   background: #edf5ff;
 }
+
 .st-tt-row:last-child td {
   border-bottom: none;
 }
+
 .st-tt-time {
   font-size: 1.05rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: #0f172a;
 }
+
 .st-dir-badge {
   display: inline-block;
   font-size: 0.65rem;
@@ -1544,21 +1755,25 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   border-radius: 2px;
   margin-right: 6px;
 }
+
 .st-dir-badge.dir-down {
   background: #eff6ff;
   color: #2563eb;
   border: 1px solid #bfdbfe;
 }
+
 .st-dir-badge.dir-up {
   background: #fffbeb;
   color: #d97706;
   border: 1px solid #fde68a;
 }
+
 .st-dest-text {
   font-size: 0.88rem;
   font-weight: 700;
   color: #1e293b;
 }
+
 .st-type-badge {
   display: inline-block;
   font-size: 0.72rem;
@@ -1566,24 +1781,29 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   padding: 2px 6px;
   border-radius: 2px;
 }
+
 .st-type-badge.type-local {
   background: #f1f5f9;
   color: #475569;
 }
+
 .st-type-badge.type-sl {
   background: #b45309;
   color: #ffffff;
 }
+
 .st-type-badge.type-extra {
   background: #b91c1c;
   color: #ffffff;
 }
+
 .st-trainno-text {
   font-family: monospace;
   font-size: 0.82rem;
   font-weight: 600;
   color: #64748b;
 }
+
 .st-op-pill {
   display: inline-block;
   font-size: 0.72rem;
@@ -1594,6 +1814,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   border-radius: 2px;
   color: #475569;
 }
+
 .st-tt-veh-pill {
   display: inline-flex;
   align-items: center;
@@ -1608,16 +1829,19 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   white-space: nowrap;
   margin-right: 4px;
 }
+
 .st-tt-veh-icon {
   width: 22px;
   height: 16px;
   object-fit: contain;
   flex-shrink: 0;
 }
+
 .st-tt-veh-unassigned {
   font-size: 0.75rem;
   color: #94a3b8;
 }
+
 .st-status-badge {
   display: inline-block;
   font-size: 0.72rem;
@@ -1626,36 +1850,48 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   border-radius: 2px;
   white-space: nowrap;
 }
+
 .st-status-badge.status-normal {
   background: #f1f5f9;
   color: #64748b;
 }
+
 .st-status-badge.status-current {
   background: #059669;
   color: #ffffff;
 }
+
 .st-status-badge.status-current.pulse {
   animation: stPulse 1.8s infinite;
 }
+
 @keyframes stPulse {
+
   0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.6); }
+
   70% { box-shadow: 0 0 0 6px rgba(5, 150, 105, 0); }
+
   100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+
 }
+
 .st-status-badge.status-running {
   background: #eff6ff;
   color: #2563eb;
   border: 1px solid #bfdbfe;
 }
+
 .st-status-badge.status-departed {
   background: #f8fafc;
   color: #94a3b8;
   font-weight: 500;
 }
+
 .st-status-badge.status-cancel {
   background: #fee2e2;
   color: #dc2626;
 }
+
 .st-tt-empty {
   padding: 36px 16px;
   text-align: center;
@@ -1664,34 +1900,57 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* モバイル対応最適化 (max-width: 600px) */
+
 @media (max-width: 600px) {
+
   .view-tabs {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     flex-wrap: nowrap;
     scrollbar-width: none;
   }
+
   .view-tabs::-webkit-scrollbar {
     display: none;
   }
+
   .view-tab {
     flex: 0 0 auto;
     padding: 8px 12px;
     font-size: 0.78rem;
   }
+
+  .station-info-card {
+    padding: 14px 12px;
+  }
+
   .st-info-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
   }
+
+  .st-header-badges {
+    width: 100%;
+  }
+
   .st-meta-grid {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 10px;
   }
+
+  .st-meta-val {
+    word-break: break-word;
+  }
+
   .st-tt-table th, .st-tt-table td {
     padding: 8px 8px;
     font-size: 0.75rem;
   }
+
   .st-tt-time {
     font-size: 0.9rem;
   }
+
 }
+
