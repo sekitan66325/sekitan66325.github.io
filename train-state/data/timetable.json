@@ -489,7 +489,7 @@
     "train_no": "113",
     "operation_id": "A1",
     "direction": "down",
-    "destination": "真岡",
+    "destination": "茂木",
     "operation_rule": {
       "service_type": "regular"
     },
