@@ -7,7 +7,16 @@ let allAdminPosts = [];
 let allAdminLogs = [];
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Check browser WebAuthn support
+  // Check browser WebAuthn support & Cloudflare Worker URL
+  const passkeySection = document.getElementById('passkey-login-section');
+  if (passkeySection) {
+    if (AUTH_WORKER_URL && isPasskeySupported()) {
+      passkeySection.style.display = 'block';
+    } else {
+      passkeySection.style.display = 'none';
+    }
+  }
+
   const passkeyHint = document.getElementById('passkey-hint-text');
   if (passkeyHint) {
     if (isPasskeySupported()) {
@@ -103,6 +112,24 @@ async function handleChangePassword(e) {
     if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
   }
 }
+
+// 明示的なグローバル公開（インラインハンドラ・モジュール境界の確実な接続）
+window.startPasskeyLogin = startPasskeyLogin;
+window.openPasskeyModal = openPasskeyModal;
+window.closePasskeyModal = closePasskeyModal;
+window.startPasskeyRegistration = startPasskeyRegistration;
+window.deletePasskeyDevice = deletePasskeyDevice;
+window.switchStationSubTab = switchStationSubTab;
+window.stepStation = stepStation;
+window.editStation = editStation;
+window.saveStationData = saveStationData;
+window.downloadStationsFile = downloadStationsFile;
+window.exportStationsToGitHub = exportStationsToGitHub;
+window.handleLogin = handleLogin;
+window.handleLogout = handleLogout;
+window.switchAdminTab = switchAdminTab;
+window.exportTimetable = exportTimetable;
+window.downloadTimetableFile = downloadTimetableFile;
 
 /**
  * 3. ログアウト処理
@@ -236,6 +263,24 @@ async function startPasskeyLogin() {
     if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
   }
 }
+
+// 明示的なグローバル公開（インラインハンドラ・モジュール境界の確実な接続）
+window.startPasskeyLogin = startPasskeyLogin;
+window.openPasskeyModal = openPasskeyModal;
+window.closePasskeyModal = closePasskeyModal;
+window.startPasskeyRegistration = startPasskeyRegistration;
+window.deletePasskeyDevice = deletePasskeyDevice;
+window.switchStationSubTab = switchStationSubTab;
+window.stepStation = stepStation;
+window.editStation = editStation;
+window.saveStationData = saveStationData;
+window.downloadStationsFile = downloadStationsFile;
+window.exportStationsToGitHub = exportStationsToGitHub;
+window.handleLogin = handleLogin;
+window.handleLogout = handleLogout;
+window.switchAdminTab = switchAdminTab;
+window.exportTimetable = exportTimetable;
+window.downloadTimetableFile = downloadTimetableFile;
 
 function openPasskeyModal() {
   const modal = document.getElementById('passkey-modal');
@@ -371,6 +416,24 @@ async function startPasskeyRegistration(e) {
   }
 }
 
+// 明示的なグローバル公開（インラインハンドラ・モジュール境界の確実な接続）
+window.startPasskeyLogin = startPasskeyLogin;
+window.openPasskeyModal = openPasskeyModal;
+window.closePasskeyModal = closePasskeyModal;
+window.startPasskeyRegistration = startPasskeyRegistration;
+window.deletePasskeyDevice = deletePasskeyDevice;
+window.switchStationSubTab = switchStationSubTab;
+window.stepStation = stepStation;
+window.editStation = editStation;
+window.saveStationData = saveStationData;
+window.downloadStationsFile = downloadStationsFile;
+window.exportStationsToGitHub = exportStationsToGitHub;
+window.handleLogin = handleLogin;
+window.handleLogout = handleLogout;
+window.switchAdminTab = switchAdminTab;
+window.exportTimetable = exportTimetable;
+window.downloadTimetableFile = downloadTimetableFile;
+
 async function deletePasskeyDevice(credId) {
   if (!confirm('このパスキー端末を削除しますか？\n削除後はこの端末からの生体認証ログインができなくなります。')) return;
   try {
@@ -398,7 +461,7 @@ function showDashboard() {
   document.getElementById('dashboard-view').style.display = 'block';
   document.getElementById('logout-btn').style.display = 'inline-block';
   const passkeyBtn = document.getElementById('btn-passkey-manage');
-  if (passkeyBtn) passkeyBtn.style.display = 'inline-block';
+  if (passkeyBtn) passkeyBtn.style.display = AUTH_WORKER_URL ? 'inline-block' : 'none';
   const urlParams = new URLSearchParams(window.location.search);
   const urlTab = urlParams.get('tab');
   if (urlTab) {
@@ -614,6 +677,24 @@ async function submitAdminEdit() {
     if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
   }
 }
+
+// 明示的なグローバル公開（インラインハンドラ・モジュール境界の確実な接続）
+window.startPasskeyLogin = startPasskeyLogin;
+window.openPasskeyModal = openPasskeyModal;
+window.closePasskeyModal = closePasskeyModal;
+window.startPasskeyRegistration = startPasskeyRegistration;
+window.deletePasskeyDevice = deletePasskeyDevice;
+window.switchStationSubTab = switchStationSubTab;
+window.stepStation = stepStation;
+window.editStation = editStation;
+window.saveStationData = saveStationData;
+window.downloadStationsFile = downloadStationsFile;
+window.exportStationsToGitHub = exportStationsToGitHub;
+window.handleLogin = handleLogin;
+window.handleLogout = handleLogout;
+window.switchAdminTab = switchAdminTab;
+window.exportTimetable = exportTimetable;
+window.downloadTimetableFile = downloadTimetableFile;
 
 /**
  * 7. 操作ログ取得
@@ -2990,6 +3071,24 @@ async function exportStationsToGitHub() {
     if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
   }
 }
+
+// 明示的なグローバル公開（インラインハンドラ・モジュール境界の確実な接続）
+window.startPasskeyLogin = startPasskeyLogin;
+window.openPasskeyModal = openPasskeyModal;
+window.closePasskeyModal = closePasskeyModal;
+window.startPasskeyRegistration = startPasskeyRegistration;
+window.deletePasskeyDevice = deletePasskeyDevice;
+window.switchStationSubTab = switchStationSubTab;
+window.stepStation = stepStation;
+window.editStation = editStation;
+window.saveStationData = saveStationData;
+window.downloadStationsFile = downloadStationsFile;
+window.exportStationsToGitHub = exportStationsToGitHub;
+window.handleLogin = handleLogin;
+window.handleLogout = handleLogout;
+window.switchAdminTab = switchAdminTab;
+window.exportTimetable = exportTimetable;
+window.downloadTimetableFile = downloadTimetableFile;
 
 // 明示的なグローバル公開（インラインハンドラ・モジュール境界の確実な接続）
 window.startPasskeyLogin = startPasskeyLogin;

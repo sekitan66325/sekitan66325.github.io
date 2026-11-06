@@ -158,8 +158,9 @@ async function kvDelete(env, key) {
    ========================================================================== */
 
 function getRpId(request, env) {
+  const origin = request.headers.get("Origin") || "";
   const host = request.headers.get("Host") || "";
-  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+  if (origin.includes("localhost") || origin.includes("127.0.0.1") || host.includes("localhost") || host.includes("127.0.0.1")) {
     return "localhost";
   }
   return env.RP_ID || "sekitan66325.github.io";
