@@ -14,7 +14,7 @@ GITHUB_BRANCH = "main"
 # Then paste the generated id below:
 [[kv_namespaces]]
 binding = "PASSKEY_KV"
-id = "MOKA_PASSKEY_KV_ID_PLACEHOLDER"
+id = "07ea28090076463fa4f9c75221c5e3ca"
 
 # Encrypted Secrets (Set via: npx wrangler secret put <NAME>)
 # - GITHUB_PAT: GitHub Personal Access Token with repo commit permissions

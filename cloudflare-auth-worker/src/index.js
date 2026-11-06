@@ -185,8 +185,8 @@ async function handleRegisterOptions(request, env, corsHeaders) {
       return jsonResponse({ error: "新しいパスキーの追加登録には、既存の管理者権限（ログイン済みセッション）が必要です。" }, 401, corsHeaders);
     }
   } else {
-    const requiredSetupKey = env.ADMIN_SETUP_KEY || "";
-    if (requiredSetupKey && setupKey !== requiredSetupKey) {
+    const requiredSetupKey = (env.ADMIN_SETUP_KEY || "").trim();
+    if (requiredSetupKey && setupKey.trim() !== requiredSetupKey) {
       return jsonResponse({ error: "初期マスターパスキーの登録キー（ADMIN_SETUP_KEY）が一致しません。" }, 403, corsHeaders);
     }
   }
@@ -532,7 +532,7 @@ async function handleSaveFileToGitHub(request, env, corsHeaders) {
     return jsonResponse({ error: "認証が必要です。再ログインしてください。" }, 401, corsHeaders);
   }
 
-  const pat = env.GITHUB_PAT;
+  const pat = (env.GITHUB_PAT || "").trim();
   if (!pat) {
     return jsonResponse({ error: "GITHUB_PAT が Cloudflare Worker のシークレットに設定されていません。" }, 500, corsHeaders);
   }
