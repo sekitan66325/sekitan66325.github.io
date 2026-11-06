@@ -427,6 +427,14 @@ function formatStationName(name) {
 }
 function getTrainDestination(train) {
   if (!train) return "";
+  // 1. 手動上書き（手動で任意の行先を介入したい場合）を最優先
+  if (train.destination_override && String(train.destination_override).trim()) {
+    return String(train.destination_override).trim();
+  }
+  if (train.manual_dest && String(train.manual_dest).trim()) {
+    return String(train.manual_dest).trim();
+  }
+  // 2. デフォルト自動算出: 有効な発着時刻が存在する最後の停車駅
   const list = train.actual || train.stations;
   if (list && list.length > 0) {
     const valid = list.filter(s => (s.arr != null || s.dep != null) && !s.is_cancelled);
@@ -436,6 +444,7 @@ function getTrainDestination(train) {
       if (st) return st.name;
     }
   }
+  // 3. フォールバック
   return train.destination || "";
 }
 
@@ -1774,7 +1783,7 @@ function createTrainCard(t) {
 
   }
 
-  infoHTML += `<span class="pos-train-dest">${t.destination}行</span>`;
+  infoHTML += `<span class="pos-train-dest">${getTrainDestination(t)}行</span>`;
 
   // 充当車両バッジの付与
 
@@ -1804,7 +1813,7 @@ function createTrainCard(t) {
 
   card.onclick = () => openTrainModal(t);
 
-  card.title = `${t.train_no} ${t.destination}行`;
+  card.title = `${t.train_no} ${getTrainDestination(t)}行`;
 
   return card;
 
@@ -2118,7 +2127,7 @@ function renderTimetable() {
 
   destRow.className = "tt-header-row tt-dest";
 
-  destRow.innerHTML = `<th>行先</th>` + trains.map(t => `<th>${formatStationName(t.destination)}</th>`).join("");
+  destRow.innerHTML = `<th>行先</th>` + trains.map(t => `<th>${formatStationName(getTrainDestination(t))}</th>`).join("");
 
   th.appendChild(destRow);
 
@@ -2305,7 +2314,7 @@ function openTrainModal(t) {
 
       <span class="badge">${t.direction === "up" ? "上り" : "下り"}</span>
 
-      <span class="badge">${formatStationName(t.destination)}行</span>
+      <span class="badge">${formatStationName(getTrainDestination(t))}行</span>
 
       <span class="badge ${statusBadgeColor}">${statusText}</span>
 
@@ -2418,6 +2427,14 @@ function updateClock() {
 
     if (state.view === "diagram") renderDiagram();
 
+    if (state.view === "station") {
+      const st = DATA.stations.find(s => s.code === state.selectedStationCode) || DATA.stations[0];
+      if (st) {
+        renderNextTrainsCard(st);
+        renderStationTimetableContent(st);
+      }
+    }
+
   }
 
 }
@@ -2453,6 +2470,9 @@ async function loadData() {
     DATA.stations = s;
 
     DATA.timetable = t;
+    DATA.timetable.forEach(tr => {
+      tr.destination = getTrainDestination(tr);
+    });
 
     DATA.status = st;
 
@@ -2481,7 +2501,12 @@ async function loadData() {
 
       if (!DATA.timetable.length) {
         const t = await fetch("data/timetable.json").then(r => r.json());
-        if (Array.isArray(t)) DATA.timetable = t;
+        if (Array.isArray(t)) {
+          DATA.timetable = t;
+          DATA.timetable.forEach(tr => {
+            tr.destination = getTrainDestination(tr);
+          });
+        }
       }
 
     } catch (e2) { console.error(e2); }
@@ -2534,13 +2559,13 @@ async function loadData() {
 
     const params = new URLSearchParams(window.location.search);
 
-    const paramDate = params.get('date');
+    const paramDate = params.get('date') || params.get('d');
 
-    const paramTime = params.get('time');
+    const paramTime = params.get('time') || params.get('t');
 
-    const paramView = params.get('view');
+    const paramView = params.get('view') || params.get('tab');
 
-    const paramStation = params.get('station');
+    const paramStation = params.get('station') || params.get('code') || params.get('st');
 
     if (paramDate && /^\d{4}-\d{2}-\d{2}$/.test(paramDate)) {
       state.serviceDate = paramDate;
@@ -2698,6 +2723,175 @@ function selectStation(code) {
   renderStationView();
 }
 
+function renderNextTrainsCard(station) {
+  const container = $("#station-next-trains-card");
+  if (!container || !station) return;
+
+  const nowM = state.currentMinutes != null
+    ? state.currentMinutes
+    : (new Date().getHours() * 60 + new Date().getMinutes());
+
+  const allTrains = effectiveTrains();
+
+  // 補助関数: 当該駅からの発車列車を抽出・ソート
+  function getUpcomingDepartures(direction) {
+    const list = [];
+    allTrains.forEach(t => {
+      if (t.direction !== direction) return;
+      const stEntry = t.stations.find(s => s.code === station.code);
+      if (!stEntry) return;
+      if (stEntry.arr === "pass" || stEntry.dep === "pass" || stEntry.arr === "レ" || stEntry.dep === "レ") return;
+
+      const actual = t.actual ? t.actual.find(s => s.code === station.code) : null;
+      if (actual?.is_cancelled) return;
+
+      // 終着駅判定 (当駅止まりは乗車不可のため除外)
+      const validStations = (t.actual || t.stations).filter(s => (s.arr != null || s.dep != null) && !s.is_cancelled);
+      const lastValidSt = validStations.length > 0 ? validStations[validStations.length - 1] : null;
+      if (lastValidSt && lastValidSt.code === station.code) return;
+
+      const depTimeStr = stEntry.dep || stEntry.arr;
+      if (!depTimeStr || depTimeStr === "＝") return;
+
+      const depMins = timeStringToMinutes(depTimeStr);
+      if (depMins == null) return;
+
+      // 発車後1分までは「まもなく発車 / 停車中」として表示、それ以降は次へ
+      if (depMins >= nowM - 1) {
+        list.push({
+          train: t,
+          depTimeStr,
+          depMins,
+          arrTimeStr: stEntry.arr,
+          diff: depMins - nowM
+        });
+      }
+    });
+
+    list.sort((a, b) => a.depMins - b.depMins);
+    return list;
+  }
+
+  const downDepartures = station.code !== "M17" ? getUpcomingDepartures("down") : [];
+  const upDepartures = station.code !== "M01" ? getUpcomingDepartures("up") : [];
+
+  // カウントダウンバッジのフォーマット
+  function formatCountdown(dep) {
+    const diff = dep.diff;
+    if (diff < 0) {
+      return `<span class="cd-chip cd-departing">発車</span>`;
+    } else if (diff <= 1) {
+      return `<span class="cd-chip cd-imminent">まもなく発車</span>`;
+    } else if (diff <= 3) {
+      return `<span class="cd-chip cd-urgent">あと${diff}分</span>`;
+    } else if (diff < 60) {
+      return `<span class="cd-chip cd-normal">あと${diff}分</span>`;
+    } else {
+      const h = Math.floor(diff / 60);
+      const m = diff % 60;
+      return `<span class="cd-chip cd-normal">あと${h}時間${m > 0 ? m + '分' : ''}</span>`;
+    }
+  }
+
+  function renderDirectionColumn(dirKey, dirLabel, iconArrow, departures) {
+    const isDown = dirKey === 'down';
+    const dirClass = isDown ? 'dir-down' : 'dir-up';
+    const next = departures.length > 0 ? departures[0] : null;
+    const following = departures.length > 1 ? departures[1] : null;
+
+    let contentHtml = '';
+    if (!next) {
+      contentHtml = `
+        <div class="next-train-empty">
+          <span class="empty-icon">✓</span>
+          <span class="empty-text">本日の運行は終了しました</span>
+        </div>
+      `;
+    } else {
+      const t = next.train;
+      const type = getTrainType(t);
+      const tStyle = getTrainTypeStyle(type);
+      const destName = formatStationName(getTrainDestination(t));
+      const vehs = getTrainAssignedVehicles(t, state.serviceDate);
+      const vehHtml = vehs.length > 0
+        ? `<span class="next-veh-pill"><img src="${getVehicleIconSrc(vehs[0])}" class="mini-veh-icon" alt=""> ${vehs.join(' ')}</span>`
+        : (t.operation_id ? `<span class="next-veh-pill op-pill">${t.operation_id}運用</span>` : '');
+
+      const folHtml = following ? `
+        <div class="following-train-row">
+          <span class="fol-tag">次々発</span>
+          <strong class="fol-time">${following.depTimeStr}発</strong>
+          <span class="fol-dest">${formatStationName(getTrainDestination(following.train))}行</span>
+          <span class="fol-train-no">${following.train.train_no}</span>
+          <span class="fol-diff">(${following.diff < 60 ? `あと${following.diff}分` : `あと${Math.floor(following.diff/60)}時間${following.diff%60}分`})</span>
+        </div>
+      ` : '';
+
+      contentHtml = `
+        <div class="next-train-primary">
+          <div class="next-time-box">
+            <span class="next-dep-time">${next.depTimeStr}</span>
+            <span class="next-dep-unit">発</span>
+          </div>
+          <div class="next-dest-box">
+            <div class="next-dest-row">
+              <span class="badge ${tStyle.badgeClass}">${tStyle.label}</span>
+              <strong class="next-dest-name">${destName}行</strong>
+            </div>
+            <div class="next-meta-row">
+              <span class="next-train-no">${t.train_no}</span>
+              ${vehHtml}
+            </div>
+          </div>
+          <div class="next-countdown-box">
+            ${formatCountdown(next)}
+          </div>
+        </div>
+        ${folHtml}
+      `;
+    }
+
+    return `
+      <div class="next-col ${dirClass}">
+        <div class="next-col-header">
+          <span class="next-col-arrow">${iconArrow}</span>
+          <span class="next-col-title">${dirLabel}</span>
+        </div>
+        <div class="next-col-body">
+          ${contentHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  const isDownOnly = station.code === "M01";
+  const isUpOnly = station.code === "M17";
+
+  let colsHtml = '';
+  if (isDownOnly) {
+    colsHtml = renderDirectionColumn('down', '下り 茂木方面', '↓', downDepartures);
+  } else if (isUpOnly) {
+    colsHtml = renderDirectionColumn('up', '上り 下館方面', '↑', upDepartures);
+  } else {
+    colsHtml = `
+      ${renderDirectionColumn('down', '下り 茂木方面', '↓', downDepartures)}
+      ${renderDirectionColumn('up', '上り 下館方面', '↑', upDepartures)}
+    `;
+  }
+
+  container.innerHTML = `
+    <div class="next-trains-card-inner ${isDownOnly || isUpOnly ? 'single-col' : 'two-cols'}">
+      <div class="next-trains-title-bar">
+        <span class="next-trains-title">次の発車列車</span>
+        <span class="next-trains-clock-sync">リアルタイム</span>
+      </div>
+      <div class="next-trains-grid">
+        ${colsHtml}
+      </div>
+    </div>
+  `;
+}
+
 function renderStationView() {
 
   const station = DATA.stations.find(s => s.code === state.selectedStationCode) || DATA.stations[0];
@@ -2773,6 +2967,9 @@ function renderStationView() {
     };
 
   }
+
+  // 1.5 次の列車カウントダウンカードの描画
+  renderNextTrainsCard(station);
 
   // 2. 駅情報カードの描画
 
@@ -3196,6 +3393,30 @@ var STATIONS_FALLBACK = [];
 setInterval(updateClock, 1000);
 
 loadData();
+
+// PWA & オフライン対応
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('../sw.js').catch(err => {
+      console.warn('PWA ServiceWorker registration failed:', err);
+    });
+  });
+}
+
+function updateOnlineStatus() {
+  const banner = $("#offline-banner");
+  if (banner) {
+    if (!navigator.onLine) {
+      banner.textContent = "📶 オフライン表示中（端末に保存された時刻表データを表示しています）";
+      banner.classList.remove("hidden");
+    } else {
+      banner.classList.add("hidden");
+    }
+  }
+}
+window.addEventListener("online", updateOnlineStatus);
+window.addEventListener("offline", updateOnlineStatus);
+if (typeof navigator !== 'undefined' && !navigator.onLine) updateOnlineStatus();
 
 window.addEventListener("load", () => setView(state.view || "position"));
 

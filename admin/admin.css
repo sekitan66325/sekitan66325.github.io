@@ -862,6 +862,22 @@ main.admin-shell {
   color: var(--c-fg);
 }
 
+.diff-val-old {
+  color: #b91c1c;
+  background-color: #fef2f2;
+  text-decoration: line-through;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.diff-val-new {
+  color: #15803d;
+  background-color: #f0fdf4;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
 .sim-badge.regular {
   border-color: var(--c-accent-border);
   background-color: var(--c-accent-soft);

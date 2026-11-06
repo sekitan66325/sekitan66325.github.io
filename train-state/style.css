@@ -1400,6 +1400,267 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   white-space: nowrap;
 }
 
+/* ===== 次の列車カウントダウンカード ===== */
+
+.station-next-trains-card {
+  margin-bottom: 16px;
+}
+
+.next-trains-card-inner {
+  background: #ffffff;
+  border: 1px solid var(--c-border, #dce2ea);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.next-trains-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--c-border, #dce2ea);
+}
+
+.next-trains-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: 0.02em;
+}
+
+.next-trains-clock-sync {
+  font-size: 0.72rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.next-trains-clock-sync::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.next-trains-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.next-trains-card-inner.single-col .next-trains-grid {
+  grid-template-columns: 1fr;
+}
+
+.next-col {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.next-col:not(:last-child) {
+  border-right: 1px solid var(--c-border, #dce2ea);
+}
+
+.next-col-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.next-col.dir-down .next-col-arrow {
+  color: #006633;
+  font-weight: 800;
+}
+
+.next-col.dir-up .next-col-arrow {
+  color: #2563eb;
+  font-weight: 800;
+}
+
+.next-train-primary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.next-time-box {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.next-dep-time {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.next-dep-unit {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.next-dest-box {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.next-dest-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.next-dest-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.next-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.74rem;
+  color: #64748b;
+}
+
+.next-train-no {
+  font-weight: 600;
+  color: #334155;
+}
+
+.next-veh-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  color: #334155;
+}
+
+.mini-veh-icon {
+  height: 14px;
+  width: auto;
+  vertical-align: middle;
+}
+
+.next-countdown-box {
+  text-align: right;
+}
+
+.cd-chip {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 3px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cd-normal {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.cd-urgent {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.cd-imminent {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+  animation: pulse-cd 1.5s infinite;
+}
+
+.cd-departing {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+@keyframes pulse-cd {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.following-train-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #64748b;
+  padding-top: 6px;
+  border-top: 1px dashed var(--c-border, #dce2ea);
+}
+
+.fol-tag {
+  font-size: 0.68rem;
+  padding: 1px 4px;
+  background: #f1f5f9;
+  border-radius: 2px;
+  color: #475569;
+}
+
+.fol-time {
+  color: #1e293b;
+  font-variant-numeric: tabular-nums;
+}
+
+.fol-dest {
+  color: #334155;
+}
+
+.fol-diff {
+  color: #94a3b8;
+}
+
+.next-train-empty {
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .next-trains-grid {
+    grid-template-columns: 1fr;
+  }
+  .next-col:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid var(--c-border, #dce2ea);
+  }
+  .next-dep-time {
+    font-size: 1.45rem;
+  }
+}
+
 /* 駅情報カード */
 
 .station-info-card {

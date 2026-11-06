@@ -80,6 +80,8 @@
         <button type="button" id="tab-btn-trains" class="admin-tab" onclick="switchAdminTab('trains')">運行データ管理</button>
         <button type="button" id="tab-btn-operations" class="admin-tab"
           onclick="switchAdminTab('operations')">運用ベース管理</button>
+        <button type="button" id="tab-btn-stations" class="admin-tab"
+          onclick="switchAdminTab('stations')">駅情報管理</button>
         <button type="button" id="tab-btn-simulation" class="admin-tab"
           onclick="switchAdminTab('simulation')">運行シミュレーション</button>
       </nav>
@@ -204,6 +206,37 @@
           </table>
         </div>
       </div>
+
+      <!-- 6. 駅情報管理（2ペイン独立スクロール） -->
+      <div id="panel-stations" class="view-panel">
+        <div class="workspace-caption-row">
+          <span class="workspace-caption">駅を選択して編集後、「変更を適用 (メモリ)」→ 「JSON保存」または「GitHubへ反映」で保存します。</span>
+          <div class="st-actions-top" style="display:flex; gap:6px; align-items:center;">
+            <button type="button" class="btn-admin" id="btn-st-diff-modal" onclick="openStationDiffModal()">差分確認</button>
+            <button type="button" class="btn-admin btn-accent" id="btn-push-stations" onclick="exportStationsToGitHub()">GitHubへ反映</button>
+            <input type="file" id="stations-upload" accept=".json" style="display:none;" onchange="handleStationsUpload(event)">
+            <button type="button" class="btn-admin" onclick="document.getElementById('stations-upload').click()">読込</button>
+            <button type="button" class="btn-admin" onclick="downloadStationsFile()">JSON保存</button>
+          </div>
+        </div>
+
+        <div id="stations-workspace" class="trains-workspace">
+          <!-- 左ペイン：駅一覧 -->
+          <aside class="train-list-sidebar">
+            <div class="train-sidebar-head">
+              <input type="search" id="station-admin-search" class="form-input train-search-input" placeholder="駅名・コード・かなで検索..." oninput="renderStationAdminList()">
+            </div>
+            <div class="train-list-container" id="station-admin-list">
+              <!-- 駅アイテム (M01〜M17) -->
+            </div>
+          </aside>
+
+          <!-- 右ペイン：駅情報エディタ -->
+          <main class="train-detail-pane" id="station-detail-pane">
+            <div class="empty-message">左のリストから駅を選択してください</div>
+          </main>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -260,6 +293,34 @@
       <div class="diff-modal-foot">
         <button type="button" onclick="closeDiffModal()" class="btn-admin">閉じる</button>
         <button type="button" onclick="exportTimetable(); closeDiffModal();"
+          class="btn-admin btn-accent">この内容でGitHubへ反映</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="station-diff-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content diff-modal-content">
+      <div class="diff-modal-head">
+        <h3 class="diff-modal-title">駅情報の変更差分プレビュー (GitHub最新との比較)</h3>
+        <button type="button" class="btn-admin btn-compact" onclick="closeStationDiffModal()">×</button>
+      </div>
+      <div id="station-diff-summary-text" class="diff-summary-text"></div>
+      <div class="diff-table-scroll">
+        <table class="diff-table" id="station-diff-table">
+          <thead>
+            <tr>
+              <th>駅</th>
+              <th>項目</th>
+              <th>元データ (GitHub)</th>
+              <th>編集後 (メモリ)</th>
+            </tr>
+          </thead>
+          <tbody id="station-diff-tbody"></tbody>
+        </table>
+      </div>
+      <div class="diff-modal-foot">
+        <button type="button" onclick="closeStationDiffModal()" class="btn-admin">閉じる</button>
+        <button type="button" onclick="exportStationsToGitHub(); closeStationDiffModal();"
           class="btn-admin btn-accent">この内容でGitHubへ反映</button>
       </div>
     </div>

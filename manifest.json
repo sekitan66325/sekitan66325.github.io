@@ -1,21 +1,25 @@
 {
-  "name": "真岡鐵道 車両運用情報",
-  "short_name": "真岡運用",
-  "description": "真岡鐵道車両運用資料ライブラリ・目撃掲示板",
+  "name": "真岡鐵道 情報ポータル・列車走行位置",
+  "short_name": "真岡鐵道",
+  "description": "真岡鐵道（真岡線）のリアルタイム列車走行位置・各駅時刻表・運用情報ポータル",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#006633",
   "icons": [
     {
       "src": "assets/apple-touch-icon.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "assets/apple-touch-icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

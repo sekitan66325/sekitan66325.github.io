@@ -119,7 +119,7 @@ function showDashboard() {
  * タブ切り替え
  */
 async function switchAdminTab(tab) {
-  const views = ['posts', 'logs', 'trains', 'operations', 'simulation'];
+  const views = ['posts', 'logs', 'trains', 'operations', 'simulation', 'stations'];
   views.forEach(v => {
     const el = document.getElementById('panel-' + v);
     if(el) {
@@ -144,6 +144,11 @@ async function switchAdminTab(tab) {
     if (!currentTrainId && timetableData.length > 0) {
       editTrain(timetableData[0].train_id);
     }
+  } else if (tab === 'stations') {
+    if (stationsData.length === 0) {
+      await loadTimetableFromRepo(true);
+    }
+    renderStationAdminView();
   } else if (tab === 'logs') {
     fetchAdminLogs();
   } else if (tab === 'simulation') {
@@ -347,20 +352,87 @@ function escapeHTML(str) {
 let timetableData = [];
 let originalTimetableData = [];
 let stationsData = [];
+let originalStationsData = [];
 let currentTrainId = null;
+let currentStationCode = 'M01';
 let currentTrainFilter = 'all';
 let currentEditorSubTab = 'basic';
 let filteredTrainIds = [];
 let hasUnappliedFormEdits = false;
+let hasUnappliedStationEdits = false;
 let manualOperations = new Set();
 let dirtyTrainIds = new Set();
+let dirtyStationCodes = new Set();
 const DRAFT_STORAGE_KEY = 'moka_admin_timetable_draft';
+
+function computeAutoDestination(stations) {
+  if (!stations || !stations.length) return '';
+  const valid = stations.filter(s => (s.arr != null && s.arr !== '' || s.dep != null && s.dep !== '') && !s.is_cancelled);
+  if (valid.length > 0) {
+    const lastCode = valid[valid.length - 1].code;
+    const st = stationsData.find(s => s.code === lastCode);
+    if (st) return st.name;
+  }
+  return '';
+}
+
+function collectStationsFromTable() {
+  const stRows = document.querySelectorAll('#edit-stations-body tr');
+  const list = [];
+  stRows.forEach(tr => {
+    const code = tr.querySelector('.st-code')?.value.trim();
+    const arr = tr.querySelector('.st-arr')?.value.trim() || null;
+    const dep = tr.querySelector('.st-dep')?.value.trim() || null;
+    if (code) list.push({ code, arr, dep });
+  });
+  return list;
+}
+
+function updateAutoDestPreview() {
+  const cb = document.getElementById('edit-dest-override-check');
+  if (cb && cb.checked) return;
+  const input = document.getElementById('edit-dest');
+  const hint = document.getElementById('edit-dest-hint');
+  if (!input) return;
+  
+  const stations = collectStationsFromTable();
+  const autoDest = computeAutoDestination(stations);
+  if (autoDest) {
+    input.value = autoDest;
+    if (hint) hint.textContent = `※停車駅から自動算出: ${autoDest}`;
+  }
+}
+
+function toggleDestOverride(cb) {
+  const input = document.getElementById('edit-dest');
+  const hint = document.getElementById('edit-dest-hint');
+  const train = timetableData.find(t => t.train_id === currentTrainId);
+  if (!input || !train) return;
+  if (cb.checked) {
+    input.removeAttribute('readonly');
+    input.style.backgroundColor = '';
+    input.style.color = '';
+    input.focus();
+    if (hint) hint.textContent = '※手動指定中（自動算出は無効）';
+  } else {
+    input.setAttribute('readonly', 'true');
+    input.style.backgroundColor = 'var(--c-surface-tint, #f1f5f9)';
+    input.style.color = 'var(--c-fg-muted, #64748b)';
+    const autoDest = computeAutoDestination(collectStationsFromTable());
+    input.value = autoDest || train.destination || '';
+    if (hint) hint.textContent = `※停車駅から自動算出: ${autoDest || '未定'}`;
+  }
+  markEditorUnapplied(true);
+}
 
 function markEditorUnapplied(flag = true) {
   hasUnappliedFormEdits = flag;
   const hint = document.getElementById('unapplied-hint');
   if (hint) {
     hint.style.display = flag ? 'inline' : 'none';
+  }
+  if (flag) {
+    updateAutoDestPreview();
   }
 }
 
@@ -434,6 +506,7 @@ async function loadTimetableFromRepo(silent = false) {
     if (!stRes.ok || !ttRes.ok) throw new Error('リポジトリからのデータ取得に失敗しました');
 
     stationsData = await stRes.json();
+    originalStationsData = JSON.parse(JSON.stringify(stationsData));
     const fetchedTt = await ttRes.json();
     originalTimetableData = JSON.parse(JSON.stringify(fetchedTt));
 
@@ -709,8 +782,17 @@ function editTrain(trainId) {
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">行先</label>
-            <input type="text" id="edit-dest" class="form-input" value="${escapeHTML(t.destination || '')}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label class="form-label" style="margin-bottom:0;">行先</label>
+              <label style="font-size:0.75rem; cursor:pointer; color:var(--c-accent, #006633); user-select:none;">
+                <input type="checkbox" id="edit-dest-override-check" onchange="toggleDestOverride(this)" ${t.destination_override ? 'checked' : ''}>
+                手動上書き
+              </label>
+            </div>
+            <input type="text" id="edit-dest" class="form-input" value="${escapeHTML(t.destination_override || t.destination || computeAutoDestination(t.stations))}" placeholder="停車駅から自動算出..." ${t.destination_override ? '' : 'readonly style="background-color:var(--c-surface-tint, #f1f5f9); color:var(--c-fg-muted, #64748b);"'}>
+            <div id="edit-dest-hint" class="form-field-hint" style="font-size:0.75rem; color:var(--c-fg-muted, #64748b); margin-top:2px;">
+              ${t.destination_override ? '※手動指定中（自動算出は無効）' : `※停車駅から自動算出: ${escapeHTML(computeAutoDestination(t.stations) || '未定')}`}
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label">運用番号</label>
@@ -1213,7 +1295,6 @@ function saveTrainData() {
     }
   }
   t.direction = document.getElementById('edit-dir').value;
-  t.destination = document.getElementById('edit-dest').value.trim();
 
   // Operation Rule
   if (!t.operation_rule) t.operation_rule = { service_type: 'regular' };
@@ -1308,6 +1389,17 @@ function saveTrainData() {
       t.stations.push({ code, arr, dep });
     }
   });
+
+  const isDestOverride = document.getElementById('edit-dest-override-check')?.checked;
+  const destVal = (document.getElementById('edit-dest')?.value || '').trim();
+  const autoDest = computeAutoDestination(t.stations);
+  if (isDestOverride && destVal) {
+    t.destination_override = destVal;
+    t.destination = destVal;
+  } else {
+    delete t.destination_override;
+    t.destination = autoDest || destVal;
+  }
 
   if (originalTimetableData.length > 0) {
     calculateDirtySet();
@@ -2022,5 +2114,421 @@ async function exportTimetable() {
     updateSyncStatus();
   } finally {
     btns.forEach(b => { b.disabled = false; b.classList.remove('btn-loading'); });
+  }
+}
+
+// ==========================================
+// 駅情報管理 (stations.json)
+// ==========================================
+
+function renderStationAdminView() {
+  renderStationAdminList();
+  if (currentStationCode) {
+    renderStationDetailPane(currentStationCode);
+  } else if (stationsData.length > 0) {
+    editStation(stationsData[0].code);
+  }
+}
+
+function renderStationAdminList() {
+  const container = document.getElementById('station-admin-list');
+  if (!container) return;
+
+  const searchInput = document.getElementById('station-admin-search');
+  const query = (searchInput?.value || '').trim().toLowerCase();
+
+  const filtered = stationsData.filter(s => {
+    if (!query) return true;
+    return s.code.toLowerCase().includes(query) ||
+           s.name.toLowerCase().includes(query) ||
+           (s.kana && s.kana.toLowerCase().includes(query)) ||
+           (s.romaji && s.romaji.toLowerCase().includes(query));
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-message">該当する駅がありません</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(s => {
+    const isSelected = s.code === currentStationCode;
+    const isDirty = dirtyStationCodes.has(s.code);
+    const isManned = s.station_type && s.station_type.includes('有人');
+    const typeLabel = isManned ? '有人' : '無人';
+    const typeClass = isManned ? 'op-chip-reg' : 'op-chip-dead';
+
+    return `
+      <div class="train-list-item ${isSelected ? 'active' : ''}" onclick="editStation('${s.code}')">
+        <div class="tli-header">
+          <span class="tli-no">${escapeHTML(s.code)} ${escapeHTML(s.name)}</span>
+          <div class="tli-badges">
+            <span class="op-chip ${typeClass}">${typeLabel}</span>
+            ${s.sl_stop ? '<span class="op-chip op-chip-sl" title="SLもおか停車駅">SL</span>' : ''}
+            ${s.can_exchange ? '<span class="op-chip op-chip-extra" title="列車交換可能">交</span>' : ''}
+            ${isDirty ? '<span class="tli-dirty-dot" title="未反映の変更あり">●</span>' : ''}
+          </div>
+        </div>
+        <div class="tli-route">${escapeHTML(s.kana || '')} / ${escapeHTML(s.romaji || '')}</div>
+        <div class="tli-meta">
+          <span>${s.distance_km} km</span>
+          <span>${escapeHTML(s.platform_layout || '')}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function editStation(code) {
+  if (hasUnappliedStationEdits && currentStationCode && currentStationCode !== code) {
+    if (confirm('編集中に未適用の入力があります。\n先にメモリへ適用しますか？')) {
+      saveStationData();
+    }
+  }
+  currentStationCode = code;
+  hasUnappliedStationEdits = false;
+  renderStationAdminList();
+  renderStationDetailPane(code);
+}
+
+function renderStationDetailPane(code) {
+  const pane = document.getElementById('station-detail-pane');
+  if (!pane) return;
+
+  const s = stationsData.find(st => st.code === code);
+  if (!s) {
+    pane.innerHTML = '<div class="empty-message">駅データが見つかりません</div>';
+    return;
+  }
+
+  const connText = (s.connections || []).join('\n');
+
+  pane.innerHTML = `
+    <div class="editor-header">
+      <div>
+        <h3 class="editor-train-title">
+          駅情報編集: [${escapeHTML(s.code)}] ${escapeHTML(s.name)}
+        </h3>
+        <span class="editor-train-meta">起点（下館）から ${s.distance_km} km / 開業日: ${escapeHTML(s.opening_date || '—')}</span>
+      </div>
+      <div class="editor-actions">
+        <span id="unapplied-st-hint" class="unapplied-hint" style="display: none; color:#b91c1c; font-size:0.8rem; font-weight:700;">● 未適用の変更あり</span>
+        <button type="button" class="btn-admin btn-accent" onclick="saveStationData()">変更を適用 (メモリ)</button>
+      </div>
+    </div>
+
+    <div class="editor-body" oninput="markStationEditorUnapplied(true)" onchange="markStationEditorUnapplied(true)">
+      <!-- 基本情報 -->
+      <h4 class="editor-block-title">基本情報</h4>
+      <div class="train-editor-grid-4">
+        <div class="form-group">
+          <label class="form-label">駅コード</label>
+          <input type="text" id="st-edit-code" class="form-input" value="${escapeHTML(s.code)}" readonly style="background-color:var(--c-surface-tint, #f1f5f9); color:var(--c-fg-muted, #64748b);">
+        </div>
+        <div class="form-group">
+          <label class="form-label">駅名</label>
+          <input type="text" id="st-edit-name" class="form-input" value="${escapeHTML(s.name || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">かな表記</label>
+          <input type="text" id="st-edit-kana" class="form-input" value="${escapeHTML(s.kana || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ローマ字</label>
+          <input type="text" id="st-edit-romaji" class="form-input" value="${escapeHTML(s.romaji || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">電報略号</label>
+          <input type="text" id="st-edit-telegram" class="form-input" value="${escapeHTML(s.telegram_code || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">順序 (order)</label>
+          <input type="number" id="st-edit-order" class="form-input" value="${s.order != null ? s.order : ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">営業キロ (km)</label>
+          <input type="number" step="0.1" id="st-edit-dist" class="form-input" value="${s.distance_km != null ? s.distance_km : ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">開業年月日</label>
+          <input type="date" id="st-edit-opening" class="form-input" value="${escapeHTML(s.opening_date || '')}">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label">所在地（住所）</label>
+        <input type="text" id="st-edit-address" class="form-input" value="${escapeHTML(s.address || '')}">
+      </div>
+
+      <!-- 運行・配線構造 -->
+      <h4 class="editor-block-title">運行・配線構造</h4>
+      <div class="train-editor-grid-4">
+        <div class="form-group">
+          <label class="form-label">駅形態</label>
+          <input type="text" id="st-edit-type" class="form-input" value="${escapeHTML(s.station_type || '')}" placeholder="例: 有人直営駅、完全無人駅">
+        </div>
+        <div class="form-group">
+          <label class="form-label">配線構造</label>
+          <input type="text" id="st-edit-platform" class="form-input" value="${escapeHTML(s.platform_layout || '')}" placeholder="例: 相対式2面2線">
+        </div>
+        <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
+          <label class="form-label">列車行き違い (交換)</label>
+          <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.85rem;">
+            <input type="checkbox" id="st-edit-exchange" ${s.can_exchange ? 'checked' : ''}>
+            交換可能
+          </label>
+        </div>
+        <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
+          <label class="form-label">SLもおか号</label>
+          <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.85rem;">
+            <input type="checkbox" id="st-edit-sl" ${s.sl_stop ? 'checked' : ''}>
+            停車駅
+          </label>
+        </div>
+      </div>
+
+      <!-- 窓口・設備 -->
+      <h4 class="editor-block-title">出札窓口・アメニティ・駐車場</h4>
+      <div class="train-editor-grid-4">
+        <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
+          <label class="form-label">出札窓口</label>
+          <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.85rem;">
+            <input type="checkbox" id="st-edit-window" ${s.has_ticket_window ? 'checked' : ''}>
+            窓口あり
+          </label>
+        </div>
+        <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
+          <label class="form-label">自動券売機</label>
+          <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.85rem;">
+            <input type="checkbox" id="st-edit-vending" ${s.has_vending_machine ? 'checked' : ''}>
+            券売機あり
+          </label>
+        </div>
+        <div class="form-group" style="grid-column: span 2;">
+          <label class="form-label">トイレ設備</label>
+          <input type="text" id="st-edit-restroom" class="form-input" value="${escapeHTML(s.restroom || '')}">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label">駐車場・駐輪場情報</label>
+        <input type="text" id="st-edit-parking" class="form-input" value="${escapeHTML(s.parking || '')}">
+      </div>
+
+      <!-- 接続路線 -->
+      <h4 class="editor-block-title">接続交通機関 (1行に1件)</h4>
+      <div class="form-group">
+        <textarea id="st-edit-connections" class="form-textarea" rows="3" placeholder="JR水戸線\n関東鉄道常総線\nコミュニティバス">${escapeHTML(connText)}</textarea>
+      </div>
+
+      <!-- 駅解説・観光 -->
+      <h4 class="editor-block-title">解説・見どころ情報</h4>
+      <div class="form-group">
+        <label class="form-label">駅の特徴 (features)</label>
+        <textarea id="st-edit-features" class="form-textarea" rows="3">${escapeHTML(s.features || '')}</textarea>
+      </div>
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label">見どころ・観光情報 (highlights)</label>
+        <textarea id="st-edit-highlights" class="form-textarea" rows="4">${escapeHTML(s.highlights || '')}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+function markStationEditorUnapplied(flag = true) {
+  hasUnappliedStationEdits = flag;
+  const hint = document.getElementById('unapplied-st-hint');
+  if (hint) {
+    hint.style.display = flag ? 'inline' : 'none';
+  }
+}
+
+function saveStationData() {
+  if (!currentStationCode) return;
+  const s = stationsData.find(st => st.code === currentStationCode);
+  if (!s) return;
+
+  s.name = (document.getElementById('st-edit-name')?.value || '').trim();
+  s.kana = (document.getElementById('st-edit-kana')?.value || '').trim();
+  s.romaji = (document.getElementById('st-edit-romaji')?.value || '').trim();
+  s.telegram_code = (document.getElementById('st-edit-telegram')?.value || '').trim();
+  s.order = Number(document.getElementById('st-edit-order')?.value) || s.order;
+  s.distance_km = Number(document.getElementById('st-edit-dist')?.value) || s.distance_km;
+  s.opening_date = (document.getElementById('st-edit-opening')?.value || '').trim();
+  s.address = (document.getElementById('st-edit-address')?.value || '').trim();
+
+  s.station_type = (document.getElementById('st-edit-type')?.value || '').trim();
+  s.platform_layout = (document.getElementById('st-edit-platform')?.value || '').trim();
+  s.can_exchange = document.getElementById('st-edit-exchange')?.checked || false;
+  s.sl_stop = document.getElementById('st-edit-sl')?.checked || false;
+
+  s.has_ticket_window = document.getElementById('st-edit-window')?.checked || false;
+  s.has_vending_machine = document.getElementById('st-edit-vending')?.checked || false;
+  s.restroom = (document.getElementById('st-edit-restroom')?.value || '').trim();
+  s.parking = (document.getElementById('st-edit-parking')?.value || '').trim();
+
+  const connRaw = (document.getElementById('st-edit-connections')?.value || '').split('\n').map(x => x.trim()).filter(Boolean);
+  s.connections = connRaw;
+
+  s.features = (document.getElementById('st-edit-features')?.value || '').trim();
+  s.highlights = (document.getElementById('st-edit-highlights')?.value || '').trim();
+
+  // 変更フラグ判定
+  const orig = originalStationsData.find(st => st.code === currentStationCode);
+  if (orig && JSON.stringify(orig) !== JSON.stringify(s)) {
+    dirtyStationCodes.add(s.code);
+  } else {
+    dirtyStationCodes.delete(s.code);
+  }
+
+  markStationEditorUnapplied(false);
+  renderStationAdminList();
+  showToast(`[${s.code} ${s.name}] の変更をメモリに適用しました`);
+}
+
+function downloadStationsFile() {
+  if (stationsData.length === 0) {
+    alert('駅データがありません');
+    return;
+  }
+  const jsonStr = JSON.stringify(stationsData, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'stations.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('stations.json をダウンロードしました');
+}
+
+function handleStationsUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!Array.isArray(parsed)) throw new Error('stations.jsonの形式が正しくありません (配列が必要)');
+      stationsData = parsed;
+      dirtyStationCodes.clear();
+      stationsData.forEach(s => {
+        const orig = originalStationsData.find(o => o.code === s.code);
+        if (!orig || JSON.stringify(orig) !== JSON.stringify(s)) {
+          dirtyStationCodes.add(s.code);
+        }
+      });
+      renderStationAdminList();
+      if (currentStationCode) renderStationDetailPane(currentStationCode);
+      showToast(`stations.json を読み込みました (${stationsData.length}駅)`);
+    } catch (err) {
+      alert('読込エラー: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function openStationDiffModal() {
+  const modal = document.getElementById('station-diff-modal');
+  const tbody = document.getElementById('station-diff-tbody');
+  const summary = document.getElementById('station-diff-summary-text');
+  if (!modal || !tbody) return;
+
+  const diffRows = [];
+  stationsData.forEach(s => {
+    const orig = originalStationsData.find(o => o.code === s.code);
+    if (!orig) {
+      diffRows.push({ station: `${s.code} ${s.name}`, field: '新規駅', orig: '—', mod: '新規作成' });
+      return;
+    }
+    const fields = ['name', 'kana', 'romaji', 'telegram_code', 'order', 'distance_km', 'opening_date', 'address',
+                    'station_type', 'platform_layout', 'can_exchange', 'sl_stop', 'has_ticket_window',
+                    'has_vending_machine', 'restroom', 'parking', 'connections', 'features', 'highlights'];
+    fields.forEach(f => {
+      const oVal = JSON.stringify(orig[f] ?? null);
+      const mVal = JSON.stringify(s[f] ?? null);
+      if (oVal !== mVal) {
+        diffRows.push({
+          station: `${s.code} ${s.name}`,
+          field: f,
+          orig: String(orig[f] ?? '—'),
+          mod: String(s[f] ?? '—')
+        });
+      }
+    });
+  });
+
+  if (diffRows.length === 0) {
+    if (summary) summary.innerHTML = '<span class="diff-badge clean">変更なし (GitHub最新と同一です)</span>';
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-message">変更点はありません</td></tr>';
+  } else {
+    if (summary) summary.innerHTML = `<span class="diff-badge dirty">未反映の変更: ${dirtyStationCodes.size} 駅 (${diffRows.length} 項目)</span>`;
+    tbody.innerHTML = diffRows.map(d => `
+      <tr>
+        <td><strong>${escapeHTML(d.station)}</strong></td>
+        <td><code>${escapeHTML(d.field)}</code></td>
+        <td class="diff-val-old">${escapeHTML(d.orig)}</td>
+        <td class="diff-val-new">${escapeHTML(d.mod)}</td>
+      </tr>
+    `).join('');
+  }
+
+  modal.style.display = 'flex';
+}
+
+function closeStationDiffModal() {
+  const modal = document.getElementById('station-diff-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function handleStationDiffBackdropClick(e) {
+  if (e.target.id === 'station-diff-modal') closeStationDiffModal();
+}
+
+async function exportStationsToGitHub() {
+  if (hasUnappliedStationEdits && currentStationCode) {
+    if (confirm('現在編集中の駅フォームに未適用の入力があります。\n先にメモリへ適用してからGitHubへ反映しますか？')) {
+      saveStationData();
+    }
+  }
+
+  if (stationsData.length === 0) {
+    alert('駅データがありません');
+    return;
+  }
+
+  if (!adminToken) {
+    alert('管理者としてログインしていません。');
+    return;
+  }
+
+  const btn = document.getElementById('btn-push-stations');
+  if (btn) { btn.disabled = true; btn.classList.add('btn-loading'); }
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'save_stations_github',
+        token: adminToken,
+        data: stationsData
+      })
+    });
+    const result = await res.json();
+    if (result.status === 'success') {
+      originalStationsData = JSON.parse(JSON.stringify(stationsData));
+      dirtyStationCodes.clear();
+      markStationEditorUnapplied(false);
+      renderStationAdminList();
+      alert('GitHubへの直接反映（プッシュ）が成功しました！');
+    } else {
+      throw new Error(result.message || '保存に失敗しました');
+    }
+  } catch (err) {
+    console.warn(err);
+    alert('お知らせ: GASサーバーへの save_stations_github 呼び出しが未設定またはエラーです (' + err.message + ')。\n最新の stations.json をダウンロードしますので、リポジトリに配置するか sync.py で同期してください。');
+    downloadStationsFile();
+  } finally {
+    if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
   }
 }
