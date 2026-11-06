@@ -1,4 +1,4 @@
-const CACHE_NAME = 'moka-pwa-v20261106';
+const CACHE_NAME = 'moka-pwa-v20261106-v4';
 
 const PRECACHE_ASSETS = [
   './',
@@ -49,7 +49,7 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => clients.claim())
+    }).then(() => self.clients.claim())
   );
 });
 
@@ -62,9 +62,15 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url);
 
-  // 外部API (Google Apps Script, Google Analytics等) はキャッシュせず直接通信
+  // 1. 管理画面 (/admin/) は Service Worker のキャッシュ対象外（常に最新をネットワークから取得）
+  if (url.pathname.includes('/admin')) {
+    return;
+  }
+
+  // 2. 外部API (Google Apps Script, Cloudflare Workers, Google Analytics等) はキャッシュせず直接通信
   if (
     url.hostname.includes('script.google.com') ||
+    url.hostname.includes('workers.dev') ||
     url.hostname.includes('google-analytics.com') ||
     url.hostname.includes('googletagmanager.com') ||
     url.hostname.includes('docs.google.com')
@@ -108,7 +114,7 @@ self.addEventListener('fetch', (event) => {
   // 2. 静的アセット (CSS, JS, 画像, フォント等): Stale-While-Revalidate
   //    (キャッシュがあれば瞬時に返却し、バックグラウンドで最新を取得)
   event.respondWith(
-    caches.match(req, { ignoreSearch: true }).then((cached) => {
+    caches.match(req).then((cached) => {
       const fetchPromise = fetch(req).then((networkRes) => {
         if (networkRes && networkRes.status === 200) {
           const clone = networkRes.clone();

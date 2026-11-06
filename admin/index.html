@@ -6,10 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>運行管理パネル - 真岡鐵道 情報ポータル</title>
   <meta name="robots" content="noindex, nofollow">
-  <link rel="stylesheet" href="../style.css?v=5">
-  <link rel="stylesheet" href="admin.css?v=5">
+  <link rel="stylesheet" href="../style.css?v=20261106_v4">
+  <link rel="stylesheet" href="admin.css?v=20261106_v4">
   <link rel="stylesheet" href="datepicker.css?v=4">
   <script defer src="datepicker.js?v=4"></script>
+  <script>
+    // 管理画面キャッシュの自動パージ & Service Worker介入防止
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => {
+          caches.open(name).then(cache => {
+            cache.keys().then(keys => {
+              keys.forEach(k => {
+                if (k.url.includes('/admin/')) cache.delete(k);
+              });
+            });
+          });
+        });
+      });
+    }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => {
+          reg.update();
+        });
+      });
+    }
+  </script>
 
   <link rel="icon" href="../assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
@@ -27,8 +50,6 @@
         </nav>
       </div>
       <div>
-        <button type="button" id="btn-passkey-manage" class="btn-admin" style="display: none; margin-right: 6px;"
-          onclick="openPasskeyModal()">パスキー管理</button>
         <button type="button" id="logout-btn" class="btn-admin" style="display: none;"
           onclick="handleLogout()">ログアウト</button>
       </div>
@@ -39,21 +60,6 @@
     <section id="login-view" class="login-box">
       <div class="login-card">
         <h2 class="section-title">管理者ログイン</h2>
-
-        <!-- パスキーログイン -->
-        <div class="passkey-login-box">
-          <button type="button" id="passkey-login-btn" class="btn-passkey-login" onclick="startPasskeyLogin()">
-            パスキーでログイン
-          </button>
-          <div id="passkey-hint-text" class="passkey-hint">
-            Windows Hello、Touch ID、Face ID などで認証します
-          </div>
-        </div>
-
-        <div class="login-divider">
-          <span>または従来のパスワード認証</span>
-        </div>
-
         <form id="admin-login-form" onsubmit="handleLogin(event)">
           <div class="form-group">
             <label class="form-label" for="login-id">管理者ID</label>
@@ -343,46 +349,6 @@
     </div>
   </div>
 
-  <div id="passkey-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 540px;">
-      <div class="diff-modal-head">
-        <h3 class="diff-modal-title">パスキー管理</h3>
-        <button type="button" class="btn-admin btn-compact" onclick="closePasskeyModal()">×</button>
-      </div>
-      <p class="section-desc" style="margin-bottom: 14px;">
-        FIDO2 / WebAuthn規格のパスキーにより、フィッシング詐欺やパスワード漏洩から運行管理システムを保護します。
-      </p>
-
-      <div class="passkey-list-box">
-        <h4 class="editor-block-title" style="margin-top: 0;">登録済みパスキー端末</h4>
-        <div id="passkey-list-container" class="passkey-items-list">
-          <div class="empty-message">読み込み中...</div>
-        </div>
-      </div>
-
-      <div class="passkey-add-box" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--c-border);">
-        <h4 class="editor-block-title" style="margin-top: 0;">新しい端末をパスキー登録</h4>
-        <form id="passkey-register-form" onsubmit="startPasskeyRegistration(event)">
-          <div class="form-group">
-            <label class="form-label" for="passkey-device-name">端末名・識別ラベル</label>
-            <input type="text" id="passkey-device-name" class="form-input" placeholder="例: 管理用 Windows PC (オフィス), 個人 iPhone" required>
-          </div>
-          <div id="passkey-setupkey-group" class="form-group" style="display: none;">
-            <label class="form-label" for="passkey-setup-key">初期マスター登録キー (ADMIN_SETUP_KEY)</label>
-            <input type="password" id="passkey-setup-key" class="form-input" placeholder="初回登録時のみ入力">
-          </div>
-          <button type="submit" id="btn-register-passkey" class="form-submit-btn" style="margin-top: 10px;">
-            この端末にパスキーを発行・登録する
-          </button>
-        </form>
-      </div>
-
-      <div class="modal-actions" style="margin-top: 16px;">
-        <button type="button" onclick="closePasskeyModal()" class="btn-admin">閉じる</button>
-      </div>
-    </div>
-  </div>
-
   <div id="admin-toast" class="admin-toast"></div>
 
   <!-- Google tag (gtag.js) -->
@@ -396,7 +362,7 @@
   </script>
 
   <script src="../config.js"></script>
-  <script src="admin.js?v=6"></script>
+  <script src="admin.js?v=20261106_v4"></script>
 </body>
 
 </html>

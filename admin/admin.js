@@ -2990,3 +2990,21 @@ async function exportStationsToGitHub() {
     if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
   }
 }
+
+// 明示的なグローバル公開（インラインハンドラ・モジュール境界の確実な接続）
+window.startPasskeyLogin = startPasskeyLogin;
+window.openPasskeyModal = openPasskeyModal;
+window.closePasskeyModal = closePasskeyModal;
+window.startPasskeyRegistration = startPasskeyRegistration;
+window.deletePasskeyDevice = deletePasskeyDevice;
+window.switchStationSubTab = switchStationSubTab;
+window.stepStation = stepStation;
+window.editStation = editStation;
+window.saveStationData = saveStationData;
+window.downloadStationsFile = downloadStationsFile;
+window.exportStationsToGitHub = exportStationsToGitHub;
+window.handleLogin = handleLogin;
+window.handleLogout = handleLogout;
+window.switchAdminTab = switchAdminTab;
+window.exportTimetable = exportTimetable;
+window.downloadTimetableFile = downloadTimetableFile;
