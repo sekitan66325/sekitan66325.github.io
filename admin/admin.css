@@ -378,9 +378,8 @@ main.admin-shell {
 }
 
 .train-list-item.selected {
-  background-color: var(--c-accent-soft);
-  border-left: 3px solid var(--c-accent);
-  padding-left: 7px;
+  background-color: var(--c-surface-hover);
+  font-weight: 700;
 }
 
 .tli-no {
@@ -1049,8 +1048,8 @@ main.admin-shell {
 }
 
 .st-toggle-card:has(input[type="checkbox"]:checked) {
-  background-color: var(--c-accent-soft);
-  border-color: var(--c-accent);
+  background-color: var(--c-surface-hover);
+  border-color: var(--c-border-strong);
 }
 
 .st-toggle-body {
@@ -1143,16 +1142,16 @@ main.admin-shell {
 .st-preview-highlights {
   font-size: 0.82rem;
   line-height: 1.6;
-  background-color: var(--c-bg);
-  border-left: 3px solid var(--c-accent);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
   padding: 10px 12px;
-  border-radius: 0 2px 2px 0;
+  border-radius: 2px;
 }
 
 .st-preview-highlights strong {
   display: block;
   font-size: 0.78rem;
-  color: var(--c-accent);
+  color: var(--c-fg);
   margin-bottom: 4px;
 }
 
@@ -1167,36 +1166,30 @@ main.admin-shell {
 }
 
 .btn-passkey-login {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  display: block;
   width: 100%;
-  padding: 12px 18px;
+  padding: 10px 14px;
   background-color: var(--c-fg);
   color: var(--c-bg);
   border: 1px solid var(--c-fg);
   border-radius: 2px;
-  font-size: 0.92rem;
-  font-weight: 700;
+  font-size: 0.88rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  text-align: center;
+  transition: background-color 0.15s ease;
   user-select: none;
 }
 
 .btn-passkey-login:hover {
-  background-color: var(--c-accent);
-  border-color: var(--c-accent);
+  background-color: #334155;
+  border-color: #334155;
   color: #fff;
 }
 
 .btn-passkey-login:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.passkey-icon {
-  flex-shrink: 0;
 }
 
 .passkey-hint {

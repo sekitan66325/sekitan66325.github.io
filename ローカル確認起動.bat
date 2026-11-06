@@ -24,3 +24,4 @@ echo.
 start http://localhost:8080/admin/index.html?dev=1^&tab=stations
 python -m http.server 8080
 pause
+

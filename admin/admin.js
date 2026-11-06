@@ -11,9 +11,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const passkeyHint = document.getElementById('passkey-hint-text');
   if (passkeyHint) {
     if (isPasskeySupported()) {
-      passkeyHint.innerHTML = '<span style="color:var(--c-accent); font-weight:600;">✓ 生体認証パスキー対応端末です</span> (Windows Hello / Touch ID / Face ID)';
+      passkeyHint.textContent = 'Windows Hello、Touch ID、Face ID などで認証できます';
     } else {
-      passkeyHint.innerHTML = '<span style="color:var(--c-muted);">※この端末・ブラウザはパスキー非対応のため下のパスワードを使用してください</span>';
+      passkeyHint.textContent = 'このブラウザはパスキー非対応のため、下のパスワードでログインしてください';
       const pBtn = document.getElementById('passkey-login-btn');
       if (pBtn) pBtn.disabled = true;
     }
@@ -279,10 +279,7 @@ async function loadPasskeyList() {
       container.innerHTML = list.map(pk => `
         <div class="passkey-item-row">
           <div class="passkey-item-info">
-            <span class="passkey-item-name">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              ${escapeHTML(pk.deviceName || '登録済み端末')}
-            </span>
+            <span class="passkey-item-name">${escapeHTML(pk.deviceName || '登録済み端末')}</span>
             <span class="passkey-item-date">登録日: ${escapeHTML(pk.createdAt ? pk.createdAt.slice(0, 10) : '—')} / 最終使用: ${escapeHTML(pk.lastUsedAt ? pk.lastUsedAt.slice(0, 10) : '—')}</span>
           </div>
           <button type="button" class="btn-admin btn-compact" onclick="deletePasskeyDevice('${pk.id}')" title="削除">削除</button>
