@@ -1,90 +1,215 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   管理者パネル専用スタイル（3色ライト・2ペイン独立スクロール設計）
+   管理者パネル専用スタイル
+   UI Design Dictionary (https://ui-design-dictionary.pages.dev/) 準拠
+   自然で実務的・プロフェッショナルなデザインシステム
    ========================================================================== */
+
+:root {
+  --bg: #f1f3f6;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --surface3: #edf2f7;
+  --border: #dbe2eb;
+  --border2: #c4d0df;
+  --text: #1e293b;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --accent: #1e40af;
+  --accent-hover: #1d4ed8;
+  --accent-soft: rgba(30, 64, 175, 0.08);
+  --accent-border: rgba(30, 64, 175, 0.25);
+  
+  --green: #15803d;
+  --green-soft: #f0fdf4;
+  --green-border: #bbf7d0;
+  --orange: #b45309;
+  --orange-soft: #fffbeb;
+  --orange-border: #fde68a;
+  --red: #b91c1c;
+  --red-soft: #fef2f2;
+  --red-border: #fecaca;
+
+  --radius: 8px;
+  --radius-sm: 6px;
+  --radius-xs: 4px;
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
 .admin-shell {
   max-width: 1240px;
 }
 
 main.admin-shell {
   padding-top: 16px;
-  padding-bottom: 28px;
+  padding-bottom: 32px;
 }
 
+/* ===== ログイン画面 ===== */
 .login-box {
-  max-width: 380px;
-  margin: 48px auto;
+  max-width: 400px;
+  margin: 60px auto;
 }
 
 .login-card {
-  padding: 24px 20px;
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
-  background-color: var(--c-bg);
+  padding: 32px 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.login-card .section-title {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 22px;
+  letter-spacing: -0.01em;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  transition: all 0.15s ease;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  background-color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  outline: none;
+}
+
+.form-input[readonly],
+.form-select:disabled,
+.form-textarea[readonly] {
+  background-color: var(--surface3);
+  color: var(--text2);
+  border-color: var(--border);
+  cursor: default;
+}
+
+.form-submit-btn {
+  width: 100%;
+  padding: 9px 16px;
+  background-color: var(--accent);
+  color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: all 0.15s ease;
+}
+
+.form-submit-btn:hover {
+  background-color: var(--accent-hover);
+  box-shadow: var(--shadow);
+}
+
+.form-submit-btn:active {
+  transform: scale(0.99);
 }
 
 .empty-message {
   text-align: center;
-  color: var(--c-muted);
-  padding: 24px 12px;
+  color: var(--text3);
+  padding: 28px 14px;
   font-size: 0.84rem;
   list-style: none;
 }
 
-/* ===== ボタン & バッジ（3色準拠） ===== */
+/* ===== ボタン & バッジ（UI Design Dictionary 準拠） ===== */
 .btn-admin {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 5px 12px;
-  background-color: var(--c-bg);
-  border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
-  color: var(--c-fg);
-  font-size: 0.8rem;
+  padding: 6px 13px;
+  background-color: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  font-size: 0.82rem;
   font-weight: 500;
+  line-height: 1.4;
   cursor: pointer;
   position: relative;
-  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+  box-shadow: var(--shadow-xs);
+  transition: all 0.15s ease;
+  user-select: none;
 }
 
 .btn-admin:hover:not(:disabled) {
-  background-color: var(--c-surface-hover);
-  border-color: var(--c-fg);
+  background-color: var(--surface3);
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.btn-admin:active:not(:disabled) {
+  transform: scale(0.99);
 }
 
 .btn-admin.btn-accent,
 .btn-admin.btn-success {
-  background-color: var(--c-accent);
-  border-color: var(--c-accent);
-  color: var(--c-bg);
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
   font-weight: 600;
+  box-shadow: 0 1px 2px rgba(30, 64, 175, 0.2);
 }
 
 .btn-admin.btn-accent:hover:not(:disabled),
 .btn-admin.btn-success:hover:not(:disabled) {
-  opacity: 0.88;
-  background-color: var(--c-accent);
-  border-color: var(--c-accent);
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  opacity: 0.95;
 }
 
 .btn-admin.btn-danger {
-  color: var(--c-red);
-  border-color: var(--c-red-border);
-  background-color: var(--c-bg);
+  color: var(--red);
+  border-color: var(--red-border);
+  background-color: var(--surface);
 }
 
 .btn-admin.btn-danger:hover:not(:disabled) {
-  background-color: var(--c-red);
-  border-color: var(--c-red);
+  background-color: var(--red);
+  border-color: var(--red);
   color: #ffffff;
 }
 
 .btn-compact {
-  padding: 2px 8px;
-  font-size: 0.75rem;
+  padding: 3px 9px;
+  font-size: 0.76rem;
+  border-radius: var(--radius-xs);
 }
 
 .btn-admin.btn-loading {
@@ -93,24 +218,25 @@ main.admin-shell {
 }
 
 .admin-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   font-size: 0.72rem;
   font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 3px;
-  border: 1px solid var(--c-border);
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
 }
 
 .badge-visible {
-  background-color: var(--c-green-soft);
-  border-color: var(--c-green-border);
-  color: #1b7a2e;
+  background-color: var(--green-soft);
+  border-color: var(--green-border);
+  color: var(--green);
 }
 
 .badge-hidden {
-  background-color: var(--c-red-soft);
-  border-color: var(--c-red-border);
-  color: var(--c-red);
+  background-color: var(--red-soft);
+  border-color: var(--red-border);
+  color: var(--red);
 }
 
 .admin-actions {
@@ -120,18 +246,19 @@ main.admin-shell {
   margin-top: 8px;
 }
 
-/* ===== 同期ステータスバー & ナビタブ ===== */
+/* ===== 同期ステータスバー & ナビタブ (Segmented Control) ===== */
 .admin-status-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px 16px;
-  padding: 9px 14px;
-  background-color: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-radius: 4px;
-  margin-bottom: 12px;
+  padding: 10px 16px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 14px;
 }
 
 .status-bar-left {
@@ -151,65 +278,78 @@ main.admin-shell {
 .sync-indicator {
   display: inline-flex;
   align-items: center;
-  padding: 2px 9px;
-  border-radius: 4px;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
   font-size: 0.76rem;
-  font-weight: 700;
-  border: 1px solid var(--c-border-strong);
+  font-weight: 600;
+  border: 1px solid var(--border2);
+  letter-spacing: 0.01em;
 }
 
 .sync-indicator.sync-ok {
-  background-color: var(--c-green-soft);
-  border-color: var(--c-green-border);
-  color: #1b7a2e;
+  background-color: var(--green-soft);
+  border-color: var(--green-border);
+  color: var(--green);
 }
 
 .sync-indicator.sync-dirty {
-  background-color: var(--c-orange-soft);
-  border-color: #ffc078;
-  color: #b45309;
+  background-color: var(--orange-soft);
+  border-color: var(--orange-border);
+  color: var(--orange);
 }
 
 .sync-indicator.sync-pushing {
-  background-color: var(--c-accent-soft);
-  border-color: var(--c-accent);
-  color: var(--c-accent);
+  background-color: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
 }
 
 .sync-memo {
   font-size: 0.78rem;
-  color: var(--c-muted);
+  color: var(--text3);
 }
 
+/* メインナビゲーション：UI Design Dictionary Segmented Control */
 .admin-tabs {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--surface3);
+  padding: 3px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
   gap: 2px;
-  border-bottom: 1px solid var(--c-border);
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  padding: 8px 14px;
-  font-size: 0.84rem;
+  border-radius: var(--radius-sm);
+  padding: 7px 15px;
+  font-size: 0.83rem;
   font-weight: 500;
-  color: var(--c-muted);
+  color: var(--text2);
   cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
 }
 
 .admin-tab:hover {
-  color: var(--c-fg);
-  background-color: var(--c-surface);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .admin-tab.active {
-  color: var(--c-accent);
-  font-weight: 700;
-  border-bottom-color: var(--c-accent);
+  background-color: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .view-panel {
@@ -222,26 +362,27 @@ main.admin-shell {
 
 /* ===== 操作ログ ===== */
 .log-card {
-  border-bottom: 1px solid var(--c-border);
-  padding: 12px 4px;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 6px;
   font-size: 0.82rem;
 }
 
 .log-header {
   display: flex;
   justify-content: space-between;
-  color: var(--c-muted);
+  color: var(--text2);
   margin-bottom: 4px;
 }
 
 .log-change {
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-border);
-  padding: 8px 10px;
-  border-radius: 2px;
+  background-color: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 9px 12px;
+  border-radius: var(--radius-xs);
   margin-top: 6px;
   white-space: pre-wrap;
   font-size: 0.78rem;
+  color: var(--text);
 }
 
 /* ==========================================================================
@@ -255,91 +396,109 @@ main.admin-shell {
   gap: 8px;
   margin-bottom: 8px;
   font-size: 0.78rem;
-  color: var(--c-muted);
+  color: var(--text2);
 }
 
 .workspace-shortcut-hint {
   font-variant-numeric: tabular-nums;
-  padding: 1px 6px;
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
-  background-color: var(--c-surface);
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background-color: var(--surface2);
+  font-family: ui-monospace, SFMono-Regular, monospace;
 }
 
 .trains-workspace {
   display: grid;
-  grid-template-columns: 295px minmax(0, 1fr);
+  grid-template-columns: 310px minmax(0, 1fr);
   height: calc(100vh - 185px);
-  min-height: 540px;
-  border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
-  background-color: var(--c-bg);
+  min-height: 560px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
-/* 左ペイン：列車一覧 */
+/* 左ペイン：列車一覧 / 駅一覧 */
 .train-list-sidebar {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  border-right: 1px solid var(--c-border-strong);
-  background-color: var(--c-bg);
+  border-right: 1px solid var(--border);
+  background-color: var(--surface);
 }
 
 .train-sidebar-head {
-  padding: 10px 10px 0;
-  background-color: var(--c-surface);
-  border-bottom: 1px solid var(--c-border);
+  padding: 10px 12px;
+  background-color: var(--surface2);
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
 .train-search-input {
-  padding: 5px 8px;
-  font-size: 0.8rem;
+  width: 100%;
+  padding: 7px 11px;
+  font-size: 0.82rem;
+  background-color: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  transition: all 0.15s ease;
+}
+
+.train-search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  outline: none;
 }
 
 .train-filter-bar {
   display: flex;
   gap: 4px;
-  margin-top: 7px;
+  margin-top: 8px;
   flex-wrap: wrap;
 }
 
 .filter-chip {
   flex: 1;
   min-width: max-content;
-  padding: 3px 6px;
-  font-size: 0.72rem;
+  padding: 4px 8px;
+  font-size: 0.74rem;
   font-weight: 500;
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
-  background-color: var(--c-bg);
-  color: var(--c-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background-color: var(--surface);
+  color: var(--text2);
   cursor: pointer;
+  text-align: center;
+  transition: all 0.12s ease;
 }
 
 .filter-chip:hover {
-  color: var(--c-fg);
-  border-color: var(--c-fg);
+  color: var(--text);
+  border-color: var(--border2);
+  background-color: var(--surface2);
 }
 
 .filter-chip.active {
-  background-color: var(--c-accent);
-  border-color: var(--c-accent);
-  color: var(--c-bg);
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
   font-weight: 600;
 }
 
 .train-list-col-head {
   display: grid;
-  grid-template-columns: 74px 1fr 56px;
+  grid-template-columns: 78px 1fr 56px;
   gap: 6px;
-  padding: 6px 4px 5px;
-  margin-top: 6px;
-  font-size: 0.7rem;
+  padding: 7px 12px 6px;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: var(--c-muted);
+  color: var(--text3);
+  background-color: var(--surface2);
+  border-bottom: 1px solid var(--border);
 }
 
 .train-list-col-head em {
@@ -362,29 +521,31 @@ main.admin-shell {
 
 .train-list-item {
   display: grid;
-  grid-template-columns: 74px 1fr auto;
+  grid-template-columns: 78px 1fr auto;
   align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-  border-bottom: 1px solid var(--c-border);
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
-  font-size: 0.8rem;
-  background-color: var(--c-bg);
-  transition: background-color 0.1s;
+  font-size: 0.81rem;
+  background-color: var(--surface);
+  color: var(--text);
+  transition: background-color 0.1s ease;
 }
 
 .train-list-item:hover {
-  background-color: var(--c-surface-hover);
+  background-color: var(--surface2);
 }
 
 .train-list-item.selected {
-  background-color: var(--c-surface-hover);
-  font-weight: 700;
+  background-color: var(--surface3);
+  color: var(--text);
+  font-weight: 600;
 }
 
 .tli-no {
   font-weight: 700;
-  color: var(--c-fg);
+  color: var(--text);
   font-variant-numeric: tabular-nums;
   display: flex;
   align-items: center;
@@ -393,17 +554,18 @@ main.admin-shell {
 }
 
 .tli-tag {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  padding: 0 3px;
-  border: 1px solid var(--c-accent-border);
-  color: var(--c-accent);
-  border-radius: 2px;
+  padding: 1px 4px;
+  border-radius: var(--radius-xs);
+  background-color: var(--surface2);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
 }
 
 .tli-route {
   font-size: 0.76rem;
-  color: var(--c-muted);
+  color: var(--text2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -415,7 +577,7 @@ main.admin-shell {
   justify-content: flex-end;
   gap: 5px;
   font-size: 0.74rem;
-  color: var(--c-muted);
+  color: var(--text3);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -425,14 +587,15 @@ main.admin-shell {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: var(--c-orange);
+  background-color: var(--orange);
 }
 
-/* 右ペイン：列車エディタ */
-.train-editor-pane {
+/* 右ペイン：列車エディタ / 駅エディタ */
+.train-editor-pane,
+.train-detail-pane {
   height: 100%;
   overflow-y: auto;
-  background-color: var(--c-bg);
+  background-color: var(--surface);
   display: flex;
   flex-direction: column;
 }
@@ -440,7 +603,7 @@ main.admin-shell {
 .editor-empty-state {
   padding: 48px 24px;
   text-align: center;
-  color: var(--c-muted);
+  color: var(--text3);
   font-size: 0.88rem;
 }
 
@@ -448,9 +611,9 @@ main.admin-shell {
   position: sticky;
   top: 0;
   z-index: 15;
-  background-color: var(--c-bg);
-  border-bottom: 1px solid var(--c-border);
-  padding: 12px 20px 0;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px 10px;
 }
 
 .editor-header-top {
@@ -472,13 +635,14 @@ main.admin-shell {
 .editor-train-title {
   font-size: 1.08rem;
   font-weight: 700;
-  color: var(--c-fg);
+  color: var(--text);
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .editor-train-id {
-  font-size: 0.78rem;
-  color: var(--c-muted);
+  font-size: 0.8rem;
+  color: var(--text3);
   font-weight: 400;
 }
 
@@ -496,39 +660,48 @@ main.admin-shell {
 .unapplied-hint {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--c-accent);
+  color: var(--accent);
 }
 
+/* サブタブ切り替え：UI Design Dictionary Segmented Pills */
 .editor-subtabs {
-  display: flex;
-  gap: 4px;
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--surface3);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  gap: 2px;
+  margin-top: 10px;
 }
 
 .editor-subtab {
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  padding: 7px 14px;
-  font-size: 0.82rem;
+  border-radius: var(--radius-xs);
+  padding: 5px 13px;
+  font-size: 0.78rem;
   font-weight: 500;
-  color: var(--c-muted);
+  color: var(--text2);
   cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s ease;
 }
 
 .editor-subtab:hover {
-  color: var(--c-fg);
-  background-color: var(--c-surface);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .editor-subtab.active {
-  color: var(--c-accent);
-  font-weight: 700;
-  border-bottom-color: var(--c-accent);
+  background-color: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .editor-body {
-  padding: 18px 20px 28px;
+  padding: 20px 22px 32px;
 }
 
 .editor-section {
@@ -540,12 +713,13 @@ main.admin-shell {
 }
 
 .editor-block-title {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: var(--c-fg);
+  color: var(--text);
   padding-bottom: 6px;
-  margin: 18px 0 12px;
-  border-bottom: 1px solid var(--c-border);
+  margin: 20px 0 12px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -0.01em;
 }
 
 .editor-block-title:first-child {
@@ -555,18 +729,18 @@ main.admin-shell {
 .train-editor-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px 16px;
+  gap: 12px 18px;
 }
 
 .train-editor-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 12px 16px;
 }
 
 .field-note {
   font-size: 0.73rem;
-  color: var(--c-accent);
+  color: var(--accent);
   margin-bottom: 4px;
 }
 
@@ -579,31 +753,32 @@ main.admin-shell {
 
 .day-toggle-pill {
   padding: 5px 11px;
-  border-radius: 2px;
-  border: 1px solid var(--c-border-strong);
-  background-color: var(--c-bg);
-  color: var(--c-muted);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border2);
+  background-color: var(--surface);
+  color: var(--text2);
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 600;
   user-select: none;
+  transition: all 0.12s ease;
 }
 
 .day-toggle-pill:hover {
-  border-color: var(--c-fg);
-  color: var(--c-fg);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .day-toggle-pill.active {
-  background-color: var(--c-accent);
-  border-color: var(--c-accent);
-  color: var(--c-bg);
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
 }
 
 .day-toggle-pill.holiday.active {
-  background-color: var(--c-fg);
-  border-color: var(--c-fg);
-  color: var(--c-bg);
+  background-color: var(--text);
+  border-color: var(--text);
+  color: #ffffff;
 }
 
 .preset-pills {
@@ -614,18 +789,20 @@ main.admin-shell {
 }
 
 .preset-pill {
-  padding: 2px 8px;
+  padding: 3px 8px;
   font-size: 0.72rem;
-  border-radius: 2px;
-  border: 1px solid var(--c-border);
-  background-color: var(--c-surface);
-  color: var(--c-muted);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+  background-color: var(--surface2);
+  color: var(--text2);
   cursor: pointer;
+  transition: all 0.12s ease;
 }
 
 .preset-pill:hover {
-  border-color: var(--c-fg);
-  color: var(--c-fg);
+  border-color: var(--border2);
+  color: var(--text);
+  background-color: var(--surface3);
 }
 
 /* 日付チップ */
@@ -647,18 +824,19 @@ main.admin-shell {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 8px;
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
+  padding: 3px 9px;
+  background-color: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-xs);
   font-size: 0.78rem;
   font-variant-numeric: tabular-nums;
+  color: var(--text);
 }
 
 .date-chip-remove {
   background: none;
   border: none;
-  color: var(--c-muted);
+  color: var(--text3);
   font-weight: 700;
   cursor: pointer;
   padding: 0 2px;
@@ -666,14 +844,15 @@ main.admin-shell {
 }
 
 .date-chip-remove:hover {
-  color: var(--c-fg);
+  color: var(--red);
 }
 
 /* エディタ内テーブル & 変更ダイヤカード */
 .editor-table-box {
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
-  background-color: var(--c-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  overflow: hidden;
 }
 
 .editor-table-toolbar {
@@ -682,9 +861,9 @@ main.admin-shell {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 8px 10px;
-  background-color: var(--c-surface);
-  border-bottom: 1px solid var(--c-border);
+  padding: 8px 12px;
+  background-color: var(--surface2);
+  border-bottom: 1px solid var(--border);
 }
 
 .editor-table {
@@ -694,18 +873,18 @@ main.admin-shell {
 }
 
 .editor-table th {
-  padding: 6px 8px;
+  padding: 7px 10px;
   text-align: left;
   font-size: 0.74rem;
   font-weight: 600;
-  color: var(--c-muted);
-  background-color: var(--c-surface);
-  border-bottom: 1px solid var(--c-border);
+  color: var(--text2);
+  background-color: var(--surface2);
+  border-bottom: 1px solid var(--border);
 }
 
 .editor-table td {
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--c-border);
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
@@ -713,18 +892,23 @@ main.admin-shell {
   border-bottom: none;
 }
 
+.editor-table tr:hover td {
+  background-color: var(--surface2);
+}
+
 .editor-table .form-input {
-  padding: 4px 7px;
+  padding: 4px 8px;
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
+  background-color: #ffffff;
 }
 
 .variant-card {
-  border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
-  padding: 12px;
-  background-color: var(--c-surface);
-  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  background-color: var(--surface2);
+  margin-bottom: 14px;
 }
 
 .variant-header {
@@ -739,9 +923,9 @@ main.admin-shell {
 .variant-scroll {
   max-height: 260px;
   overflow-y: auto;
-  border: 1px solid var(--c-border);
-  background-color: var(--c-bg);
-  border-radius: 2px;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  border-radius: var(--radius-xs);
 }
 
 /* ===== 運用ベース管理 & シミュレーション & 差分モーダル ===== */
@@ -755,13 +939,13 @@ main.admin-shell {
 .op-add-input,
 .sim-date-field {
   width: 148px;
-  padding: 5px 8px;
+  padding: 6px 10px;
   font-size: 0.82rem;
 }
 
 .sim-date-label {
   font-size: 0.82rem;
-  color: var(--c-muted);
+  color: var(--text2);
 }
 
 .op-grid {
@@ -771,58 +955,61 @@ main.admin-shell {
 }
 
 .op-card {
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
-  padding: 14px;
-  background-color: var(--c-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  background-color: var(--surface);
+  box-shadow: var(--shadow-xs);
 }
 
 .op-card-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .op-card-head h3 {
   font-size: 0.96rem;
   font-weight: 700;
   margin: 0;
+  color: var(--text);
 }
 
 .op-day-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 3px 0;
+  padding: 4px 0;
 }
 
 .op-day-label {
-  width: 26px;
+  width: 28px;
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--c-muted);
+  color: var(--text3);
 }
 
 .sim-summary-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 18px;
-  padding: 10px 14px;
-  margin-bottom: 12px;
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  background-color: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 0.84rem;
 }
 
 .table-wrap {
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   overflow-x: auto;
-  background-color: var(--c-bg);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-xs);
 }
 
 .sim-table,
@@ -835,82 +1022,115 @@ main.admin-shell {
 
 .sim-table th,
 .diff-table th {
-  background-color: var(--c-surface);
-  padding: 8px 10px;
-  color: var(--c-muted);
+  background-color: var(--surface2);
+  padding: 8px 12px;
+  color: var(--text2);
   font-weight: 600;
+  font-size: 0.76rem;
   text-align: left;
-  border-bottom: 1px solid var(--c-border-strong);
+  border-bottom: 1px solid var(--border);
 }
 
 .sim-table td,
 .diff-table td {
-  padding: 7px 10px;
-  border-bottom: 1px solid var(--c-border);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.sim-table tr:hover td,
+.diff-table tr:hover td {
+  background-color: var(--surface2);
 }
 
 .sim-badge,
 .diff-tag {
   display: inline-block;
-  padding: 1px 6px;
-  border-radius: 2px;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
   font-size: 0.72rem;
   font-weight: 600;
-  border: 1px solid var(--c-border);
-  background-color: var(--c-surface);
-  color: var(--c-fg);
+  border: 1px solid var(--border);
+  background-color: var(--surface2);
+  color: var(--text);
 }
 
 .diff-val-old {
-  color: #b91c1c;
-  background-color: #fef2f2;
+  color: var(--red);
+  background-color: var(--red-soft);
   text-decoration: line-through;
-  padding: 1px 4px;
-  border-radius: 2px;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
 }
 
 .diff-val-new {
-  color: #15803d;
-  background-color: #f0fdf4;
+  color: var(--green);
+  background-color: var(--green-soft);
   font-weight: 600;
-  padding: 1px 4px;
-  border-radius: 2px;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
 }
 
 .sim-badge.regular {
-  border-color: var(--c-accent-border);
-  background-color: var(--c-accent-soft);
-  color: var(--c-accent);
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+  color: var(--accent);
 }
 
 .sim-badge.sl,
 .sim-badge.variant {
-  border-color: #ffc078;
-  background-color: var(--c-orange-soft);
-  color: #b45309;
+  border-color: var(--orange-border);
+  background-color: var(--orange-soft);
+  color: var(--orange);
 }
 
 .sim-badge.extra {
-  border-color: var(--c-red-border);
-  background-color: var(--c-red-soft);
-  color: var(--c-red);
+  border-color: var(--red-border);
+  background-color: var(--red-soft);
+  color: var(--red);
 }
 
 .diff-tag.mod {
-  border-color: var(--c-accent-border);
-  background-color: var(--c-accent-soft);
-  color: var(--c-accent);
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+  color: var(--accent);
 }
 
 .diff-tag.add {
-  border-color: var(--c-green-border);
-  background-color: var(--c-green-soft);
-  color: #1b7a2e;
+  border-color: var(--green-border);
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+/* モーダル：UI Design Dictionary Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-content {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  max-width: 540px;
+  width: 100%;
+  padding: 22px 24px;
 }
 
 .diff-modal-content {
-  max-width: 760px;
-  max-height: 82vh;
+  max-width: 820px;
+  max-height: 84vh;
   display: flex;
   flex-direction: column;
 }
@@ -919,26 +1139,29 @@ main.admin-shell {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid var(--c-border);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .diff-modal-title {
-  font-size: 1rem;
+  font-size: 1.02rem;
   font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .diff-summary-text {
   font-size: 0.82rem;
-  color: var(--c-muted);
-  margin-bottom: 8px;
+  color: var(--text2);
+  margin-bottom: 10px;
 }
 
 .diff-table-scroll {
   overflow-y: auto;
   flex: 1;
-  border: 1px solid var(--c-border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
 }
 
 .diff-modal-foot {
@@ -947,29 +1170,29 @@ main.admin-shell {
   gap: 8px;
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid var(--c-border);
+  border-top: 1px solid var(--border);
 }
 
 .admin-toast {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: var(--c-fg);
-  color: var(--c-bg);
-  border: 1px solid var(--c-fg);
-  padding: 9px 16px;
-  border-radius: 2px;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--text);
+  color: #ffffff;
+  border: 1px solid var(--text);
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
   font-size: 0.82rem;
   font-weight: 500;
   z-index: 9999;
   display: none;
   pointer-events: none;
+  box-shadow: var(--shadow-md);
 }
 
 .admin-toast.show {
   display: block;
 }
-
 
 /* --- 駅情報エディタ固有スタイル --- */
 .train-list-item.station-item {
@@ -988,15 +1211,15 @@ main.admin-shell {
 
 .station-item .st-name-text {
   font-weight: 700;
-  color: var(--c-fg);
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .station-item .tli-route {
-  font-size: 0.73rem;
-  color: var(--c-muted);
+  font-size: 0.74rem;
+  color: var(--text3);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1006,50 +1229,52 @@ main.admin-shell {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1px 6px;
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-accent-border);
-  color: var(--c-accent);
-  font-size: 0.76rem;
-  font-weight: 700;
-  border-radius: 2px;
+  padding: 2px 7px;
+  background-color: var(--surface3);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  font-family: ui-monospace, SFMono-Regular, monospace;
   font-variant-numeric: tabular-nums;
-  margin-right: 4px;
+  margin-right: 6px;
 }
 
 .st-card-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 
 .st-toggle-card {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 10px 12px;
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
+  padding: 11px 13px;
+  background-color: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
 }
 
 .st-toggle-card:hover {
-  background-color: var(--c-surface-hover);
-  border-color: var(--c-border-strong);
+  background-color: var(--surface3);
+  border-color: var(--border2);
 }
 
 .st-toggle-card input[type="checkbox"] {
-  margin-top: 3px;
+  margin-top: 2px;
   cursor: pointer;
-  accent-color: var(--c-accent);
+  accent-color: var(--accent);
 }
 
 .st-toggle-card:has(input[type="checkbox"]:checked) {
-  background-color: var(--c-surface-hover);
-  border-color: var(--c-border-strong);
+  background-color: var(--surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-border);
 }
 
 .st-toggle-body {
@@ -1061,27 +1286,27 @@ main.admin-shell {
 .st-toggle-title {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--c-fg);
+  color: var(--text);
 }
 
 .st-toggle-desc {
   font-size: 0.72rem;
-  color: var(--c-muted);
-  line-height: 1.3;
+  color: var(--text3);
+  line-height: 1.35;
 }
 
 .conn-chips-preview-box {
   margin-top: 14px;
   padding: 12px 14px;
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
+  background-color: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .conn-chips-title {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--c-fg);
+  color: var(--text2);
   margin-bottom: 8px;
 }
 
@@ -1098,103 +1323,76 @@ main.admin-shell {
   padding: 3px 8px;
   font-size: 0.78rem;
   font-weight: 600;
-  background-color: var(--c-bg);
-  border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
-  color: var(--c-fg);
+  background-color: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-xs);
+  color: var(--text);
 }
 
 .st-preview-card {
-  padding: 16px;
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
-  margin-top: 8px;
+  padding: 18px 20px;
+  background-color: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: 10px;
 }
 
 .st-preview-header {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--c-border);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
 }
 
 .st-preview-name {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--c-fg);
+  color: var(--text);
 }
 
 .st-preview-kana {
   font-size: 0.8rem;
-  color: var(--c-muted);
+  color: var(--text3);
 }
 
 .st-preview-features {
   font-size: 0.84rem;
   line-height: 1.6;
-  color: var(--c-fg);
+  color: var(--text2);
   margin: 0 0 12px;
 }
 
 .st-preview-highlights {
   font-size: 0.82rem;
   line-height: 1.6;
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-border);
-  padding: 10px 12px;
-  border-radius: 2px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
 }
 
 .st-preview-highlights strong {
   display: block;
   font-size: 0.78rem;
-  color: var(--c-fg);
+  color: var(--text);
   margin-bottom: 4px;
 }
 
 .st-preview-highlights p {
   margin: 0;
-  color: var(--c-fg);
+  color: var(--text2);
 }
 
-/* --- パスキー (WebAuthn / FIDO2) 認証UI --- */
+/* --- パスキー認証UI --- */
 .passkey-login-box {
   margin-bottom: 8px;
 }
 
-.btn-passkey-login {
-  display: block;
-  width: 100%;
-  padding: 10px 14px;
-  background-color: var(--c-fg);
-  color: var(--c-bg);
-  border: 1px solid var(--c-fg);
-  border-radius: 2px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  transition: background-color 0.15s ease;
-  user-select: none;
-}
-
-.btn-passkey-login:hover {
-  background-color: #334155;
-  border-color: #334155;
-  color: #fff;
-}
-
-.btn-passkey-login:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .passkey-hint {
   font-size: 0.74rem;
-  color: var(--c-muted);
+  color: var(--text3);
   text-align: center;
   margin-top: 6px;
   line-height: 1.4;
@@ -1204,20 +1402,20 @@ main.admin-shell {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 18px 0;
-  color: var(--c-muted);
-  font-size: 0.76rem;
+  margin: 20px 0;
+  color: var(--text3);
+  font-size: 0.75rem;
 }
 
 .login-divider::before,
 .login-divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--border);
 }
 
 .login-divider span {
-  padding: 0 10px;
+  padding: 0 12px;
 }
 
 .passkey-items-list {
@@ -1232,10 +1430,10 @@ main.admin-shell {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 2px;
+  padding: 9px 13px;
+  background-color: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
 }
 
 .passkey-item-info {
@@ -1247,7 +1445,7 @@ main.admin-shell {
 .passkey-item-name {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--c-fg);
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1255,14 +1453,13 @@ main.admin-shell {
 
 .passkey-item-date {
   font-size: 0.72rem;
-  color: var(--c-muted);
+  color: var(--text3);
 }
 
 @media (max-width: 880px) {
   .st-card-grid-4 {
     grid-template-columns: 1fr;
   }
-
 
   .trains-workspace {
     display: flex;
@@ -1274,10 +1471,11 @@ main.admin-shell {
   .train-list-sidebar {
     max-height: 240px;
     border-right: none;
-    border-bottom: 1px solid var(--c-border-strong);
+    border-bottom: 1px solid var(--border);
   }
 
-  .train-editor-pane {
+  .train-editor-pane,
+  .train-detail-pane {
     height: auto;
     overflow-y: visible;
   }

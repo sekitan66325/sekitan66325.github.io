@@ -4,41 +4,76 @@
    1. 配色トークン & 基本設定
    ========================================================================== */
 :root {
-  --c-canvas: #f4f6f9;
-  --c-bg: #ffffff;
-  --c-fg: #18181b;
-  --c-accent: #0066cc;
+  /* UI Design Dictionary (ui-design-dictionary.pages.dev) 準拠トークン体系 */
+  --bg: #f1f3f6;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --surface3: #edf2f7;
+  --border: #dcdce4;
+  --border2: #c8c8d2;
+  --text: #1e293b;
+  --text2: #475569;
+  --text3: #888898;
+  --accent: #1e40af;
+  --accent-hover: #1e3a8a;
+  --accent2: #2563eb;
+  --accent-soft: rgba(30, 64, 175, 0.08);
+  --accent-border: rgba(30, 64, 175, 0.28);
 
-  --c-surface: #f8fafc;
-  --c-surface-hover: #eef2f7;
-  --c-muted: #525866;
-  --c-faint: #8a94a6;
-  --c-border: #dce2ea;
-  --c-border-strong: #b8c2cf;
-  --c-accent-soft: rgba(0, 102, 204, 0.08);
-  --c-accent-border: rgba(0, 102, 204, 0.32);
+  --green: #16a34a;
+  --green-soft: #f0fdf4;
+  --green-border: #bbf7d0;
+  --orange: #d97706;
+  --orange-soft: #fffbeb;
+  --orange-border: #fde68a;
+  --red: #dc2626;
+  --red-soft: #fef2f2;
+  --red-border: #fecaca;
 
-  /* ステータス・種別用セマンティックカラー */
-  --c-green: #2fb344;
-  --c-green-soft: #ebfbee;
-  --c-green-border: #b2f2bb;
-  --c-orange: #f08c00;
-  --c-orange-soft: #fff9db;
-  --c-orange-border: #ffec99;
-  --c-red: #e03131;
-  --c-red-soft: #fff5f5;
-  --c-red-border: #ffc9c9;
+  /* 秩序ある3段階の角丸スケール（2pxのようなAI的・未調整な端数を排除） */
+  --radius: 10px;       /* コンテナ・カード・モーダル */
+  --radius-sm: 6px;     /* ボタン・入力欄・セグメント */
+  --radius-xs: 4px;     /* ピル・バッジ・タグ */
+
+  /* 自然で静かな多層シャドウ */
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.08);
+
+  /* 既存システム互換マッピング */
+  --c-canvas: var(--bg);
+  --c-bg: var(--surface);
+  --c-fg: var(--text);
+  --c-accent: var(--accent);
+  --c-surface: var(--surface2);
+  --c-surface-hover: var(--surface3);
+  --c-muted: var(--text2);
+  --c-faint: var(--text3);
+  --c-border: var(--border);
+  --c-border-strong: var(--border2);
+  --c-accent-soft: var(--accent-soft);
+  --c-accent-border: var(--accent-border);
+
+  --c-green: var(--green);
+  --c-green-soft: var(--green-soft);
+  --c-green-border: var(--green-border);
+  --c-orange: var(--orange);
+  --c-orange-soft: var(--orange-soft);
+  --c-orange-border: var(--orange-border);
+  --c-red: var(--red);
+  --c-red-soft: var(--red-soft);
+  --c-red-border: var(--red-border);
 
   /* 互換エイリアス */
-  --bg-system: var(--c-canvas);
-  --bg-secondary: var(--c-bg);
-  --bg-card: var(--c-bg);
-  --border-subtle: var(--c-border);
-  --border-separator: var(--c-border);
-  --text-primary: var(--c-fg);
-  --text-secondary: var(--c-muted);
-  --text-link: var(--c-accent);
-  --color-accent: var(--c-accent);
+  --bg-system: var(--bg);
+  --bg-secondary: var(--surface);
+  --bg-card: var(--surface);
+  --border-subtle: var(--border);
+  --border-separator: var(--border);
+  --text-primary: var(--text);
+  --text-secondary: var(--text2);
+  --text-link: var(--accent);
+  --color-accent: var(--accent);
 }
 
 *,
@@ -130,32 +165,38 @@ textarea {
 }
 
 .global-nav {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 2px;
+  background-color: var(--surface3);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .global-nav .nav-link {
-  display: inline-block;
-  padding: 5px 10px;
-  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  font-size: 0.84rem;
   font-weight: 500;
-  color: var(--c-muted);
-  border-radius: 2px;
-  border-bottom: 2px solid transparent;
-  transition: color 0.12s, background-color 0.12s;
+  color: var(--text2);
+  border-radius: var(--radius-xs);
+  text-decoration: none;
+  transition: all 0.15s ease;
 }
 
 .global-nav .nav-link:hover {
-  color: var(--c-fg);
-  background-color: var(--c-surface);
+  color: var(--text);
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
 .global-nav .nav-link.active {
-  color: var(--c-accent);
+  color: var(--text);
+  background-color: var(--surface);
   font-weight: 600;
-  border-bottom-color: var(--c-accent);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 /* ==========================================================================
@@ -191,12 +232,12 @@ main.container {
 }
 
 .notice-section {
-  padding: 13px 16px;
+  padding: 16px 18px;
   margin-bottom: 24px;
-  background-color: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-left: 4px solid var(--c-accent);
-  border-radius: 4px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .notice-section strong {
@@ -255,17 +296,20 @@ main.container {
 .portal-card {
   display: flex;
   flex-direction: column;
-  padding: 18px 16px;
-  background-color: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-radius: 4px;
-  color: var(--c-fg);
-  transition: border-color 0.12s, background-color 0.12s;
+  padding: 20px 18px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .portal-card:hover {
-  border-color: var(--c-accent);
-  background-color: #f8fbff;
+  border-color: var(--border2);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background-color: var(--surface);
 }
 
 .portal-card h2 {
@@ -291,11 +335,11 @@ main.container {
   align-items: center;
   flex-wrap: wrap;
   gap: 16px 20px;
-  padding: 16px 18px;
-  background-color: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-left: 4px solid var(--c-accent);
-  border-radius: 4px;
+  padding: 18px 20px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .discord-card-body {
@@ -326,9 +370,10 @@ main.container {
    ========================================================================== */
 .list-container {
   list-style: none;
-  background-color: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-radius: 4px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   margin-bottom: 24px;
   overflow: hidden;
 }
@@ -382,7 +427,7 @@ main.container {
   height: 34px;
   background-color: var(--c-surface);
   border: 1px solid var(--c-border);
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   flex-shrink: 0;
 }
 
@@ -442,7 +487,7 @@ main.container {
   border: 1px solid var(--c-accent-border);
   background-color: var(--c-accent-soft);
   padding: 1px 6px;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
 }
 
 .chevron-right::after {
@@ -466,7 +511,7 @@ main.container {
   width: 100%;
   margin-top: 10px;
   border: 1px solid var(--c-border);
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   overflow: hidden;
 }
 
@@ -488,7 +533,7 @@ main.container {
   padding: 8px 12px;
   background-color: var(--c-surface);
   border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   color: var(--c-fg);
   transition: background-color 0.12s, border-color 0.12s;
 }
@@ -509,7 +554,7 @@ main.container {
   font-size: 0.72rem;
   font-weight: 700;
   padding: 1px 6px;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   background-color: var(--c-fg);
   color: var(--c-bg);
 }
@@ -543,7 +588,7 @@ main.container {
    ========================================================================== */
 .board-form-accordion {
   border: 1px solid var(--c-border);
-  border-radius: 2px;
+  border-radius: var(--radius);
   margin-bottom: 32px;
   background-color: var(--c-bg);
 }
@@ -612,7 +657,7 @@ main.container {
   padding: 8px 12px;
   background-color: var(--c-surface);
   border: 1px solid var(--c-border);
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
 }
 
 .rule-example-label {
@@ -647,7 +692,7 @@ main.container {
   width: 100%;
   background-color: var(--c-bg);
   border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   padding: 7px 10px;
   color: var(--c-fg);
   font-size: 0.875rem;
@@ -668,7 +713,7 @@ main.container {
   background-color: var(--c-accent);
   color: var(--c-bg);
   border: 1px solid var(--c-accent);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   padding: 9px 16px;
   font-weight: 600;
   font-size: 0.85rem;
@@ -693,7 +738,7 @@ main.container {
   background-color: var(--c-bg);
   color: var(--c-fg);
   border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   padding: 7px 14px;
   font-weight: 500;
   font-size: 0.85rem;
@@ -731,7 +776,7 @@ main.container {
   width: 100%;
   background-color: var(--c-bg);
   border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   padding: 6px 10px;
   color: var(--c-fg);
   font-size: 0.82rem;
@@ -801,7 +846,7 @@ main.container {
   background-color: var(--c-bg);
   border: 1px solid var(--c-border);
   padding: 3px 10px;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   font-size: 0.75rem;
   color: var(--c-muted);
   cursor: pointer;
@@ -833,7 +878,7 @@ main.container {
   border: 1px solid var(--c-border-strong);
   color: var(--c-fg);
   padding: 6px 14px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   font-size: 0.82rem;
   cursor: pointer;
 }
@@ -868,13 +913,14 @@ main.container {
 }
 
 .modal-content {
-  background-color: var(--c-bg);
-  border: 1px solid var(--c-border-strong);
-  border-radius: 3px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 440px;
-  padding: 20px;
-  color: var(--c-fg);
+  padding: 24px;
+  color: var(--text);
 }
 
 .modal-actions {
@@ -938,9 +984,10 @@ main.container {
   gap: 10px 14px;
   margin-bottom: 16px;
   padding: 10px 14px;
-  background-color: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-radius: 4px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .op-date-controls {
@@ -962,7 +1009,7 @@ main.container {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--c-border-strong);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   background-color: var(--c-bg);
   padding: 0 24px 0 6px;
   width: 115px;
@@ -991,41 +1038,40 @@ main.container {
 
 .seg-group {
   display: inline-flex;
-  align-items: stretch;
-  border: 1px solid var(--c-border-strong);
-  border-radius: 4px;
-  overflow: hidden;
-  background-color: var(--c-bg);
+  align-items: center;
+  background-color: var(--surface3);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  gap: 2px;
+  border: 1px solid var(--border);
 }
 
 .seg-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--c-bg);
+  background-color: transparent;
   border: none;
-  border-right: 1px solid var(--c-border-strong);
   padding: 5px 12px;
   font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--c-muted);
+  font-weight: 500;
+  color: var(--text2);
+  border-radius: var(--radius-xs);
   cursor: pointer;
   line-height: 1.4;
-  transition: background-color 0.12s, color 0.12s;
-}
-
-.seg-btn:last-child {
-  border-right: none;
+  transition: all 0.15s ease;
 }
 
 .seg-btn:hover:not(.active) {
-  color: var(--c-fg);
-  background-color: var(--c-surface-hover);
+  color: var(--text);
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
 .seg-btn.active {
-  background-color: var(--c-accent);
-  color: #ffffff;
+  background-color: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .op-table-wrap {
@@ -1087,7 +1133,7 @@ main.container {
   font-size: 0.78rem;
   font-weight: 700;
   padding: 2px 7px;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   border: 1px solid var(--c-border);
   background-color: var(--c-surface);
   color: var(--c-fg);
@@ -1124,7 +1170,7 @@ main.container {
 .v-tag-pred {
   font-size: 0.7rem;
   padding: 1px 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   background-color: #e2e8f0;
   color: #475569;
   margin-left: 4px;
@@ -1133,7 +1179,7 @@ main.container {
 .v-tag-mod {
   font-size: 0.7rem;
   padding: 1px 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   background-color: #fee2e2;
   color: #dc2626;
   margin-left: 4px;
