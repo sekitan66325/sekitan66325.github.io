@@ -1,0 +1,16 @@
+{
+  "name": "moka-cloudflare-auth-worker",
+  "version": "1.0.0",
+  "description": "FIDO2 / WebAuthn Passkey Authentication Gateway for Moka Railway Administration",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": ["webauthn", "fido2", "passkey", "cloudflare-worker"],
+  "author": "Moka Railway Information Portal",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}

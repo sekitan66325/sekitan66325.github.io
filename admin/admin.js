@@ -1,11 +1,25 @@
 const GAS_URL = typeof CONFIG !== 'undefined' ? CONFIG.GAS_API_URL : '';
+const AUTH_WORKER_URL = typeof CONFIG !== 'undefined' ? (CONFIG.AUTH_WORKER_URL || '') : '';
 
 let adminToken = sessionStorage.getItem('admin_token') || '';
+let adminPasskeyJwt = sessionStorage.getItem('admin_passkey_jwt') || '';
 let allAdminPosts = [];
 let allAdminLogs = [];
 
 window.addEventListener('DOMContentLoaded', () => {
-  if (adminToken) {
+  // Check browser WebAuthn support
+  const passkeyHint = document.getElementById('passkey-hint-text');
+  if (passkeyHint) {
+    if (isPasskeySupported()) {
+      passkeyHint.innerHTML = '<span style="color:var(--c-accent); font-weight:600;">✓ 生体認証パスキー対応端末です</span> (Windows Hello / Touch ID / Face ID)';
+    } else {
+      passkeyHint.innerHTML = '<span style="color:var(--c-muted);">※この端末・ブラウザはパスキー非対応のため下のパスワードを使用してください</span>';
+      const pBtn = document.getElementById('passkey-login-btn');
+      if (pBtn) pBtn.disabled = true;
+    }
+  }
+
+  if (adminToken || adminPasskeyJwt) {
     showDashboard();
   }
 });
@@ -96,10 +110,279 @@ async function handleLogout() {
   } catch (e) {}
 
   adminToken = '';
+  adminPasskeyJwt = '';
   sessionStorage.removeItem('admin_token');
+  sessionStorage.removeItem('admin_passkey_jwt');
   document.getElementById('login-view').style.display = 'block';
   document.getElementById('dashboard-view').style.display = 'none';
   document.getElementById('logout-btn').style.display = 'none';
+  const passkeyBtn = document.getElementById('btn-passkey-manage');
+  if (passkeyBtn) passkeyBtn.style.display = 'none';
+}
+
+/**
+ * ==========================================================================
+ * FIDO2 / WebAuthn パスキー認証ロジック
+ * ==========================================================================
+ */
+
+function isPasskeySupported() {
+  return !!(window.PublicKeyCredential &&
+            navigator.credentials &&
+            navigator.credentials.create &&
+            navigator.credentials.get);
+}
+
+function base64UrlToBuffer(base64url) {
+  let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) base64 += '=';
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+function bufferToBase64Url(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+async function startPasskeyLogin() {
+  if (!AUTH_WORKER_URL) {
+    alert('Cloudflare Auth Worker URL が未設定です (config.js の AUTH_WORKER_URL を確認してください)。');
+    return;
+  }
+  if (!isPasskeySupported()) {
+    alert('お使いの環境はパスキー（WebAuthn）に対応していません。パスワードをご利用ください。');
+    return;
+  }
+
+  const btn = document.getElementById('passkey-login-btn');
+  if (btn) { btn.disabled = true; btn.classList.add('btn-loading'); }
+
+  try {
+    // 1. ログインチャレンジ取得
+    const optRes = await fetch(`${AUTH_WORKER_URL}/api/auth/login-options`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!optRes.ok) {
+      const err = await optRes.json().catch(() => ({}));
+      throw new Error(err.error || 'ログインオプションの取得に失敗しました');
+    }
+    const options = await optRes.json();
+
+    options.challenge = base64UrlToBuffer(options.challenge);
+    if (options.allowCredentials && options.allowCredentials.length > 0) {
+      options.allowCredentials = options.allowCredentials.map(c => ({
+        ...c,
+        id: base64UrlToBuffer(c.id)
+      }));
+    }
+
+    // 2. ブラウザ生体認証ダイアログの呼び出し
+    const assertion = await navigator.credentials.get({ publicKey: options });
+    if (!assertion) throw new Error('認証がキャンセルされました');
+
+    // 3. 署名検証
+    const verifyBody = {
+      id: assertion.id,
+      response: {
+        clientDataJSON: bufferToBase64Url(assertion.response.clientDataJSON),
+        authenticatorData: bufferToBase64Url(assertion.response.authenticatorData),
+        signature: bufferToBase64Url(assertion.response.signature),
+        userHandle: assertion.response.userHandle ? bufferToBase64Url(assertion.response.userHandle) : null
+      }
+    };
+
+    const verifyRes = await fetch(`${AUTH_WORKER_URL}/api/auth/login-verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(verifyBody)
+    });
+
+    const verifyData = await verifyRes.json();
+    if (!verifyRes.ok || verifyData.status !== 'success') {
+      throw new Error(verifyData.error || 'パスキー認証に失敗しました');
+    }
+
+    adminPasskeyJwt = verifyData.token;
+    sessionStorage.setItem('admin_passkey_jwt', adminPasskeyJwt);
+    adminToken = 'passkey_authenticated';
+    sessionStorage.setItem('admin_token', adminToken);
+
+    showToast(`パスキーでログインしました (${verifyData.deviceName || '認証完了'})`);
+    showDashboard();
+  } catch (err) {
+    console.error('Passkey Login Error:', err);
+    if (err.name !== 'NotAllowedError') {
+      alert('パスキー認証エラー: ' + (err.message || '認証に失敗しました'));
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
+  }
+}
+
+function openPasskeyModal() {
+  const modal = document.getElementById('passkey-modal');
+  if (modal) modal.style.display = 'flex';
+  loadPasskeyList();
+}
+
+function closePasskeyModal() {
+  const modal = document.getElementById('passkey-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function loadPasskeyList() {
+  const container = document.getElementById('passkey-list-container');
+  if (!container) return;
+
+  if (!AUTH_WORKER_URL) {
+    container.innerHTML = '<div class="empty-message">AUTH_WORKER_URL が設定されていません (config.js)</div>';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${AUTH_WORKER_URL}/api/admin/passkeys`, {
+      headers: adminPasskeyJwt ? { 'Authorization': `Bearer ${adminPasskeyJwt}` } : {}
+    });
+    if (!res.ok) {
+      const setupGroup = document.getElementById('passkey-setupkey-group');
+      if (setupGroup) setupGroup.style.display = 'block';
+      container.innerHTML = '<div class="empty-message">登録済みパスキーはありません。下のフォームから最初のマスターパスキーを登録してください。</div>';
+      return;
+    }
+    const data = await res.json();
+    const list = data.passkeys || [];
+    if (list.length === 0) {
+      const setupGroup = document.getElementById('passkey-setupkey-group');
+      if (setupGroup) setupGroup.style.display = 'block';
+      container.innerHTML = '<div class="empty-message">登録済みパスキーはありません。下のフォームから最初のマスターパスキーを登録してください。</div>';
+    } else {
+      const setupGroup = document.getElementById('passkey-setupkey-group');
+      if (setupGroup) setupGroup.style.display = 'none';
+      container.innerHTML = list.map(pk => `
+        <div class="passkey-item-row">
+          <div class="passkey-item-info">
+            <span class="passkey-item-name">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              ${escapeHTML(pk.deviceName || '登録済み端末')}
+            </span>
+            <span class="passkey-item-date">登録日: ${escapeHTML(pk.createdAt ? pk.createdAt.slice(0, 10) : '—')} / 最終使用: ${escapeHTML(pk.lastUsedAt ? pk.lastUsedAt.slice(0, 10) : '—')}</span>
+          </div>
+          <button type="button" class="btn-admin btn-compact" onclick="deletePasskeyDevice('${pk.id}')" title="削除">削除</button>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    container.innerHTML = `<div class="empty-message" style="color:#b91c1c;">通信エラー: ${escapeHTML(err.message)}</div>`;
+  }
+}
+
+async function startPasskeyRegistration(e) {
+  e.preventDefault();
+  const nameInput = document.getElementById('passkey-device-name');
+  const setupKeyInput = document.getElementById('passkey-setup-key');
+  const deviceName = (nameInput?.value || '').trim();
+  const setupKey = (setupKeyInput?.value || '').trim();
+  const btn = document.getElementById('btn-register-passkey');
+
+  if (!AUTH_WORKER_URL) {
+    alert('AUTH_WORKER_URL が設定されていません。');
+    return;
+  }
+  if (!isPasskeySupported()) {
+    alert('この端末はパスキー（WebAuthn）に対応していません。');
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.classList.add('btn-loading'); }
+
+  try {
+    const optRes = await fetch(`${AUTH_WORKER_URL}/api/auth/register-options`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(adminPasskeyJwt ? { 'Authorization': `Bearer ${adminPasskeyJwt}` } : {})
+      },
+      body: JSON.stringify({ setupKey, deviceName })
+    });
+    const options = await optRes.json();
+    if (!optRes.ok) {
+      throw new Error(options.error || '登録オプションの取得に失敗しました');
+    }
+
+    options.challenge = base64UrlToBuffer(options.challenge);
+    options.user.id = base64UrlToBuffer(options.user.id);
+
+    const credential = await navigator.credentials.create({ publicKey: options });
+    if (!credential) throw new Error('登録がキャンセルされました');
+
+    const regBody = {
+      id: credential.id,
+      rawId: bufferToBase64Url(credential.rawId),
+      response: {
+        clientDataJSON: bufferToBase64Url(credential.response.clientDataJSON),
+        attestationObject: bufferToBase64Url(credential.response.attestationObject)
+      },
+      type: credential.type,
+      deviceName
+    };
+
+    const verifyRes = await fetch(`${AUTH_WORKER_URL}/api/auth/register-verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(regBody)
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyRes.ok || verifyData.status !== 'success') {
+      throw new Error(verifyData.error || 'パスキーの登録検証に失敗しました');
+    }
+
+    adminPasskeyJwt = verifyData.token;
+    sessionStorage.setItem('admin_passkey_jwt', adminPasskeyJwt);
+    adminToken = 'passkey_authenticated';
+    sessionStorage.setItem('admin_token', adminToken);
+
+    alert('パスキーの登録が完了しました！\n次回以降、生体認証（Windows Hello / Touch ID / Face ID）でワンタップログインが可能です。');
+    if (nameInput) nameInput.value = '';
+    if (setupKeyInput) setupKeyInput.value = '';
+    loadPasskeyList();
+    showDashboard();
+  } catch (err) {
+    console.error('Passkey Registration Error:', err);
+    if (err.name !== 'NotAllowedError') {
+      alert('パスキー登録エラー: ' + err.message);
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
+  }
+}
+
+async function deletePasskeyDevice(credId) {
+  if (!confirm('このパスキー端末を削除しますか？\n削除後はこの端末からの生体認証ログインができなくなります。')) return;
+  try {
+    const res = await fetch(`${AUTH_WORKER_URL}/api/admin/passkeys/${credId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${adminPasskeyJwt}` }
+    });
+    const data = await res.json();
+    if (res.ok && data.status === 'success') {
+      showToast('パスキーを削除しました');
+      loadPasskeyList();
+    } else {
+      alert('削除失敗: ' + (data.error || 'エラー'));
+    }
+  } catch (err) {
+    alert('通信エラー: ' + err.message);
+  }
 }
 
 /**
@@ -109,7 +392,28 @@ function showDashboard() {
   document.getElementById('login-view').style.display = 'none';
   document.getElementById('dashboard-view').style.display = 'block';
   document.getElementById('logout-btn').style.display = 'inline-block';
-  fetchAdminPosts();
+  const passkeyBtn = document.getElementById('btn-passkey-manage');
+  if (passkeyBtn) passkeyBtn.style.display = 'inline-block';
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTab = urlParams.get('tab');
+  if (urlTab) {
+    Promise.resolve(switchAdminTab(urlTab)).then(() => {
+      if (urlTab === 'stations') {
+        const stCode = urlParams.get('st');
+        if (stCode) editStation(stCode);
+        const subTab = urlParams.get('subtab');
+        if (subTab) switchStationSubTab(subTab);
+      }
+      if (urlParams.get('modal') === 'passkey') {
+        openPasskeyModal();
+      }
+    });
+  } else {
+    fetchAdminPosts();
+    if (urlParams.get('modal') === 'passkey') {
+      openPasskeyModal();
+    }
+  }
   if (timetableData.length === 0) {
     loadTimetableFromRepo(true);
   }
@@ -176,8 +480,10 @@ async function fetchAdminPosts() {
     const data = await res.json();
 
     if (data.status === 'unauthorized') {
-      alert('セッションが切れました。再度ログインしてください。');
-      handleLogout();
+      if (!adminPasskeyJwt) {
+        alert('セッションが切れました。再度ログインしてください。');
+        handleLogout();
+      }
       return;
     }
 
@@ -2086,16 +2392,37 @@ async function exportTimetable() {
   btns.forEach(b => { b.disabled = true; b.classList.add('btn-loading'); });
 
   try {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        action: 'save_timetable_github',
-        token: adminToken,
-        data: timetableData
-      })
-    });
-    const result = await res.json();
+    let result;
+    if (adminPasskeyJwt && AUTH_WORKER_URL) {
+      if (memo) memo.textContent = 'パスキー認証ゲートウェイ(Cloudflare)経由でGitHubへコミット中...';
+      const cfRes = await fetch(`${AUTH_WORKER_URL}/api/admin/save-file`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminPasskeyJwt}`
+        },
+        body: JSON.stringify({
+          path: 'train-state/data/timetable.json',
+          content: timetableData,
+          message: `Update timetable.json via Admin Passkey (${dirtyTrainIds.size ? `${dirtyTrainIds.size} trains modified` : 'sync'})`
+        })
+      });
+      result = await cfRes.json();
+      if (!cfRes.ok || result.status !== 'success') {
+        throw new Error(result.error || 'Cloudflare Gateway経由のコミットに失敗しました');
+      }
+    } else {
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'save_timetable_github',
+          token: adminToken,
+          data: timetableData
+        })
+      });
+      result = await res.json();
+    }
     if (result.status === 'success') {
       originalTimetableData = JSON.parse(JSON.stringify(timetableData));
       dirtyTrainIds.clear();
@@ -2130,6 +2457,34 @@ function renderStationAdminView() {
   }
 }
 
+let currentStationSubTab = 'basic';
+
+function switchStationSubTab(subtab) {
+  currentStationSubTab = subtab;
+  const sections = ['basic', 'facility', 'connections', 'guide'];
+  sections.forEach(sec => {
+    const el = document.getElementById(`st-sec-${sec}`);
+    if (el) el.classList.toggle('active', sec === subtab);
+    const btn = document.querySelector(`.editor-subtab[data-st-subtab="${sec}"]`);
+    if (btn) btn.classList.toggle('active', sec === subtab);
+  });
+}
+
+function stepStation(delta) {
+  if (!currentStationCode || stationsData.length === 0) return;
+  if (hasUnappliedStationEdits) {
+    if (confirm('現在編集中の駅フォームに未適用の入力があります。\n先にメモリへ適用してから移動しますか？')) {
+      saveStationData();
+    }
+  }
+  const currentIndex = stationsData.findIndex(s => s.code === currentStationCode);
+  if (currentIndex === -1) return;
+  let nextIndex = currentIndex + delta;
+  if (nextIndex < 0) nextIndex = stationsData.length - 1;
+  if (nextIndex >= stationsData.length) nextIndex = 0;
+  editStation(stationsData[nextIndex].code);
+}
+
 function renderStationAdminList() {
   const container = document.getElementById('station-admin-list');
   if (!container) return;
@@ -2158,20 +2513,20 @@ function renderStationAdminList() {
     const typeClass = isManned ? 'op-chip-reg' : 'op-chip-dead';
 
     return `
-      <div class="train-list-item ${isSelected ? 'active' : ''}" onclick="editStation('${s.code}')">
-        <div class="tli-header">
-          <span class="tli-no">${escapeHTML(s.code)} ${escapeHTML(s.name)}</span>
-          <div class="tli-badges">
-            <span class="op-chip ${typeClass}">${typeLabel}</span>
-            ${s.sl_stop ? '<span class="op-chip op-chip-sl" title="SLもおか停車駅">SL</span>' : ''}
-            ${s.can_exchange ? '<span class="op-chip op-chip-extra" title="列車交換可能">交</span>' : ''}
-            ${isDirty ? '<span class="tli-dirty-dot" title="未反映の変更あり">●</span>' : ''}
-          </div>
+      <div class="train-list-item station-item ${isSelected ? 'selected' : ''}" onclick="editStation('${s.code}')">
+        <div class="tli-no">
+          <span class="st-code-pill">${escapeHTML(s.code)}</span>
+          <span class="st-name-text">${escapeHTML(s.name)}</span>
         </div>
-        <div class="tli-route">${escapeHTML(s.kana || '')} / ${escapeHTML(s.romaji || '')}</div>
+        <div class="tli-route">
+          <span>${escapeHTML(s.kana || '')}</span>
+          <span style="color:var(--c-muted); margin-left:4px;">${s.distance_km != null ? s.distance_km.toFixed(1) + 'km' : ''}</span>
+        </div>
         <div class="tli-meta">
-          <span>${s.distance_km} km</span>
-          <span>${escapeHTML(s.platform_layout || '')}</span>
+          <span class="op-chip ${typeClass}">${typeLabel}</span>
+          ${s.sl_stop ? '<span class="op-chip op-chip-sl" title="SL停車駅">SL</span>' : ''}
+          ${s.can_exchange ? '<span class="op-chip op-chip-extra" title="交換可能">交</span>' : ''}
+          ${isDirty ? '<span class="op-chip" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;" title="未反映の変更あり">未</span>' : ''}
         </div>
       </div>
     `;
@@ -2180,14 +2535,39 @@ function renderStationAdminList() {
 
 function editStation(code) {
   if (hasUnappliedStationEdits && currentStationCode && currentStationCode !== code) {
-    if (confirm('編集中に未適用の入力があります。\n先にメモリへ適用しますか？')) {
+    if (confirm('現在編集中の駅フォームに未適用の入力があります。\n先にメモリへ適用してから別の駅に切り替えますか？')) {
       saveStationData();
     }
   }
   currentStationCode = code;
-  hasUnappliedStationEdits = false;
+  markStationEditorUnapplied(false);
   renderStationAdminList();
   renderStationDetailPane(code);
+}
+
+function updateConnectionChipsPreview() {
+  const container = document.getElementById('st-conn-chips-container');
+  const textarea = document.getElementById('st-edit-connections');
+  if (!container || !textarea) return;
+  const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length === 0) {
+    container.innerHTML = '<span style="color:var(--c-muted); font-size:0.75rem;">（接続交通機関は登録されていません）</span>';
+    return;
+  }
+  container.innerHTML = lines.map(line => `<span class="conn-chip">${escapeHTML(line)}</span>`).join('');
+}
+
+function updateStationPreviewCard() {
+  const featEl = document.getElementById('st-preview-features');
+  const highEl = document.getElementById('st-preview-highlights');
+  const featInput = document.getElementById('st-edit-features');
+  const highInput = document.getElementById('st-edit-highlights');
+  if (featEl && featInput) {
+    featEl.textContent = featInput.value.trim() || '（駅の特徴は未設定です）';
+  }
+  if (highEl && highInput) {
+    highEl.textContent = highInput.value.trim() || '（見どころ情報は未設定です）';
+  }
 }
 
 function renderStationDetailPane(code) {
@@ -2201,135 +2581,188 @@ function renderStationDetailPane(code) {
   }
 
   const connText = (s.connections || []).join('\n');
+  const connCount = (s.connections || []).length;
 
   pane.innerHTML = `
-    <div class="editor-header">
-      <div>
-        <h3 class="editor-train-title">
-          駅情報編集: [${escapeHTML(s.code)}] ${escapeHTML(s.name)}
-        </h3>
-        <span class="editor-train-meta">起点（下館）から ${s.distance_km} km / 開業日: ${escapeHTML(s.opening_date || '—')}</span>
+    <div class="editor-sticky-bar">
+      <div class="editor-header-top">
+        <div class="editor-title-group">
+          <h3 class="editor-train-title">
+            <span class="st-code-pill">${escapeHTML(s.code)}</span>
+            ${escapeHTML(s.name)}
+            <span class="editor-train-id">(${escapeHTML(s.romaji || '')} / 起点から ${s.distance_km} km)</span>
+          </h3>
+          <div class="editor-step-btns">
+            <button type="button" class="btn-admin btn-compact" onclick="stepStation(-1)" title="前の駅">◀ 前</button>
+            <button type="button" class="btn-admin btn-compact" onclick="stepStation(1)" title="次の駅">次 ▶</button>
+          </div>
+        </div>
+        <div class="editor-apply-group">
+          <span id="unapplied-st-hint" class="unapplied-hint" style="display: none;">● 未適用の変更あり</span>
+          <button type="button" class="btn-admin btn-accent" onclick="saveStationData()">変更を適用 (メモリ)</button>
+        </div>
       </div>
-      <div class="editor-actions">
-        <span id="unapplied-st-hint" class="unapplied-hint" style="display: none; color:#b91c1c; font-size:0.8rem; font-weight:700;">● 未適用の変更あり</span>
-        <button type="button" class="btn-admin btn-accent" onclick="saveStationData()">変更を適用 (メモリ)</button>
+
+      <div class="editor-subtabs">
+        <button type="button" class="editor-subtab ${currentStationSubTab === 'basic' ? 'active' : ''}" data-st-subtab="basic" onclick="switchStationSubTab('basic')">基本情報</button>
+        <button type="button" class="editor-subtab ${currentStationSubTab === 'facility' ? 'active' : ''}" data-st-subtab="facility" onclick="switchStationSubTab('facility')">運行・設備・配線</button>
+        <button type="button" class="editor-subtab ${currentStationSubTab === 'connections' ? 'active' : ''}" data-st-subtab="connections" onclick="switchStationSubTab('connections')">接続交通機関 (${connCount})</button>
+        <button type="button" class="editor-subtab ${currentStationSubTab === 'guide' ? 'active' : ''}" data-st-subtab="guide" onclick="switchStationSubTab('guide')">解説・見どころ</button>
       </div>
     </div>
 
     <div class="editor-body" oninput="markStationEditorUnapplied(true)" onchange="markStationEditorUnapplied(true)">
-      <!-- 基本情報 -->
-      <h4 class="editor-block-title">基本情報</h4>
-      <div class="train-editor-grid-4">
-        <div class="form-group">
-          <label class="form-label">駅コード</label>
-          <input type="text" id="st-edit-code" class="form-input" value="${escapeHTML(s.code)}" readonly style="background-color:var(--c-surface-tint, #f1f5f9); color:var(--c-fg-muted, #64748b);">
+      <!-- 1. 基本情報 -->
+      <section id="st-sec-basic" class="editor-section ${currentStationSubTab === 'basic' ? 'active' : ''}">
+        <h4 class="editor-block-title">駅コード・名称・キロ程</h4>
+        <div class="train-editor-grid-4">
+          <div class="form-group">
+            <label class="form-label">駅コード (ナンバリング)</label>
+            <input type="text" id="st-edit-code" class="form-input" value="${escapeHTML(s.code)}" readonly style="background-color:var(--c-surface-tint, #f1f5f9); color:var(--c-fg-muted, #64748b); font-weight:700;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">駅名（漢字）</label>
+            <input type="text" id="st-edit-name" class="form-input" value="${escapeHTML(s.name || '')}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">かな表記</label>
+            <input type="text" id="st-edit-kana" class="form-input" value="${escapeHTML(s.kana || '')}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ローマ字表記</label>
+            <input type="text" id="st-edit-romaji" class="form-input" value="${escapeHTML(s.romaji || '')}">
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">駅名</label>
-          <input type="text" id="st-edit-name" class="form-input" value="${escapeHTML(s.name || '')}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">かな表記</label>
-          <input type="text" id="st-edit-kana" class="form-input" value="${escapeHTML(s.kana || '')}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">ローマ字</label>
-          <input type="text" id="st-edit-romaji" class="form-input" value="${escapeHTML(s.romaji || '')}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">電報略号</label>
-          <input type="text" id="st-edit-telegram" class="form-input" value="${escapeHTML(s.telegram_code || '')}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">順序 (order)</label>
-          <input type="number" id="st-edit-order" class="form-input" value="${s.order != null ? s.order : ''}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">営業キロ (km)</label>
-          <input type="number" step="0.1" id="st-edit-dist" class="form-input" value="${s.distance_km != null ? s.distance_km : ''}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">開業年月日</label>
-          <input type="date" id="st-edit-opening" class="form-input" value="${escapeHTML(s.opening_date || '')}">
-        </div>
-      </div>
-      <div class="form-group" style="margin-top: 10px;">
-        <label class="form-label">所在地（住所）</label>
-        <input type="text" id="st-edit-address" class="form-input" value="${escapeHTML(s.address || '')}">
-      </div>
 
-      <!-- 運行・配線構造 -->
-      <h4 class="editor-block-title">運行・配線構造</h4>
-      <div class="train-editor-grid-4">
-        <div class="form-group">
-          <label class="form-label">駅形態</label>
-          <input type="text" id="st-edit-type" class="form-input" value="${escapeHTML(s.station_type || '')}" placeholder="例: 有人直営駅、完全無人駅">
+        <div class="train-editor-grid-4" style="margin-top: 12px;">
+          <div class="form-group">
+            <label class="form-label">電報略号</label>
+            <input type="text" id="st-edit-telegram" class="form-input" value="${escapeHTML(s.telegram_code || '')}" placeholder="例: シテ">
+          </div>
+          <div class="form-group">
+            <label class="form-label">駅順序 (order)</label>
+            <input type="number" id="st-edit-order" class="form-input" value="${s.order != null ? s.order : ''}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">起点からの営業キロ (km)</label>
+            <input type="number" step="0.1" id="st-edit-dist" class="form-input" value="${s.distance_km != null ? s.distance_km : ''}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">開業年月日</label>
+            <input type="date" id="st-edit-opening" class="form-input" value="${escapeHTML(s.opening_date || '')}">
+          </div>
         </div>
+
+        <h4 class="editor-block-title" style="margin-top: 20px;">所在地・地理情報</h4>
         <div class="form-group">
-          <label class="form-label">配線構造</label>
-          <input type="text" id="st-edit-platform" class="form-input" value="${escapeHTML(s.platform_layout || '')}" placeholder="例: 相対式2面2線">
+          <label class="form-label">駅所在地（住所）</label>
+          <input type="text" id="st-edit-address" class="form-input" value="${escapeHTML(s.address || '')}" placeholder="例: 茨城県筑西市乙86">
         </div>
-        <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
-          <label class="form-label">列車行き違い (交換)</label>
-          <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.85rem;">
+      </section>
+
+      <!-- 2. 運行・設備・配線 -->
+      <section id="st-sec-facility" class="editor-section ${currentStationSubTab === 'facility' ? 'active' : ''}">
+        <h4 class="editor-block-title">駅形態 & 配線構造</h4>
+        <div class="train-editor-grid">
+          <div class="form-group">
+            <label class="form-label">駅形態 (station_type)</label>
+            <input type="text" id="st-edit-type" class="form-input" value="${escapeHTML(s.station_type || '')}" placeholder="例: 有人直営駅、完全無人駅、委託駅">
+          </div>
+          <div class="form-group">
+            <label class="form-label">配線構造 (platform_layout)</label>
+            <input type="text" id="st-edit-platform" class="form-input" value="${escapeHTML(s.platform_layout || '')}" placeholder="例: 単式1面1線、相対式2面2線、1面2線">
+          </div>
+        </div>
+
+        <h4 class="editor-block-title" style="margin-top: 20px;">運行特性 & 出札機能</h4>
+        <div class="st-card-grid-4">
+          <label class="st-toggle-card">
             <input type="checkbox" id="st-edit-exchange" ${s.can_exchange ? 'checked' : ''}>
-            交換可能
+            <div class="st-toggle-body">
+              <span class="st-toggle-title">列車交換 (行き違い)</span>
+              <span class="st-toggle-desc">上下列車の交換設備あり</span>
+            </div>
           </label>
-        </div>
-        <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
-          <label class="form-label">SLもおか号</label>
-          <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.85rem;">
+          <label class="st-toggle-card">
             <input type="checkbox" id="st-edit-sl" ${s.sl_stop ? 'checked' : ''}>
-            停車駅
+            <div class="st-toggle-body">
+              <span class="st-toggle-title">SLもおか号 停車駅</span>
+              <span class="st-toggle-desc">SL観光列車の指定停車駅</span>
+            </div>
           </label>
-        </div>
-      </div>
-
-      <!-- 窓口・設備 -->
-      <h4 class="editor-block-title">出札窓口・アメニティ・駐車場</h4>
-      <div class="train-editor-grid-4">
-        <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
-          <label class="form-label">出札窓口</label>
-          <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.85rem;">
+          <label class="st-toggle-card">
             <input type="checkbox" id="st-edit-window" ${s.has_ticket_window ? 'checked' : ''}>
-            窓口あり
+            <div class="st-toggle-body">
+              <span class="st-toggle-title">出札窓口</span>
+              <span class="st-toggle-desc">駅係員・乗車券販売窓口</span>
+            </div>
           </label>
-        </div>
-        <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
-          <label class="form-label">自動券売機</label>
-          <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.85rem;">
+          <label class="st-toggle-card">
             <input type="checkbox" id="st-edit-vending" ${s.has_vending_machine ? 'checked' : ''}>
-            券売機あり
+            <div class="st-toggle-body">
+              <span class="st-toggle-title">自動券売機</span>
+              <span class="st-toggle-desc">近距離乗車券の券売機あり</span>
+            </div>
           </label>
         </div>
-        <div class="form-group" style="grid-column: span 2;">
-          <label class="form-label">トイレ設備</label>
-          <input type="text" id="st-edit-restroom" class="form-input" value="${escapeHTML(s.restroom || '')}">
+
+        <h4 class="editor-block-title" style="margin-top: 20px;">アメニティ & 交通インフラ</h4>
+        <div class="train-editor-grid">
+          <div class="form-group">
+            <label class="form-label">トイレ設備 (restroom)</label>
+            <input type="text" id="st-edit-restroom" class="form-input" value="${escapeHTML(s.restroom || '')}" placeholder="例: 水洗（車椅子・多機能トイレあり）、なし">
+          </div>
+          <div class="form-group">
+            <label class="form-label">駐車場・駐輪場 (parking)</label>
+            <input type="text" id="st-edit-parking" class="form-input" value="${escapeHTML(s.parking || '')}" placeholder="例: 無料駐車場20台 / 市営駐輪場あり">
+          </div>
         </div>
-      </div>
-      <div class="form-group" style="margin-top: 10px;">
-        <label class="form-label">駐車場・駐輪場情報</label>
-        <input type="text" id="st-edit-parking" class="form-input" value="${escapeHTML(s.parking || '')}">
-      </div>
+      </section>
 
-      <!-- 接続路線 -->
-      <h4 class="editor-block-title">接続交通機関 (1行に1件)</h4>
-      <div class="form-group">
-        <textarea id="st-edit-connections" class="form-textarea" rows="3" placeholder="JR水戸線\n関東鉄道常総線\nコミュニティバス">${escapeHTML(connText)}</textarea>
-      </div>
+      <!-- 3. 接続交通機関 -->
+      <section id="st-sec-connections" class="editor-section ${currentStationSubTab === 'connections' ? 'active' : ''}">
+        <h4 class="editor-block-title">乗り換え路線・連絡バス（1行に1系統ずつ入力）</h4>
+        <div class="form-group">
+          <textarea id="st-edit-connections" class="form-textarea" rows="5" placeholder="JR水戸線&#10;関東鉄道常総線&#10;筑西市コミュニティバス&#10;筑西市道の駅循環バス" oninput="updateConnectionChipsPreview()">${escapeHTML(connText)}</textarea>
+        </div>
+        <div class="conn-chips-preview-box">
+          <div class="conn-chips-title">現在の認識プレビュー:</div>
+          <div id="st-conn-chips-container" class="conn-chips-list">
+            <!-- リアルタイムチップ表示 -->
+          </div>
+        </div>
+      </section>
 
-      <!-- 駅解説・観光 -->
-      <h4 class="editor-block-title">解説・見どころ情報</h4>
-      <div class="form-group">
-        <label class="form-label">駅の特徴 (features)</label>
-        <textarea id="st-edit-features" class="form-textarea" rows="3">${escapeHTML(s.features || '')}</textarea>
-      </div>
-      <div class="form-group" style="margin-top: 10px;">
-        <label class="form-label">見どころ・観光情報 (highlights)</label>
-        <textarea id="st-edit-highlights" class="form-textarea" rows="4">${escapeHTML(s.highlights || '')}</textarea>
-      </div>
+      <!-- 4. 解説・見どころ -->
+      <section id="st-sec-guide" class="editor-section ${currentStationSubTab === 'guide' ? 'active' : ''}">
+        <h4 class="editor-block-title">駅の特徴・歴史 (features)</h4>
+        <div class="form-group">
+          <textarea id="st-edit-features" class="form-textarea" rows="4" placeholder="駅の立地、構造、歴史的背景など..." oninput="updateStationPreviewCard()">${escapeHTML(s.features || '')}</textarea>
+        </div>
+
+        <h4 class="editor-block-title" style="margin-top: 20px;">周辺見どころ・観光案内 (highlights)</h4>
+        <div class="form-group">
+          <textarea id="st-edit-highlights" class="form-textarea" rows="5" placeholder="周辺の観光地、特産品、イベントなど..." oninput="updateStationPreviewCard()">${escapeHTML(s.highlights || '')}</textarea>
+        </div>
+
+        <h4 class="editor-block-title" style="margin-top: 20px;">公開ポータル・走行位置での表示プレビュー</h4>
+        <div class="st-preview-card" id="st-preview-card">
+          <div class="st-preview-header">
+            <span class="st-code-pill">${escapeHTML(s.code)}</span>
+            <span class="st-preview-name">${escapeHTML(s.name)}</span>
+            <span class="st-preview-kana">${escapeHTML(s.kana || '')}</span>
+          </div>
+          <p class="st-preview-features" id="st-preview-features">${escapeHTML(s.features || '（駅の特徴は未設定です）')}</p>
+          <div class="st-preview-highlights">
+            <strong>観光・見どころ:</strong>
+            <p id="st-preview-highlights">${escapeHTML(s.highlights || '（見どころ情報は未設定です）')}</p>
+          </div>
+        </div>
+      </section>
     </div>
   `;
+
+  updateConnectionChipsPreview();
 }
 
 function markStationEditorUnapplied(flag = true) {
@@ -2505,16 +2938,36 @@ async function exportStationsToGitHub() {
   if (btn) { btn.disabled = true; btn.classList.add('btn-loading'); }
 
   try {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        action: 'save_stations_github',
-        token: adminToken,
-        data: stationsData
-      })
-    });
-    const result = await res.json();
+    let result;
+    if (adminPasskeyJwt && AUTH_WORKER_URL) {
+      const cfRes = await fetch(`${AUTH_WORKER_URL}/api/admin/save-file`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminPasskeyJwt}`
+        },
+        body: JSON.stringify({
+          path: 'train-state/data/stations.json',
+          content: stationsData,
+          message: `Update stations.json via Admin Passkey (${dirtyStationCodes.size ? `${dirtyStationCodes.size} stations modified` : 'sync'})`
+        })
+      });
+      result = await cfRes.json();
+      if (!cfRes.ok || result.status !== 'success') {
+        throw new Error(result.error || 'Cloudflare Gateway経由のコミットに失敗しました');
+      }
+    } else {
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'save_stations_github',
+          token: adminToken,
+          data: stationsData
+        })
+      });
+      result = await res.json();
+    }
     if (result.status === 'success') {
       originalStationsData = JSON.parse(JSON.stringify(stationsData));
       dirtyStationCodes.clear();

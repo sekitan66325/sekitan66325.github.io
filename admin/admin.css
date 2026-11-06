@@ -971,7 +971,306 @@ main.admin-shell {
   display: block;
 }
 
+
+/* --- 駅情報エディタ固有スタイル --- */
+.train-list-item.station-item {
+  grid-template-columns: 118px 1fr auto;
+  gap: 8px;
+}
+
+.station-item .tli-no {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.station-item .st-name-text {
+  font-weight: 700;
+  color: var(--c-fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.station-item .tli-route {
+  font-size: 0.73rem;
+  color: var(--c-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.st-code-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-accent-border);
+  color: var(--c-accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  border-radius: 2px;
+  font-variant-numeric: tabular-nums;
+  margin-right: 4px;
+}
+
+.st-card-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.st-toggle-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.st-toggle-card:hover {
+  background-color: var(--c-surface-hover);
+  border-color: var(--c-border-strong);
+}
+
+.st-toggle-card input[type="checkbox"] {
+  margin-top: 3px;
+  cursor: pointer;
+  accent-color: var(--c-accent);
+}
+
+.st-toggle-card:has(input[type="checkbox"]:checked) {
+  background-color: var(--c-accent-soft);
+  border-color: var(--c-accent);
+}
+
+.st-toggle-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.st-toggle-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--c-fg);
+}
+
+.st-toggle-desc {
+  font-size: 0.72rem;
+  color: var(--c-muted);
+  line-height: 1.3;
+}
+
+.conn-chips-preview-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+}
+
+.conn-chips-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--c-fg);
+  margin-bottom: 8px;
+}
+
+.conn-chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.conn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background-color: var(--c-bg);
+  border: 1px solid var(--c-border-strong);
+  border-radius: 2px;
+  color: var(--c-fg);
+}
+
+.st-preview-card {
+  padding: 16px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  margin-top: 8px;
+}
+
+.st-preview-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.st-preview-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--c-fg);
+}
+
+.st-preview-kana {
+  font-size: 0.8rem;
+  color: var(--c-muted);
+}
+
+.st-preview-features {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--c-fg);
+  margin: 0 0 12px;
+}
+
+.st-preview-highlights {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  background-color: var(--c-bg);
+  border-left: 3px solid var(--c-accent);
+  padding: 10px 12px;
+  border-radius: 0 2px 2px 0;
+}
+
+.st-preview-highlights strong {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--c-accent);
+  margin-bottom: 4px;
+}
+
+.st-preview-highlights p {
+  margin: 0;
+  color: var(--c-fg);
+}
+
+/* --- パスキー (WebAuthn / FIDO2) 認証UI --- */
+.passkey-login-box {
+  margin-bottom: 8px;
+}
+
+.btn-passkey-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 18px;
+  background-color: var(--c-fg);
+  color: var(--c-bg);
+  border: 1px solid var(--c-fg);
+  border-radius: 2px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.btn-passkey-login:hover {
+  background-color: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+}
+
+.btn-passkey-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.passkey-icon {
+  flex-shrink: 0;
+}
+
+.passkey-hint {
+  font-size: 0.74rem;
+  color: var(--c-muted);
+  text-align: center;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 18px 0;
+  color: var(--c-muted);
+  font-size: 0.76rem;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.login-divider span {
+  padding: 0 10px;
+}
+
+.passkey-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.passkey-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+}
+
+.passkey-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.passkey-item-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--c-fg);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.passkey-item-date {
+  font-size: 0.72rem;
+  color: var(--c-muted);
+}
+
 @media (max-width: 880px) {
+  .st-card-grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+
   .trains-workspace {
     display: flex;
     flex-direction: column;

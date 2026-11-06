@@ -1,0 +1,22 @@
+name = "moka-auth-worker"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+[vars]
+RP_ID = "sekitan66325.github.io"
+RP_NAME = "真岡鐵道 運行管理パネル"
+GITHUB_OWNER = "sekitan66325"
+GITHUB_REPO = "sekitan66325.github.io"
+GITHUB_BRANCH = "main"
+
+# Cloudflare KV Namespace for WebAuthn public keys, credentials, and challenges
+# Create with: npx wrangler kv:namespace create PASSKEY_KV
+# Then paste the generated id below:
+[[kv_namespaces]]
+binding = "PASSKEY_KV"
+id = "MOKA_PASSKEY_KV_ID_PLACEHOLDER"
+
+# Encrypted Secrets (Set via: npx wrangler secret put <NAME>)
+# - GITHUB_PAT: GitHub Personal Access Token with repo commit permissions
+# - JWT_SECRET: Random 256-bit secret string for signing session tokens
+# - ADMIN_SETUP_KEY: One-time/initial token to register the first master passkey
