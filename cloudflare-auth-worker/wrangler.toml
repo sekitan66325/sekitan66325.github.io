@@ -20,3 +20,4 @@ id = "MOKA_PASSKEY_KV_ID_PLACEHOLDER"
 # - GITHUB_PAT: GitHub Personal Access Token with repo commit permissions
 # - JWT_SECRET: Random 256-bit secret string for signing session tokens
 # - ADMIN_SETUP_KEY: One-time/initial token to register the first master passkey
+

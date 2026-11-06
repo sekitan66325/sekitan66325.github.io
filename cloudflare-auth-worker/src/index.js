@@ -828,3 +828,4 @@ function hexToBuf(hex) {
   }
   return bytes;
 }
+
