@@ -412,6 +412,21 @@ main.container {
   background-color: var(--c-surface);
 }
 
+.list-static-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  color: var(--text2);
+  background-color: var(--surface2);
+}
+
+.list-static-row .item-label {
+  color: var(--text2);
+}
+
 .item-left-block {
   display: flex;
   align-items: center;
@@ -492,6 +507,12 @@ main.container {
   padding: 2px 8px;
   border-radius: var(--radius-xs);
   font-variant-numeric: tabular-nums;
+}
+
+.status-badge-red {
+  color: var(--c-red);
+  border-color: var(--c-red-border);
+  background-color: var(--c-red-soft);
 }
 
 .chevron-right::after {

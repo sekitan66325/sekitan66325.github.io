@@ -1,9 +1,9 @@
-const CACHE_NAME = 'moka-pwa-v20261114';
+const CACHE_NAME = 'moka-pwa-v20261114-v2';
 
 const PRECACHE_ASSETS = [
   './',
   './index.html',
-  './style.css?v=20261114',
+  './style.css?v=20261114_v2',
   './script.js',
   './manifest.json',
   './assets/favicon.png',
