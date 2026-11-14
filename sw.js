@@ -1,13 +1,14 @@
-const CACHE_NAME = 'moka-pwa-v20261106-v4';
+const CACHE_NAME = 'moka-pwa-v20261114';
 
 const PRECACHE_ASSETS = [
   './',
   './index.html',
-  './style.css?v=7',
+  './style.css?v=20261114',
   './script.js',
   './manifest.json',
   './assets/favicon.png',
   './assets/apple-touch-icon.png',
+  './assets/hako-dia/favicon.svg',
   './assets/moka14.png',
   './assets/c12mk.png',
   './assets/de10j1.png',
@@ -62,8 +63,8 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url);
 
-  // 1. 管理画面 (/admin/) は Service Worker のキャッシュ対象外（常に最新をネットワークから取得）
-  if (url.pathname.includes('/admin')) {
+  // 1. 管理画面 (/admin/) および別アプリのサブパス (/box-diagram/) は Service Worker の対象外
+  if (url.pathname.includes('/admin') || url.pathname.startsWith('/box-diagram')) {
     return;
   }
 

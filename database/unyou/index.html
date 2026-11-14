@@ -39,7 +39,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="../../style.css?v=20261106_v5">
+  <link rel="stylesheet" href="../../style.css?v=20261114">
   <link rel="stylesheet" href="../../admin/datepicker.css?v=20261101d">
   <link rel="icon" href="../../assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
@@ -324,6 +324,52 @@
       </ul>
     </section>
 
+    <section class="content-section" id="box-diagram-guide-section">
+      <h2 class="section-title">箱ダイヤを自作・PDF出力できるWebツール</h2>
+      <div class="discord-card tool-intro-card tool-compact-card">
+        <div class="tool-card-media">
+          <img
+            src="../../assets/hako-dia/favicon.svg"
+            alt="箱ダイヤ描画システム アイコン"
+            class="tool-card-icon"
+            width="40"
+            height="40"
+            loading="lazy"
+          >
+        </div>
+
+        <div class="discord-card-body">
+          <div class="tool-card-heading">
+            <strong class="discord-card-title">箱ダイヤ描画システム（β版）</strong>
+            <span
+              class="status-badge"
+              data-release-at="2026-11-14T18:00:00+09:00"
+              data-before-text="11/14 18:00 公開予定"
+              data-after-text="無料公開中"
+            >11/14 18:00 公開予定</span>
+            <span class="status-badge status-badge-neutral">PC推奨</span>
+          </div>
+          <p class="discord-card-desc">
+            Excel不要・ブラウザだけで鉄道の「箱ダイヤ（仕業行路図）」を作成＆A4 / B5 ベクター PDF 化できる無料汎用ツールです（真岡鐵道以外の任意路線・架空鉄道も作成可 / 外部送信なし・JSON保存対応）。
+          </p>
+          <p class="tool-card-sublinks">
+            <a href="https://youtu.be/rNZxBmkyHq0" target="_blank" rel="noopener noreferrer">
+              紹介動画 (YouTube / 約48秒) ↗
+            </a>
+            <a href="https://github.com/sekitan66325/box-diagram/blob/main/MANUAL.md" target="_blank" rel="noopener noreferrer">
+              取扱説明書 ↗
+            </a>
+          </p>
+        </div>
+
+        <div class="discord-card-action">
+          <a href="/box-diagram/" class="btn-primary">
+            ツールを開く
+          </a>
+        </div>
+      </div>
+    </section>
+
     <section class="notice-section acknowledgement-section">
       <strong>運用情報の収集と御礼</strong>
       <p>目撃情報掲示板やSNS上の投稿等を参考に運用調査へ反映しております。日頃より情報を提供いただいている皆様に厚く御礼申し上げます。</p>
@@ -337,12 +383,27 @@
         <li><a href="../../train-state/index.html" class="footer-link">列車走行位置</a></li>
         <li><a href="../../operation-board/index.html" class="footer-link">目撃掲示板</a></li>
         <li><a href="index.html" class="footer-link">車両運用資料</a></li>
+        <li><a href="/box-diagram/" class="footer-link">箱ダイヤ描画システム (β版)</a></li>
         <li><a href="https://x.com/sekitan66325" class="footer-link" target="_blank" rel="noopener noreferrer">X (@sekitan66325)</a></li>
         <li><a href="mailto:sekitan.info@gmail.com" class="footer-link">お問い合わせ</a></li>
       </ul>
       <p class="copyright">© 2026 せきたん / 真岡鐵道 非公式情報ポータル</p>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var now = Date.now();
+      document.querySelectorAll('[data-release-at]').forEach(function (el) {
+        var releaseAt = Date.parse(el.getAttribute('data-release-at'));
+        if (!Number.isNaN(releaseAt)) {
+          el.textContent = now >= releaseAt
+            ? (el.getAttribute('data-after-text') || el.textContent)
+            : (el.getAttribute('data-before-text') || el.textContent);
+        }
+      });
+    })();
+  </script>
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0GM4B0FTW9"></script>
