@@ -118,13 +118,8 @@
         <div class="discord-card-body">
           <div class="tool-card-heading">
             <strong class="discord-card-title">箱ダイヤ描画システム（鉄道車両仕業行路図作成）</strong>
-            <span
-              class="status-badge"
-              data-release-at="2026-11-14T18:00:00+09:00"
-              data-before-text="2026年11月14日 18:00 公開予定"
-              data-after-text="無料公開中"
-            >2026年11月14日 18:00 公開予定</span>
-            <span class="status-badge">β版</span>
+            <span class="status-badge">2026年11月14日 公開</span>
+            <span class="status-badge">β版・無料</span>
             <span class="status-badge status-badge-neutral">PC推奨</span>
           </div>
           <p class="discord-card-desc">
@@ -147,8 +142,8 @@
         </div>
 
         <div class="discord-card-action">
-          <a href="/box-diagram/" class="btn-primary">
-            ツールを開く（無料）
+          <a href="/box-diagram/" class="btn-primary" target="_blank" rel="noopener noreferrer">
+            ツールを開く（無料）↗
           </a>
         </div>
       </div>
@@ -257,26 +252,12 @@
         <li><a href="train-state/index.html" class="footer-link">列車走行位置</a></li>
         <li><a href="operation-board/index.html" class="footer-link">目撃掲示板</a></li>
         <li><a href="database/unyou/index.html" class="footer-link">車両運用資料</a></li>
-        <li><a href="/box-diagram/" class="footer-link">箱ダイヤ描画システム (β版)</a></li>
+        <li><a href="/box-diagram/" class="footer-link" target="_blank" rel="noopener noreferrer">箱ダイヤ描画システム (β版)</a></li>
         <li><a href="https://discord.gg/2MWfFE3Z2" class="footer-link" target="_blank" rel="noopener noreferrer">Discord通知</a></li>
       </ul>
       <p class="copyright">© 2026 せきたん / 真岡鐵道 非公式情報ポータル</p>
     </div>
   </footer>
-
-  <script>
-    (function () {
-      var now = Date.now();
-      document.querySelectorAll('[data-release-at]').forEach(function (el) {
-        var releaseAt = Date.parse(el.getAttribute('data-release-at'));
-        if (!Number.isNaN(releaseAt)) {
-          el.textContent = now >= releaseAt
-            ? (el.getAttribute('data-after-text') || el.textContent)
-            : (el.getAttribute('data-before-text') || el.textContent);
-        }
-      });
-    })();
-  </script>
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0GM4B0FTW9"></script>
