@@ -1,54 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- 総合ポータルTOP -->
+  <!-- ポータルTOP -->
   <url>
-    <loc>https://sekitan.net/</loc>
-    <lastmod>2026-11-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-
-  <!-- 真岡鐵道データベースTOP -->
-  <url>
-    <loc>https://sekitan.net/moka-railway/</loc>
-    <lastmod>2026-11-18</lastmod>
+    <loc>https://sekitan66325.github.io/</loc>
+    <lastmod>2026-11-01</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <priority>1.0</priority>
   </url>
 
   <!-- 車両運用資料 -->
   <url>
-    <loc>https://sekitan.net/moka-railway/database/unyou/</loc>
-    <lastmod>2026-11-18</lastmod>
+    <loc>https://sekitan66325.github.io/database/unyou/</loc>
+    <lastmod>2026-11-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- 列車走行位置 -->
   <url>
-    <loc>https://sekitan.net/moka-railway/train-state/</loc>
-    <lastmod>2026-11-18</lastmod>
+    <loc>https://sekitan66325.github.io/train-state/</loc>
+    <lastmod>2026-11-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- 目撃掲示板 -->
   <url>
-    <loc>https://sekitan.net/moka-railway/operation-board/</loc>
-    <lastmod>2026-11-18</lastmod>
+    <loc>https://sekitan66325.github.io/operation-board/</loc>
+    <lastmod>2026-11-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- 主要運用資料PDF -->
   <url>
-    <loc>https://sekitan.net/moka-railway/database/unyou/202303/moka14.pdf</loc>
+    <loc>https://sekitan66325.github.io/database/unyou/202303/moka14.pdf</loc>
     <lastmod>2026-08-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sekitan.net/moka-railway/database/unyou/202303/sl-pc.pdf</loc>
+    <loc>https://sekitan66325.github.io/database/unyou/202303/sl-pc.pdf</loc>
     <lastmod>2026-08-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

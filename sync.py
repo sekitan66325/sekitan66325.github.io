@@ -23,12 +23,12 @@ RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}
 API_BASE = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "moka-railway", "train-state", "data")
+DATA_DIR = os.path.join(BASE_DIR, "train-state", "data")
 BACKUP_DIR = os.path.join(DATA_DIR, "backups")
 
 TARGET_FILES = [
-    "moka-railway/train-state/data/timetable.json",
-    "moka-railway/train-state/data/stations.json"
+    "train-state/data/timetable.json",
+    "train-state/data/stations.json"
 ]
 
 def make_backup(filename):

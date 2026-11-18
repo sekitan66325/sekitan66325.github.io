@@ -1,4 +1,4 @@
-const CACHE_NAME = 'moka-pwa-v20261118-v1';
+const CACHE_NAME = 'moka-pwa-v20261114-v2';
 
 const PRECACHE_ASSETS = [
   './',

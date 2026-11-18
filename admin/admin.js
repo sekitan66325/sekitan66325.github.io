@@ -2488,7 +2488,7 @@ async function exportTimetable() {
           'Authorization': `Bearer ${adminPasskeyJwt}`
         },
         body: JSON.stringify({
-          path: 'moka-railway/train-state/data/timetable.json',
+          path: 'train-state/data/timetable.json',
           content: timetableData,
           message: `Update timetable.json via Admin Passkey (${dirtyTrainIds.size ? `${dirtyTrainIds.size} trains modified` : 'sync'})`
         })
@@ -3033,7 +3033,7 @@ async function exportStationsToGitHub() {
           'Authorization': `Bearer ${adminPasskeyJwt}`
         },
         body: JSON.stringify({
-          path: 'moka-railway/train-state/data/stations.json',
+          path: 'train-state/data/stations.json',
           content: stationsData,
           message: `Update stations.json via Admin Passkey (${dirtyStationCodes.size ? `${dirtyStationCodes.size} stations modified` : 'sync'})`
         })
