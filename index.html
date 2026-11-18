@@ -4,276 +4,499 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>真岡鐵道 情報ポータル</title>
-  <meta name="description" content="真岡鐵道（真岡線）の列車走行位置・時刻表、現地目撃情報掲示板、モオカ14形・SLもおかの車両運用資料をまとめた非公式情報ポータルです。">
-  <meta name="keywords" content="真岡鐵道, 真岡線, 運用, 運用表, 列車走行位置, 目撃情報, モオカ14, SLもおか, 時刻表, ダイヤ">
-  <link rel="canonical" href="https://sekitan66325.github.io/">
+  <title>せきたん | sekitan.net</title>
+  <meta name="description" content="せきたん（@sekitan66325）の総合ポータル。鉄道ダイヤ関係システム開発、真岡鐵道データベース、私家版『真岡鐵道ダイヤ全録』の公開窓口です。">
+  <meta name="keywords" content="せきたん, sekitan.net, BoxDia, 箱ダイヤ描画ソフト, 真岡線 運賃料金シミュレーター, 真岡鐵道データベース, 真岡鐵道ダイヤ全録">
+  <link rel="canonical" href="https://sekitan.net/">
 
-  <meta property="og:title" content="真岡鐵道 情報ポータル">
-  <meta property="og:description" content="真岡鐵道（真岡線）の列車走行位置・時刻表、現地目撃情報掲示板、車両運用資料をまとめた非公式情報ポータルです。">
+  <meta property="og:title" content="せきたん | sekitan.net">
+  <meta property="og:description" content="鉄道ダイヤ関係システム開発／真岡鐵道データベース・ダイヤ同人誌の制作">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://sekitan66325.github.io/">
-  <meta property="og:image" content="https://sekitan66325.github.io/assets/moka14.png">
-  <meta property="og:site_name" content="真岡鐵道 情報ポータル">
+  <meta property="og:url" content="https://sekitan.net/">
+  <meta property="og:image" content="https://sekitan.net/moka-railway/assets/apple-touch-icon.png">
+  <meta property="og:site_name" content="sekitan.net">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@sekitan66325">
+  <meta name="theme-color" content="#f6f5f1">
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "真岡鐵道 情報ポータル",
-    "url": "https://sekitan66325.github.io/",
-    "description": "真岡鐵道の車両運用情報、目撃掲示板、列車走行位置をまとめた非公式ポータルサイト",
+    "name": "sekitan.net",
+    "url": "https://sekitan.net/",
+    "description": "鉄道ダイヤ関係システム開発／真岡鐵道データベース・ダイヤ同人誌の制作",
     "author": {
       "@type": "Person",
       "name": "せきたん",
-      "url": "https://x.com/sekitan66325"
+      "url": "https://x.com/sekitan66325",
+      "sameAs": [
+        "https://x.com/sekitan66325",
+        "https://github.com/sekitan66325",
+        "https://www.youtube.com/@sekitan66325",
+        "https://www.instagram.com/sekitan66325/?hl=ja",
+        "https://note.com/sekitan66325",
+        "https://sekitan66325.booth.pm/",
+        "https://ofuse.me/sekitan66325"
+      ]
     }
   }
   </script>
 
-  <link rel="stylesheet" href="style.css?v=20261114_v2">
-  <link rel="icon" href="assets/favicon.png" type="image/png">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <script>
+    document.documentElement.classList.add('js-enhanced');
+  </script>
+
+  <link rel="icon" href="moka-railway/assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="moka-railway/assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="portal/portal.css?v=20261118_v2">
 </head>
 
 <body>
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="header-brand-nav">
-        <h1 class="logo"><a href="index.html">真岡鐵道 情報ポータル</a></h1>
-        <nav class="global-nav" aria-label="メインナビゲーション">
-          <a href="index.html" class="nav-link active">トップ</a>
-          <a href="train-state/index.html" class="nav-link">列車走行位置</a>
-          <a href="operation-board/index.html" class="nav-link">目撃掲示板</a>
-          <a href="database/unyou/index.html" class="nav-link">車両運用資料</a>
-        </nav>
-      </div>
+  <div class="scroll-rail" aria-hidden="true">
+    <div class="scroll-rail-fill" id="scroll-rail-fill"></div>
+  </div>
+
+  <header class="site-topbar">
+    <div class="topbar-inner">
+      <a href="#top" class="brand-mark">
+        <img src="moka-railway/assets/favicon.png" alt="せきたんアイコン" class="brand-mark-icon" width="24" height="24">
+        <span class="brand-mark-text">sekitan.net</span>
+      </a>
+
+      <nav class="topbar-nav" id="topbar-nav" aria-label="ページ内ナビゲーション">
+        <a href="#tools" class="topbar-link">ツール・通知</a>
+        <a href="#database" class="topbar-link">データベース</a>
+        <a href="#publications" class="topbar-link">刊行物</a>
+        <span class="topbar-indicator" id="topbar-indicator" aria-hidden="true"></span>
+      </nav>
     </div>
   </header>
 
-  <main class="container">
-    <div class="portal-intro">
-      <h2 class="hero-title">真岡鐵道 情報ポータル</h2>
-      <p class="hero-subtitle">下館〜真岡〜茂木間の列車走行位置・ダイヤ、目撃情報、車両運用記録をまとめた非公式情報サイトです。</p>
-    </div>
-
-    <div class="portal-grid">
-      <a href="train-state/index.html" class="portal-card">
-        <h2>列車走行位置・時刻表</h2>
-        <p>現行ダイヤに基づく列車の現在位置、ダイヤグラム（運行図表）、路線時刻表を確認できます。</p>
-      </a>
-
-      <a href="operation-board/index.html" class="portal-card">
-        <h2>目撃情報掲示板</h2>
-        <p>モオカ14形やSLもおか（C12 66・DE10）の現地目撃情報の共有、編成確認、過去ログ検索を行えます。</p>
-      </a>
-
-      <a href="database/unyou/index.html" class="portal-card">
-        <h2>車両運用資料</h2>
-        <p>定期・臨時運用の行路表および毎日の運用記録をまとめた月別運用報告書（PDF）を閲覧できます。</p>
-      </a>
-    </div>
-
-    <section class="content-section">
-      <h2 class="section-title">公式運行情報・新着情報 自動通知（Discord）</h2>
-      <p class="section-desc">
-        真岡鐵道公式HPの運行情報および新着情報（公式発表）を巡回監視し、更新検知時にDiscordへ即時通知するサーバーを運用しています。遅延・運休情報や各種公式発表の迅速な把握にご活用ください。
+  <main class="portal-main" id="top">
+    <!-- 1. ヘッダー・プロフィール帯 -->
+    <section class="hero-band" aria-labelledby="hero-title" data-reveal>
+      <p class="hero-eyebrow">
+        <span class="hero-eyebrow-dot" aria-hidden="true"></span>
+        <span>Railway Diagram Systems &amp; Moka Railway Archive</span>
       </p>
 
-      <div class="discord-card">
-        <div class="discord-card-body">
-          <strong class="discord-card-title">真岡鐵道 運行・公式新着情報通知サーバー</strong>
-          <p class="discord-card-desc">
-            公式HPの更新を検知してAPI経由でメッセージを自動配信します。どなたでもご自由にご参加いただけます。
+      <div class="hero-identity">
+        <img src="moka-railway/assets/apple-touch-icon.png" alt="せきたん" class="hero-avatar" width="60" height="60">
+        <div class="hero-title-wrap">
+          <h1 class="hero-name" id="hero-title">
+            せきたん<span class="hero-name-sub">@sekitan66325</span>
+          </h1>
+          <p class="hero-bio">
+            鉄道ダイヤ関係システム開発／真岡鐵道データベース・ダイヤ同人誌の制作
           </p>
         </div>
-        <div class="discord-card-action">
-          <a href="https://discord.gg/2MWfFE3Z2" class="btn-primary" target="_blank" rel="noopener noreferrer">
-            Discordサーバーに参加
+      </div>
+
+      <div class="profile-links-wrap" aria-label="公式リンク一覧">
+        <div class="profile-links-group">
+          <span class="profile-group-label">Official</span>
+
+          <a href="https://x.com/sekitan66325" class="chip-link" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            <span>X</span>
+            <span class="chip-link-handle">@sekitan66325</span>
+          </a>
+
+          <a href="https://github.com/sekitan66325" class="chip-link" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            <span>GitHub</span>
+          </a>
+
+          <a href="https://sekitan66325.booth.pm/" class="chip-link" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 7h12l1 13H5L6 7z"/>
+              <path d="M9 7a3 3 0 0 1 6 0"/>
+            </svg>
+            <span>BOOTH</span>
+          </a>
+
+          <a href="https://note.com/sekitan66325" class="chip-link" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6z"/>
+              <path d="M14 3v6h6"/>
+              <path d="M8 13h8"/>
+              <path d="M8 17h5"/>
+            </svg>
+            <span>note</span>
+          </a>
+
+          <a href="https://ofuse.me/sekitan66325" class="chip-link chip-link--support" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="14" rx="2"/>
+              <path d="M3 7l9 6 9-6"/>
+            </svg>
+            <span>OFUSE（応援）</span>
+          </a>
+        </div>
+
+        <div class="profile-links-group">
+          <span class="profile-group-label">SNS / More</span>
+
+          <a href="https://www.youtube.com/@sekitan66325" class="chip-link chip-link--quiet" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2.5" y="5.5" width="19" height="13" rx="3.5"/>
+              <polygon points="10,9.5 15.5,12 10,14.5" fill="currentColor" stroke="none"/>
+            </svg>
+            <span>YouTube</span>
+          </a>
+
+          <a href="https://www.instagram.com/sekitan66325/?hl=ja" class="chip-link chip-link--quiet" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+            </svg>
+            <span>Instagram</span>
+          </a>
+
+          <a href="https://discord.gg/2MWfFE3Z2" class="chip-link chip-link--quiet" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+            </svg>
+            <span>Discord</span>
+          </a>
+
+          <a href="mailto:sekitan.info@gmail.com" class="chip-link chip-link--quiet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/>
+              <path d="M3 7l9 6 9-6"/>
+            </svg>
+            <span>メール</span>
           </a>
         </div>
       </div>
     </section>
 
-    <section class="content-section" id="box-diagram-section">
-      <h2 class="section-title">Webツール：箱ダイヤ描画システム（β版）</h2>
-      <p class="section-desc">
-        『真岡鐵道ダイヤ全録』の行路図制作を効率化するために開発した、ブラウザ上で鉄道の箱ダイヤ（車両運用図・仕業行路図）を作成・編集し、そのまま A4 / B5 のベクター PDF として出力できる無料 Web
-        アプリ（β版）です。真岡鐵道に限らず、全国の路線や架空鉄道のダイヤを自由に作成できます（体験用サンプル収録）。
-      </p>
-
-      <div class="discord-card tool-intro-card">
-        <div class="tool-card-media">
-          <img src="assets/hako-dia/favicon.svg" alt="箱ダイヤ描画システム アイコン" class="tool-card-icon" width="48" height="48"
-            loading="lazy">
+    <!-- 2. Webアプリ・ダイヤツール・通知システム -->
+    <section class="portal-section" id="tools" aria-labelledby="tools-heading" data-reveal data-reveal-delay="60">
+      <div class="section-head">
+        <div class="section-title-group">
+          <span class="section-index">01</span>
+          <h2 class="section-heading" id="tools-heading">Webアプリ・ダイヤツール・通知システム</h2>
         </div>
+      </div>
 
-        <div class="discord-card-body">
-          <div class="tool-card-heading">
-            <strong class="discord-card-title">箱ダイヤ描画システム（鉄道車両仕業行路図作成）</strong>
-            <span class="status-badge">2026年11月14日 公開</span>
-            <span class="status-badge">β版・無料</span>
-            <span class="status-badge status-badge-neutral">PC推奨</span>
+      <div class="tools-grid">
+        <!-- BoxDia -->
+        <article class="work-card">
+          <div>
+            <div class="work-card-top">
+              <div class="work-icon-box">
+                <img src="moka-railway/assets/hako-dia/favicon.svg" alt="BoxDia アイコン" width="44" height="44">
+              </div>
+              <div class="work-heading-block">
+                <div class="work-title-row">
+                  <h3 class="work-title">BoxDia</h3>
+                  <span class="meta-tag meta-tag--accent">v1.2.0</span>
+                  <span class="meta-tag">Webアプリ・無料</span>
+                </div>
+                <p class="work-subtitle">鉄道車両運用表・箱ダイヤ描画ソフト</p>
+              </div>
+            </div>
+
+            <p class="work-desc">
+              登録・インストール不要で、ブラウザ上から鉄道の箱ダイヤ（駅軸）および時刻軸運用線図を作成・編集できる無料ツール。OuDia（.oud / .oud2）の取込や A4 / B5 の 1:1 ベクター PDF・画像保存に対応しています。
+            </p>
           </div>
-          <p class="discord-card-desc">
-            登録・インストール不要、Excel の罫線引きやセル結合も不要です。左側の表に入力するだけで図面をリアルタイム自動描画し、種別色・線種、併結同期、途中駅部分継走、○出区 / △入区記号、図面上ドラッグ＆Alt
-            キー吸着の注記配置に対応。A4 / B5 の 1:1 ベクター PDF を書き出せます。
-          </p>
-          <p class="tool-card-note">
-            ※ 100%ブラウザ内処理で外部送信されません。閉じた後の再開には「保存 (JSON)」「読込 (JSON)」をご利用ください。β版につき、アプリ内「✉
-            お問い合わせ」等から要望・不具合報告を受け付け順次改善予定です。
-          </p>
-          <p class="tool-card-sublinks">
-            <a href="https://youtu.be/rNZxBmkyHq0" target="_blank" rel="noopener noreferrer">
-              紹介動画を見る（通販CM風 / 約48秒 / YouTube）↗
+
+          <div class="work-card-foot">
+            <div class="work-sublinks">
+              <a href="https://github.com/sekitan66325/box-diagram/blob/main/MANUAL.md" target="_blank" rel="noopener noreferrer">取扱説明書 ↗</a>
+              <a href="https://youtu.be/rNZxBmkyHq0" target="_blank" rel="noopener noreferrer">紹介動画 ↗</a>
+            </div>
+            <a href="https://boxdia.sekitan.net/" class="action-link" target="_blank" rel="noopener noreferrer">
+              <span>アプリを開く</span>
+              <span class="arrow-glyph" aria-hidden="true">↗</span>
             </a>
-            <a href="https://github.com/sekitan66325/box-diagram/blob/main/MANUAL.md" target="_blank"
-              rel="noopener noreferrer">
-              取扱説明書・仕様 ↗
+          </div>
+        </article>
+
+        <!-- 真岡線 運賃料金シミュレーター -->
+        <article class="work-card">
+          <div>
+            <div class="work-card-top">
+              <div class="work-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="3" width="16" height="18" rx="2"/>
+                  <line x1="8" y1="8" x2="16" y2="8"/>
+                  <line x1="8" y1="12.5" x2="11.5" y2="12.5"/>
+                  <line x1="14" y1="12.5" x2="16" y2="12.5"/>
+                  <line x1="8" y1="16.5" x2="11.5" y2="16.5"/>
+                  <line x1="14" y1="16.5" x2="16" y2="16.5"/>
+                </svg>
+              </div>
+              <div class="work-heading-block">
+                <div class="work-title-row">
+                  <h3 class="work-title">真岡線 運賃料金シミュレーター</h3>
+                  <span class="meta-tag">BOOTH 頒布</span>
+                </div>
+                <p class="work-subtitle">真岡鐵道 真岡線 運賃・料金計算ソフトウェア</p>
+              </div>
+            </div>
+
+            <p class="work-desc">
+              真岡鐵道真岡線（下館〜茂木間）の各駅間における運賃および各種料金の計算・シミュレーションを行える鉄道ソフトウェアです。BOOTH にて頒布しています。
+            </p>
+          </div>
+
+          <div class="work-card-foot">
+            <div class="work-sublinks">
+              <span>BOOTH 配布ページ</span>
+            </div>
+            <a href="https://sekitan66325.booth.pm/items/8281750" class="action-link" target="_blank" rel="noopener noreferrer">
+              <span>BOOTHで見る</span>
+              <span class="arrow-glyph" aria-hidden="true">↗</span>
             </a>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSc45MP0RUGMoadCOQn6BY76kv__9lb29PureF1rfRvtywM2ZQ/viewform"
-              target="_blank" rel="noopener noreferrer">
-              ご意見・不具合フォーム ↗
+          </div>
+        </article>
+
+        <!-- 真岡鐵道 公式運行情報・新着情報 自動通知（Discord） -->
+        <article class="work-card work-card--wide">
+          <div>
+            <div class="work-card-top">
+              <div class="work-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                  <circle cx="18" cy="5" r="2.2" fill="currentColor" stroke="none"/>
+                </svg>
+              </div>
+              <div class="work-heading-block">
+                <div class="work-title-row">
+                  <h3 class="work-title">真岡鐵道 公式運行情報・新着情報 自動通知サーバー（Discord）</h3>
+                  <span class="meta-tag meta-tag--accent">自動監視・即時通知</span>
+                  <span class="meta-tag">参加無料</span>
+                </div>
+                <p class="work-subtitle">公式HP巡回監視 ＆ API 経由リアルタイム配信システム</p>
+              </div>
+            </div>
+
+            <p class="work-desc">
+              真岡鐵道公式HPの運行情報および新着情報（公式発表）を常時巡回監視し、更新を検知した瞬間に API 経由で Discord へ自動配信する通知サーバーを運用しています。遅延・運休などの輸送障害や臨時列車・公式アナウンスをいち早く把握したい方に向けて公開しており、どなたでも無料でご参加いただけます。
+            </p>
+
+            <div class="work-feature-list">
+              <div class="work-feature-item">
+                <span class="work-feature-label">01 / 運行情報の即時検知</span>
+                <p class="work-feature-text">列車の遅延・運休・運転見合わせなど、公式運行情報ページの更新を即座に通知します。</p>
+              </div>
+              <div class="work-feature-item">
+                <span class="work-feature-label">02 / 公式新着の自動配信</span>
+                <p class="work-feature-text">臨時運行やダイヤ改正・イベント案内など、公式HPの新着発表を見逃さずキャッチできます。</p>
+              </div>
+              <div class="work-feature-item">
+                <span class="work-feature-label">03 / 誰でも参加・通知調整可</span>
+                <p class="work-feature-text">Discord アカウントがあれば招待リンクからすぐ参加でき、スマホ通知の受け取りにも対応しています。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="work-card-foot">
+            <div class="work-sublinks">
+              <span>非公式・有志運用通知サーバー</span>
+            </div>
+            <a href="https://discord.gg/2MWfFE3Z2" class="action-link" target="_blank" rel="noopener noreferrer">
+              <span>Discordサーバーに参加</span>
+              <span class="arrow-glyph" aria-hidden="true">↗</span>
             </a>
-          </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 3. データベース・研究資料 -->
+    <section class="portal-section" id="database" aria-labelledby="database-heading" data-reveal data-reveal-delay="80">
+      <div class="section-head">
+        <div class="section-title-group">
+          <span class="section-index">02</span>
+          <h2 class="section-heading" id="database-heading">データベース・研究資料</h2>
+        </div>
+      </div>
+
+      <div class="db-panel">
+        <div class="db-panel-hero">
+          <div class="db-panel-main">
+            <div class="db-path-row">
+              <h3 class="db-title">真岡鐵道データベース</h3>
+              <span class="db-path-pill">/moka-railway/</span>
+            </div>
+            <p class="db-desc">
+              これまでトップ直下に置いていた車両運用資料（C12 66・モオカ14形・DE10 1535）およびダイヤ変遷アーカイブの入口。列車走行位置・時刻表・月別運用報告書（PDF）・現地目撃情報掲示板へアクセスできます。
+            </p>
+          </div>
+
+          <a href="moka-railway/index.html" class="action-link action-link--arrow">
+            <span>データベースへ入る</span>
+            <span class="arrow-glyph" aria-hidden="true">→</span>
+          </a>
         </div>
 
-        <div class="discord-card-action">
-          <a href="/box-diagram/" class="btn-primary" target="_blank" rel="noopener noreferrer">
-            ツールを開く（無料）↗
+        <div class="db-subgrid">
+          <a href="moka-railway/train-state/index.html" class="db-sublink">
+            <div class="db-sublink-head">
+              <span>列車走行位置・時刻表</span>
+              <span class="db-sublink-arrow" aria-hidden="true">→</span>
+            </div>
+            <p class="db-sublink-desc">現行ダイヤに基づく推定走行位置・運行図表・駅別時刻表</p>
+          </a>
+
+          <a href="moka-railway/database/unyou/index.html" class="db-sublink">
+            <div class="db-sublink-head">
+              <span>車両運用資料・報告書</span>
+              <span class="db-sublink-arrow" aria-hidden="true">→</span>
+            </div>
+            <p class="db-sublink-desc">C12 66・モオカ14形 定期行路表および月別運用報告書 PDF</p>
+          </a>
+
+          <a href="moka-railway/operation-board/index.html" class="db-sublink">
+            <div class="db-sublink-head">
+              <span>目撃情報掲示板</span>
+              <span class="db-sublink-arrow" aria-hidden="true">→</span>
+            </div>
+            <p class="db-sublink-desc">モオカ14形・SLもおかの現地目撃情報共有と過去ログ検索</p>
           </a>
         </div>
       </div>
     </section>
 
-    <section class="content-section">
-      <h2 class="section-title">『真岡鐵道ダイヤ全録』シリーズ</h2>
-      <p class="section-desc">
-        臨時ダイヤ施行時の運転時刻から車両運用までを体系的に記録した私家版資料集です。
+    <!-- 4. 刊行物・同人誌（BOOTH / note） -->
+    <section class="portal-section" id="publications" aria-labelledby="publications-heading" data-reveal data-reveal-delay="80">
+      <div class="section-head">
+        <div class="section-title-group">
+          <span class="section-index">03</span>
+          <h2 class="section-heading" id="publications-heading">刊行物・同人誌</h2>
+        </div>
+        <div class="section-meta-links">
+          <a href="https://sekitan66325.booth.pm/" class="inline-arrow-link" target="_blank" rel="noopener noreferrer">
+            <span>BOOTH 一覧</span><span class="arrow-glyph" aria-hidden="true">↗</span>
+          </a>
+          <a href="https://note.com/sekitan66325" class="inline-arrow-link" target="_blank" rel="noopener noreferrer">
+            <span>note 一覧</span><span class="arrow-glyph" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <p class="pub-intro">
+        <strong>『私家版 真岡鐵道ダイヤ全録』</strong> — 臨時ダイヤ施行時の運転時刻から車両運用までを体系的に記録した私家版資料集です。
       </p>
 
-      <ul class="list-container">
-        <li class="list-item">
-          <a href="https://sekitan66325.booth.pm/items/9148510" class="btn-link" target="_blank"
-            rel="noopener noreferrer">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label">真岡鐵道ダイヤ全録 ―2026年 陶器市総集編（春・秋）―</span>
-                <span class="card-tag">BOOTH / 初版 2026年11月14日</span>
+      <ul class="ledger-list">
+        <li class="ledger-item">
+          <a href="https://sekitan66325.booth.pm/items/9148510" class="ledger-row" target="_blank" rel="noopener noreferrer">
+            <div class="ledger-main">
+              <div class="ledger-title">真岡鐵道ダイヤ全録 ―2026年 陶器市総集編（春・秋）―</div>
+              <div class="ledger-meta">
+                <span>BOOTH</span>
+                <span>/</span>
+                <span>初版 2026.11.14</span>
               </div>
             </div>
-            <div class="item-right-block">
-              <span class="status-badge status-badge-red">新刊</span>
-              <span class="chevron-right"></span>
+            <div class="ledger-side">
+              <span class="meta-tag meta-tag--new">新刊</span>
+              <span class="ledger-arrow" aria-hidden="true">↗</span>
             </div>
           </a>
         </li>
 
-        <li class="list-item">
-          <a href="https://sekitan66325.booth.pm/items/8682952" class="btn-link-card" target="_blank" rel="noopener">
-            <div class="card-header-row">
-              <div class="item-text-meta">
-                <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー</span>
-                <span class="card-tag">C108・BOOTH / 初版 2026年8月16日</span>
-              </div>
-              <div class="item-right-block">
-                <span class="status-badge">頒布中</span>
-                <span class="chevron-right"></span>
+        <li class="ledger-item">
+          <a href="https://sekitan66325.booth.pm/items/8682952" class="ledger-row ledger-row--featured" target="_blank" rel="noopener noreferrer">
+            <div class="ledger-cover">
+              <img src="moka-railway/assets/zenroku/2026hanabi.png" alt="私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー 表紙" loading="lazy">
+            </div>
+            <div class="ledger-main">
+              <div class="ledger-title">私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー</div>
+              <div class="ledger-meta">
+                <span>C108・BOOTH</span>
+                <span>/</span>
+                <span>初版 2026.08.16</span>
               </div>
             </div>
-
-            <div class="card-banner-wrapper">
-              <img src="assets/zenroku/2026hanabi.png" alt="私家版 真岡鐵道ダイヤ全録 ー2026花火臨時編ー" class="card-banner-img">
+            <div class="ledger-side">
+              <span class="meta-tag meta-tag--accent">頒布中</span>
+              <span class="ledger-arrow" aria-hidden="true">↗</span>
             </div>
           </a>
 
-          <div class="card-errata-wrapper">
-            <a href="book/zenroku/2026hanabi/errata.pdf" class="card-errata-link" target="_blank" rel="noopener">
-              <div class="errata-left">
-                <span class="errata-badge">正誤表</span>
-                <span class="errata-title">『花火臨時編』誌面訂正とお詫び・正誤表 (PDF)</span>
+          <a href="moka-railway/book/zenroku/2026hanabi/errata.pdf" class="ledger-subnote" target="_blank" rel="noopener noreferrer">
+            <span class="ledger-subnote-left">
+              <span class="meta-tag">正誤表</span>
+              <span>『花火臨時編』誌面訂正とお詫び・正誤表 (PDF)</span>
+            </span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        </li>
+
+        <li class="ledger-item">
+          <a href="https://note.com/sekitan66325/n/ndb16fc170dab" class="ledger-row" target="_blank" rel="noopener noreferrer">
+            <div class="ledger-main">
+              <div class="ledger-title">私家版 真岡鐵道ダイヤ全録 Shortー2026年8月23日編ー</div>
+              <div class="ledger-meta">
+                <span>note</span>
+                <span>/</span>
+                <span>2026.08.25 公開</span>
               </div>
-              <div class="item-right-block">
-                <span class="chevron-right"></span>
+            </div>
+            <div class="ledger-side">
+              <span class="ledger-arrow" aria-hidden="true">↗</span>
+            </div>
+          </a>
+        </li>
+
+        <li class="ledger-item">
+          <a href="https://note.com/sekitan66325/n/n6dae8103cac6" class="ledger-row" target="_blank" rel="noopener noreferrer">
+            <div class="ledger-main">
+              <div class="ledger-title">私家版 真岡鐵道ダイヤ全録 Shortー2026秋減車編ー</div>
+              <div class="ledger-meta">
+                <span>note</span>
+                <span>/</span>
+                <span>2026.09.01 公開</span>
               </div>
-            </a>
+            </div>
+            <div class="ledger-side">
+              <span class="ledger-arrow" aria-hidden="true">↗</span>
+            </div>
+          </a>
+        </li>
+
+        <li class="ledger-item">
+          <div class="ledger-row ledger-row--static">
+            <div class="ledger-main">
+              <div class="ledger-title">私家版 真岡鐵道ダイヤ全録 ー2026年春 陶器市臨時ダイヤ編ー</div>
+              <div class="ledger-meta">
+                <span>BOOTH</span>
+                <span>/</span>
+                <span>初版 2026.06.12</span>
+              </div>
+            </div>
+            <div class="ledger-side">
+              <span class="meta-tag meta-tag--ended">頒布終了</span>
+            </div>
           </div>
         </li>
-
-        <li class="list-item">
-          <a href="https://note.com/sekitan66325/n/ndb16fc170dab" class="btn-link" target="_blank" rel="noopener">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label">私家版 真岡鐵道ダイヤ全録 Shortー2026年8月23日編ー</span>
-                <span class="card-tag">note / 2026年8月25日公開</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
-
-        <li class="list-item">
-          <a href="https://note.com/sekitan66325/n/n6dae8103cac6" class="btn-link" target="_blank" rel="noopener">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label">私家版 真岡鐵道ダイヤ全録 Shortー2026秋減車編ー</span>
-                <span class="card-tag">note / 2026年9月1日公開</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="chevron-right"></span>
-            </div>
-          </a>
-        </li>
-
-        <li class="list-item">
-          <div class="list-static-row">
-            <div class="item-left-block">
-              <div class="item-text-meta">
-                <span class="item-label">私家版 真岡鐵道ダイヤ全録 ー2026年春 陶器市臨時ダイヤ編ー</span>
-                <span class="card-tag">BOOTH / 初版 2026年6月12日</span>
-              </div>
-            </div>
-            <div class="item-right-block">
-              <span class="status-badge status-badge-neutral">頒布終了</span>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </section>
-
-    <section class="content-section">
-      <h2 class="section-title">外部リンク・お問い合わせ</h2>
-      <p class="section-desc">更新告知や記事公開、個別のお問い合わせは以下の各窓口をご利用ください。</p>
-      <ul class="inline-links-list">
-        <li><a href="https://discord.gg/2MWfFE3Z2" target="_blank" rel="noopener noreferrer">Discord (運行・新着通知)</a></li>
-        <li><a href="https://x.com/sekitan66325" target="_blank" rel="noopener noreferrer">X (@sekitan66325)</a></li>
-        <li><a href="https://note.com/sekitan66325" target="_blank" rel="noopener noreferrer">note</a></li>
-        <li><a href="https://www.instagram.com/sekitan66325/?hl=ja" target="_blank"
-            rel="noopener noreferrer">Instagram</a></li>
-        <li><a href="https://sekitan66325.booth.pm/" target="_blank" rel="noopener noreferrer">BOOTH</a></li>
-        <li><a href="mailto:sekitan.info@gmail.com">メール (sekitan.info@gmail.com)</a></li>
       </ul>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <ul class="footer-links">
-        <li><a href="index.html" class="footer-link">トップ</a></li>
-        <li><a href="train-state/index.html" class="footer-link">列車走行位置</a></li>
-        <li><a href="operation-board/index.html" class="footer-link">目撃掲示板</a></li>
-        <li><a href="database/unyou/index.html" class="footer-link">車両運用資料</a></li>
-        <li><a href="/box-diagram/" class="footer-link" target="_blank" rel="noopener noreferrer">箱ダイヤ描画システム (β版)</a>
-        </li>
-        <li><a href="https://discord.gg/2MWfFE3Z2" class="footer-link" target="_blank"
-            rel="noopener noreferrer">Discord通知</a></li>
-      </ul>
-      <p class="copyright">© 2026 せきたん / 真岡鐵道 非公式情報ポータル</p>
+      <nav class="footer-nav" aria-label="フッターリンク">
+        <a href="https://x.com/sekitan66325" target="_blank" rel="noopener noreferrer">X</a>
+        <a href="https://github.com/sekitan66325" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://sekitan66325.booth.pm/" target="_blank" rel="noopener noreferrer">BOOTH</a>
+        <a href="mailto:sekitan.info@gmail.com">お問い合わせ</a>
+      </nav>
+      <p class="footer-copy">© 2026 せきたん / sekitan.net</p>
     </div>
   </footer>
 
@@ -286,6 +509,8 @@
 
     gtag('config', 'G-0GM4B0FTW9');
   </script>
+
+  <script src="portal/portal.js?v=20261118_v2" defer></script>
 </body>
 
 </html>

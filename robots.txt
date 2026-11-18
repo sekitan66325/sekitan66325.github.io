@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
+Disallow: /moka-railway/admin/
 
-Sitemap: https://sekitan66325.github.io/sitemap.xml
+Sitemap: https://sekitan.net/sitemap.xml
 

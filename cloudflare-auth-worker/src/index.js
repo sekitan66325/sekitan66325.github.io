@@ -87,6 +87,8 @@ export default {
 function getCorsHeaders(request, env) {
   const origin = request.headers.get("Origin") || "";
   const allowed = [
+    "https://sekitan.net",
+    "https://www.sekitan.net",
     "https://sekitan66325.github.io",
     "http://localhost:8080",
     "http://localhost:8089",
