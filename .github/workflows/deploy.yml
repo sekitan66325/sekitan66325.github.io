@@ -1,0 +1,56 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build Pages Site
+        run: |
+          mkdir -p _site
+
+          # 1. Deploy portal files to root
+          cp -r portal/* _site/
+
+          # 2. Deploy moka-railway files to /moka-railway/
+          mkdir -p _site/moka-railway
+          cp -r moka-railway/* _site/moka-railway/
+
+          # 3. Copy root SEO, Verification & Domain files
+          [ -f CNAME ] && cp CNAME _site/
+          [ -f robots.txt ] && cp robots.txt _site/
+          [ -f sitemap.xml ] && cp sitemap.xml _site/
+          [ -f google*.html ] && cp google*.html _site/
+          [ -f favicon.ico ] && cp favicon.ico _site/
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
