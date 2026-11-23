@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 276 64" width="276" height="64" fill="none">
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="#821432" />
+  <line x1="12" y1="18" x2="52" y2="18" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.25" />
+  <line x1="12" y1="32" x2="52" y2="32" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.25" />
+  <line x1="12" y1="46" x2="52" y2="46" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.25" />
+  <line x1="17" y1="46" x2="47" y2="18" stroke="#FDE68A" stroke-width="4.2" stroke-linecap="round" />
+  <line x1="17" y1="18" x2="47" y2="46" stroke="#FFFFFF" stroke-width="4.4" stroke-linecap="round" />
+  <circle cx="17" cy="18" r="3.4" fill="#821432" stroke="#FFFFFF" stroke-width="2.5" />
+  <circle cx="32" cy="32" r="4.0" fill="#821432" stroke="#FFFFFF" stroke-width="2.6" />
+  <circle cx="47" cy="46" r="3.4" fill="#821432" stroke="#FFFFFF" stroke-width="2.5" />
+
+  <g stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M97 18H78V46H97M78 32H94" stroke="#821432" />
+    <line x1="105" y1="46" x2="123" y2="25" stroke="#E11D48" />
+    <line x1="105" y1="25" x2="123" y2="46" stroke="#821432" />
+    <path d="M133 18H142A13 14 0 0 1 142 46H133Z" stroke="#1E293B" />
+    <circle cx="165" cy="18.2" r="2.7" fill="#D97706" stroke="none" />
+    <line x1="165" y1="25.5" x2="165" y2="46" stroke="#1E293B" />
+    <circle cx="184.5" cy="35.5" r="9.5" stroke="#1E293B" />
+    <line x1="194" y1="25.5" x2="194" y2="46" stroke="#1E293B" />
+  </g>
+
+  <rect x="206" y="21" width="62" height="22" rx="6" fill="#FDF2F4" stroke="#F43F5E" stroke-width="1.2" />
+  <g stroke="#821432" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M217 37V27H221.5A2.5 2.5 0 0 1 221.5 32H217" />
+    <path d="M228 27V37H234" />
+    <path d="M238 27V33.5A3.5 3.5 0 0 0 245 33.5V27" />
+    <path d="M257 28.5C256.5 27.5 255.3 27 254 27C252.2 27 251 28 251 29.3C251 32.2 257 31.5 257 34.7C257 36 255.8 37 254 37C252.5 37 251.3 36.4 250.8 35.4" />
+  </g>
+</svg>
