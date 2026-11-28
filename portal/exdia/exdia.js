@@ -14,7 +14,7 @@
     customFormUrl: 'https://forms.gle/CaTR8ShCaVNaA6f56',
 
     // 紹介PV動画URL（YouTube埋め込みURL 例: 'https://www.youtube.com/embed/XXXX' または MP4パス 例: 'assets/videos/exdia-pv.mp4'）
-    pvVideoUrl: '',
+    pvVideoUrl: 'https://www.youtube.com/embed/SItO7Ik-fj0',
 
     // 実機スクリーンショット画像を使用する場合は true に変更（false の間はクリーンなタイトル枠を表示し404を出さない）
     useScreenshots: true,
