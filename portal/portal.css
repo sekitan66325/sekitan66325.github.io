@@ -609,12 +609,12 @@ svg {
   color: var(--ink-3);
 }
 
-.work-sublinks a {
+.work-sublinks a:not(.action-link) {
   color: var(--ink-2);
   transition: color 140ms ease;
 }
 
-.work-sublinks a:hover {
+.work-sublinks a:not(.action-link):hover {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -625,18 +625,32 @@ svg {
   align-items: center;
   gap: 6px;
   padding: 7px 14px;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background-color: var(--ink);
   color: #ffffff;
   font-size: 0.83rem;
   font-weight: 600;
   letter-spacing: 0.01em;
-  transition: background-color 160ms ease, transform 90ms ease-out;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 90ms ease-out;
   white-space: nowrap;
 }
 
 .action-link:hover {
   background-color: var(--accent);
+  color: #ffffff;
+}
+
+.action-link--secondary {
+  background-color: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent-hover);
+}
+
+.action-link--secondary:hover {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
 }
 
 .action-link:active {
