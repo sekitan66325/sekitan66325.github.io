@@ -17,7 +17,7 @@
     pvVideoUrl: '',
 
     // 実機スクリーンショット画像を使用する場合は true に変更（false の間はクリーンなタイトル枠を表示し404を出さない）
-    useScreenshots: false,
+    useScreenshots: true,
 
     // 実機スクリーンショット画像パス（useScreenshots: true 時に読込、未配置時はプレースホルダー表示）
     media: {
