@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExDia 公式製品サイト（Web版・Plus / Pro / Ultra） | sekitan.net</title>
+  <meta name="description" content="鉄道ダイヤ・車両運用統合システム「ExDia」公式サイト。Windowsデスクトップ版（v27.0.0・Plus / Pro / Ultra）と無料Web版（v1.3.0）の仕様、価格、機能比較、動作環境をご案内します。">
+  <meta name="keywords" content="ExDia, エクスダイヤ, 鉄道ダイヤ作成, 車両運用, 箱ダイヤ, OuDia, ランカーブ, TID, 運転士スタフ, 買い切り, sekitan.net">
+  <link rel="canonical" href="https://sekitan.net/exdia/">
+
+  <meta property="og:title" content="ExDia 公式製品サイト（Web版・Plus / Pro / Ultra） | sekitan.net">
+  <meta property="og:description" content="ダイヤ作成から運行管理まで、ひとつのデータで。Windowsデスクトップ版（v27.0.0）と無料Web版（v1.3.0）の比較・仕様案内。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sekitan.net/exdia/">
+  <meta property="og:image" content="https://sekitan.net/moka-railway/assets/apple-touch-icon.png">
+  <meta property="og:site_name" content="sekitan.net">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@sekitan66325">
+  <meta name="theme-color" content="#FFFFFF">
+
+  <link rel="icon" id="site-favicon" href="assets/brand/icon-web.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../moka-railway/assets/apple-touch-icon.png">
+
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.add('js-enhanced');
+      var themes = {
+        web:   { rect: '#2C6266', diag: '#38BDF8', e: '#2C6266', x1: '#0284C7', x2: '#2C6266', dia: '#0F172A', dot: '#2C6266', accent: '#2C6266' },
+        plus:  { rect: '#821432', diag: '#FDE68A', e: '#821432', x1: '#E11D48', x2: '#821432', dia: '#1E293B', dot: '#E11D48', accent: '#821432' },
+        pro:   { rect: '#1D3984', diag: '#7DD3FC', e: '#1D3984', x1: '#2563EB', x2: '#1D3984', dia: '#0F172A', dot: '#1D3984', accent: '#1D3984' },
+        ultra: { rect: '#18191B', diag: '#C99E32', e: '#18191B', x1: '#C99E32', x2: '#18191B', dia: '#18191B', dot: '#C99E32', accent: '#18191B' }
+      };
+      var keys = ['web', 'plus', 'pro', 'ultra'];
+      var chosen = 'web';
+      try {
+        var prev = sessionStorage.getItem('exdia_intro_theme');
+        var pool = keys.filter(function (k) { return k !== prev; });
+        chosen = pool[Math.floor(Math.random() * pool.length)] || 'web';
+        sessionStorage.setItem('exdia_intro_theme', chosen);
+      } catch (_) {
+        chosen = keys[Math.floor(Math.random() * keys.length)];
+      }
+      var p = themes[chosen];
+      d.setAttribute('data-brand-theme', chosen);
+      d.style.setProperty('--theme-rect', p.rect);
+      d.style.setProperty('--theme-diag', p.diag);
+      d.style.setProperty('--theme-e', p.e);
+      d.style.setProperty('--theme-x1', p.x1);
+      d.style.setProperty('--theme-x2', p.x2);
+      d.style.setProperty('--theme-dia', p.dia);
+      d.style.setProperty('--theme-dot', p.dot);
+      d.style.setProperty('--theme-accent', p.accent);
+      var fav = document.getElementById('site-favicon');
+      if (fav) fav.setAttribute('href', 'assets/brand/icon-' + chosen + '.svg');
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        d.classList.add('hero-ready');
+      } else {
+        d.classList.add('intro-active');
+      }
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Google tag (gtag.js) -->
+  <script>
+    (function () {
+      var gaId = 'G-0GM4B0FTW9';
+      var isProd = location.hostname === 'sekitan.net';
+      var isGaDebug = false;
+      try {
+        isGaDebug = new URLSearchParams(location.search).get('ga_debug') === '1';
+      } catch (_) {
+        isGaDebug = /(?:^|[?&])ga_debug=1(?:&|$)/.test(location.search);
+      }
+      window.__exdiaGaDebug = isGaDebug;
+      if (!isProd && !isGaDebug) {
+        window['ga-disable-' + gaId] = true;
+        window.__exdiaGaDryRun = true;
+      } else {
+        window.__exdiaGaDryRun = false;
+      }
+    })();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0GM4B0FTW9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    if (!window.__exdiaGaDryRun) {
+      gtag('js', new Date());
+      if (location.hostname === 'sekitan.net') {
+        gtag('config', 'G-0GM4B0FTW9', { send_page_view: true });
+      } else {
+        gtag('config', 'G-0GM4B0FTW9', { debug_mode: true });
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="exdia.css?v=20261128a">
+</head>
+
+<body>
+  <!-- オープニング：ExDia ロゴ描画オーバーレイ（背景白固定・4色ローテーション連動） -->
+  <div class="intro-overlay" id="intro-overlay">
+    <svg class="intro-logo-svg" viewBox="0 0 212 64" width="212" height="64" fill="none" aria-hidden="true">
+      <g class="intro-icon">
+        <rect class="intro-bg-rect" x="2" y="2" width="60" height="60" rx="15" style="fill: var(--theme-rect, #2C6266);" />
+        <line class="intro-stroke intro-grid-1" x1="12" y1="18" x2="52" y2="18" pathLength="1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.25" />
+        <line class="intro-stroke intro-grid-2" x1="12" y1="32" x2="52" y2="32" pathLength="1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.25" />
+        <line class="intro-stroke intro-grid-3" x1="12" y1="46" x2="52" y2="46" pathLength="1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.25" />
+        <line class="intro-stroke intro-diag-sub" x1="17" y1="46" x2="47" y2="18" pathLength="1" style="stroke: var(--theme-diag, #38BDF8);" stroke-width="4.2" stroke-linecap="round" />
+        <line class="intro-stroke intro-diag-main" x1="17" y1="18" x2="47" y2="46" pathLength="1" stroke="#FFFFFF" stroke-width="4.4" stroke-linecap="round" />
+        <circle class="intro-node intro-node-1" cx="17" cy="18" r="3.4" style="fill: var(--theme-rect, #2C6266);" stroke="#FFFFFF" stroke-width="2.5" />
+        <circle class="intro-node intro-node-2" cx="32" cy="32" r="4.0" style="fill: var(--theme-rect, #2C6266);" stroke="#FFFFFF" stroke-width="2.6" />
+        <circle class="intro-node intro-node-3" cx="47" cy="46" r="3.4" style="fill: var(--theme-rect, #2C6266);" stroke="#FFFFFF" stroke-width="2.5" />
+      </g>
+      <g class="intro-wordmark" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+        <path class="intro-wm-stroke intro-wm-1" d="M97 18H78V46H97M78 32H94" pathLength="1" style="stroke: var(--theme-e, #2C6266);" />
+        <line class="intro-wm-stroke intro-wm-2" x1="105" y1="46" x2="123" y2="25" pathLength="1" style="stroke: var(--theme-x1, #0284C7);" />
+        <line class="intro-wm-stroke intro-wm-3" x1="105" y1="25" x2="123" y2="46" pathLength="1" style="stroke: var(--theme-x2, #2C6266);" />
+        <path class="intro-wm-stroke intro-wm-4" d="M133 18H142A13 14 0 0 1 142 46H133Z" pathLength="1" style="stroke: var(--theme-dia, #0F172A);" />
+        <line class="intro-wm-stroke intro-wm-5" x1="165" y1="25.5" x2="165" y2="46" pathLength="1" style="stroke: var(--theme-dia, #0F172A);" />
+        <circle class="intro-node intro-wm-dot" cx="165" cy="18.2" r="2.7" style="fill: var(--theme-dot, #2C6266);" stroke="none" />
+        <circle class="intro-wm-stroke intro-wm-6" cx="184.5" cy="35.5" r="9.5" pathLength="1" style="stroke: var(--theme-dia, #0F172A);" />
+        <line class="intro-wm-stroke intro-wm-7" x1="194" y1="25.5" x2="194" y2="46" pathLength="1" style="stroke: var(--theme-dia, #0F172A);" />
+      </g>
+    </svg>
+    <button type="button" class="intro-skip" id="intro-skip" aria-label="オープニングをスキップ">Skip</button>
+  </div>
+
+  <!-- トップ極細スクロール進捗バー -->
+  <div class="scroll-rail" aria-hidden="true">
+    <div class="scroll-rail-fill" id="scroll-rail-fill"></div>
+  </div>
+
+  <!-- 1. 透過ライト固定ヘッダー（高さ 56px） -->
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="header-identity">
+        <a href="../" class="header-back" data-ga-outbound="portal" data-ga-placement="header">sekitan.net</a>
+        <span class="header-sep" aria-hidden="true">/</span>
+        <a href="#top" class="header-brand" aria-label="ExDia トップへ">
+          <svg class="header-brand-logo" viewBox="0 0 212 64" width="80" height="24" fill="none" role="img" aria-label="ExDia">
+            <rect x="2" y="2" width="60" height="60" rx="15" style="fill: var(--theme-rect, #2C6266);" />
+            <line x1="12" y1="18" x2="52" y2="18" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.25" />
+            <line x1="12" y1="32" x2="52" y2="32" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.25" />
+            <line x1="12" y1="46" x2="52" y2="46" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.25" />
+            <line x1="17" y1="46" x2="47" y2="18" style="stroke: var(--theme-diag, #38BDF8);" stroke-width="4.2" stroke-linecap="round" />
+            <line x1="17" y1="18" x2="47" y2="46" stroke="#FFFFFF" stroke-width="4.4" stroke-linecap="round" />
+            <circle cx="17" cy="18" r="3.4" style="fill: var(--theme-rect, #2C6266);" stroke="#FFFFFF" stroke-width="2.5" />
+            <circle cx="32" cy="32" r="4.0" style="fill: var(--theme-rect, #2C6266);" stroke="#FFFFFF" stroke-width="2.6" />
+            <circle cx="47" cy="46" r="3.4" style="fill: var(--theme-rect, #2C6266);" stroke="#FFFFFF" stroke-width="2.5" />
+            <g stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M97 18H78V46H97M78 32H94" style="stroke: var(--theme-e, #2C6266);" />
+              <line x1="105" y1="46" x2="123" y2="25" style="stroke: var(--theme-x1, #0284C7);" />
+              <line x1="105" y1="25" x2="123" y2="46" style="stroke: var(--theme-x2, #2C6266);" />
+              <path d="M133 18H142A13 14 0 0 1 142 46H133Z" style="stroke: var(--theme-dia, #0F172A);" />
+              <circle cx="165" cy="18.2" r="2.7" style="fill: var(--theme-dot, #2C6266);" stroke="none" />
+              <line x1="165" y1="25.5" x2="165" y2="46" style="stroke: var(--theme-dia, #0F172A);" />
+              <circle cx="184.5" cy="35.5" r="9.5" style="stroke: var(--theme-dia, #0F172A);" />
+              <line x1="194" y1="25.5" x2="194" y2="46" style="stroke: var(--theme-dia, #0F172A);" />
+            </g>
+          </svg>
+        </a>
+      </div>
+
+      <nav class="header-nav" id="header-nav" aria-label="ページ内ナビゲーション">
+        <a href="#features" class="header-nav-link">特徴</a>
+        <a href="#editions" class="header-nav-link">エディション・価格</a>
+        <a href="#compare" class="header-nav-link">機能比較</a>
+        <a href="#requirements" class="header-nav-link">動作環境・FAQ</a>
+        <span class="header-nav-indicator" id="header-nav-indicator" aria-hidden="true"></span>
+      </nav>
+
+      <div class="header-actions">
+        <a href="https://exdia.sekitan.net/" class="btn btn--sm btn--ghost-border" data-ga-placement="header" target="_blank" rel="noopener noreferrer">Web版を開く</a>
+        <a href="#editions" class="btn btn--sm btn--dark" data-ga-cta="editions_section" data-ga-placement="header_editions_btn">価格を見る</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- 2. ヒーロー（無地ホワイト・中央揃え・H1から開始） -->
+    <section class="hero-section" aria-labelledby="hero-title">
+      <div class="container">
+        <h1 class="hero-title" id="hero-title">
+          <span class="motion-mask"><span class="motion-mask-inner">ダイヤ作成から運行管理まで、ひとつのデータで。</span></span>
+        </h1>
+
+        <p class="hero-sub">
+          スジ編集、時刻表、箱ダイヤ、駅ポスター、TID・ランカーブ・運転士スタフまで。
+        </p>
+
+        <div class="hero-cta-group">
+          <div class="hero-actions">
+            <a href="#editions" class="btn btn--pill btn--dark" data-ga-cta="editions_section" data-ga-placement="hero_editions_btn">エディション・価格を見る</a>
+            <a href="https://exdia.sekitan.net/" class="btn btn--pill btn--ghost-border" data-ga-placement="hero" target="_blank" rel="noopener noreferrer">無料Web版を開く</a>
+          </div>
+          <p class="hero-microcopy tabular">登録不要 / .oud・.oud2 読込対応 / デスクトップ版は買い切り (Windows 10 / 11 64bit)</p>
+        </div>
+
+        <!-- ミニマル 16:9 製品ビジュアル枠 -->
+        <div class="viewer-wrap" aria-label="ExDia 実機画面および紹介PVビューア">
+          <div class="viewer-tabs" role="tablist" aria-label="表示画面の切り替え">
+            <div class="viewer-tabs-track" id="viewer-tabs-track">
+              <span class="viewer-tab-indicator" id="viewer-tab-indicator" aria-hidden="true"></span>
+              <button type="button" class="viewer-tab" role="tab" aria-selected="true" tabindex="0" data-media-key="diagram">ダイヤグラム</button>
+              <button type="button" class="viewer-tab" role="tab" aria-selected="false" tabindex="-1" data-media-key="box-diagram">箱ダイヤ</button>
+              <button type="button" class="viewer-tab" role="tab" aria-selected="false" tabindex="-1" data-media-key="tid-track">TID・構内配線</button>
+              <button type="button" class="viewer-tab" role="tab" aria-selected="false" tabindex="-1" data-media-key="run-curve">ランカーブ</button>
+              <button type="button" class="viewer-tab" role="tab" aria-selected="false" tabindex="-1" data-media-key="station-poster">駅ポスター</button>
+              <button type="button" class="viewer-tab" role="tab" aria-selected="false" tabindex="-1" data-media-key="driver-staff">運転士スタフ</button>
+              <button type="button" class="viewer-tab" role="tab" aria-selected="false" tabindex="-1" data-media-key="pv">紹介PV</button>
+            </div>
+          </div>
+
+          <div class="viewer-frame motion-curtain" id="viewer-stage" role="tabpanel" aria-live="polite">
+            <div class="viewer-stage-inner">
+              <div class="viewer-placeholder">
+                <p class="viewer-placeholder-title">ダイヤグラム・時刻表編集</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="viewer-caption-row">
+            <p class="viewer-caption" id="viewer-caption">1,200本超の列車スジも60fpsで軽快にドラッグ編集。秒単位の時刻調整や番線競合を即座に検出します。</p>
+            <a href="#editions" class="viewer-bridge-link" id="viewer-bridge-link" data-target-edition="web">
+              <span id="viewer-bridge-text">Web版から利用可能 — 価格を見る</span>
+              <span class="arrow-glyph" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 伸縮ライン ＋ 静かな 4 項目実績・互換リスト -->
+        <div class="motion-rule" data-reveal aria-hidden="true"></div>
+        <ul class="facts-row" aria-label="利用実績とデータ互換性">
+          <li data-reveal data-reveal-delay="0">
+            <span class="facts-title tabular">月間 2,600 名以上が利用</span>
+            <span class="facts-sub">Web版を中心に日々のダイヤ制作で利用中</span>
+          </li>
+          <li data-reveal data-reveal-delay="65">
+            <span class="facts-title">.oud・.oud2 対応</span>
+            <span class="facts-sub">既存の OuDia / OuDiaSecond 資産を取込</span>
+          </li>
+          <li data-reveal data-reveal-delay="130">
+            <span class="facts-title">独自 .exdia 圧縮</span>
+            <span class="facts-sub">大規模路線データも軽量・高速に保存</span>
+          </li>
+          <li data-reveal data-reveal-delay="195">
+            <span class="facts-title">全エディション完全互換</span>
+            <span class="facts-sub">Web版・デスクトップ版間で相互開閉</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3. 機能紹介 (#features on #F7F8FA) -->
+    <section class="section-block section-block--subtle" id="features" aria-labelledby="features-heading">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <h2 class="section-title" id="features-heading">
+            <span class="motion-mask"><span class="motion-mask-inner">ひとつのデータで、すべてが連動する。</span></span>
+          </h2>
+          <div class="motion-rule section-rule" data-reveal aria-hidden="true"></div>
+        </div>
+
+        <div class="showcase-list">
+          <!-- Block 1 -->
+          <article class="showcase-block" data-reveal>
+            <div class="showcase-text">
+              <span class="showcase-edition-label">Web 〜 全エディション標準</span>
+              <h3 class="showcase-title">1,200本超でも60fpsで軽快なスジ編集と .exdia 圧縮</h3>
+              <p class="showcase-desc">
+                15MB級の大規模 <code>.oud2</code> も <code>.exdia</code> 形式で自動圧縮し、幹線の過密ダイヤも60fpsで滑らかに操作できます。
+              </p>
+              <ul class="showcase-points">
+                <li><code>.oud</code> / <code>.oud2</code> の自動文字コード判定読込・書出</li>
+                <li>秒ヒゲ・番線在線表示・当駅始発/直通の右クリック切替</li>
+                <li>単線・複線・複々線・分岐・環状線の競合自動検出</li>
+              </ul>
+              <a href="#compare" class="text-arrow-link">
+                <span>対応エディションを比較表で確認</span>
+                <span class="arrow-glyph" aria-hidden="true">→</span>
+              </a>
+            </div>
+            <!-- 差し替え枠: assets/screenshots/showcase-diagram.png -->
+            <div class="showcase-media motion-curtain" data-showcase-media data-reveal>
+              <img data-src="assets/screenshots/showcase-diagram.png" alt="ExDia 大規模ダイヤグラム編集画面" hidden>
+              <div class="showcase-placeholder">
+                <p class="showcase-placeholder-title">スジ編集・ダイヤグラム表示</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Block 2 -->
+          <article class="showcase-block showcase-block--reverse" data-reveal>
+            <div class="showcase-text">
+              <span class="showcase-edition-label">Web 〜 全エディション標準</span>
+              <h3 class="showcase-title">時刻表・運用表・箱ダイヤ・番線在線表の完全連動</h3>
+              <p class="showcase-desc">
+                単体版「箱ダイヤ描画システム（BoxDia）」の描画基盤を統合し、スジの修正を全帳票へリアルタイム反映します。
+              </p>
+              <ul class="showcase-points">
+                <li>駅軸・時刻軸の両対応箱ダイヤと運用行路の自動同期</li>
+                <li>日付別ダイヤ・臨時列車・区間運休のカレンダープレビュー</li>
+                <li>横長1枚出力や A4/B5 ベクター PDF・SVG・PNG 書出</li>
+              </ul>
+              <a href="#compare" class="text-arrow-link">
+                <span>対応エディションを比較表で確認</span>
+                <span class="arrow-glyph" aria-hidden="true">→</span>
+              </a>
+            </div>
+            <!-- 差し替え枠: assets/screenshots/showcase-boxdia.png -->
+            <div class="showcase-media motion-curtain" data-showcase-media data-reveal>
+              <img data-src="assets/screenshots/showcase-boxdia.png" alt="ExDia 箱ダイヤ・運用表・番線在線表の連動画面" hidden>
+              <div class="showcase-placeholder">
+                <p class="showcase-placeholder-title">箱ダイヤ・運用表・番線在線表</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Block 3 -->
+          <article class="showcase-block" data-reveal>
+            <div class="showcase-text">
+              <span class="showcase-edition-label showcase-edition-label--pro">Plus / Pro デスクトップ版</span>
+              <h3 class="showcase-title">駅掲示時刻表ポスター・クレジット非表示入稿・編成両数収支</h3>
+              <p class="showcase-desc">
+                Atomic Write の安全保存や駅ポスター一括SVGに加え、Proでは印刷制御と基地別両数収支に対応します。
+              </p>
+              <ul class="showcase-points">
+                <li>Plus：完全オフライン動作・多階層フォルダ・一括時刻シフト・駅縦型時刻表SVG</li>
+                <li>Pro：クレジット非表示＆任意文字印字・全ダイヤ/運用一括SVG・20世代バックアップ</li>
+                <li>Pro：車両編成マスタ管理・日別運用充当・基地別入出庫両数収支</li>
+              </ul>
+              <a href="#compare" class="text-arrow-link">
+                <span>対応エディションを比較表で確認</span>
+                <span class="arrow-glyph" aria-hidden="true">→</span>
+              </a>
+            </div>
+            <!-- 差し替え枠: assets/screenshots/showcase-poster-pro.png -->
+            <div class="showcase-media motion-curtain" data-showcase-media data-reveal>
+              <img data-src="assets/screenshots/showcase-poster-pro.png" alt="ExDia Plus/Pro 駅掲示時刻表と編成両数管理画面" hidden>
+              <div class="showcase-placeholder">
+                <p class="showcase-placeholder-title">駅掲示ポスター ＆ 編成両数収支</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Block 4: アルマイト質感マットブラック Ultra 枠 -->
+        <article class="showcase-block showcase-block--reverse ultra-showcase-panel" aria-labelledby="ultra-showcase-heading" data-reveal>
+          <div class="showcase-text">
+            <span class="showcase-edition-label">Ultra 限定機能</span>
+            <h3 class="showcase-title" id="ultra-showcase-heading">マルチトラックTID・構内配線カスタム・遅延波及・物理運転曲線・運転士スタフ</h3>
+            <p class="showcase-desc">
+              構内配線と連動するTID遅延波及、物理運転曲線からの基準時分算出、運転士スタフ出力まで一気通貫で完結します。
+            </p>
+            <ul class="showcase-points">
+              <li>構内配線・渡り線カスタムエディタ（3状態終端・留置線在線表示）</li>
+              <li>マルチトラックTID指令盤・遅延波及シミュレーション・物理運転曲線（ランカーブ）</li>
+              <li>乗務員仕業（行路）作成・休憩チェック・運転士スタフSVG/PDF出力</li>
+            </ul>
+            <a href="#compare" class="text-arrow-link">
+              <span>対応エディションを比較表で確認</span>
+              <span class="arrow-glyph" aria-hidden="true">→</span>
+            </a>
+          </div>
+          <!-- 差し替え枠: assets/screenshots/showcase-ultra.png -->
+          <div class="showcase-media motion-curtain" data-showcase-media data-reveal>
+            <img data-src="assets/screenshots/showcase-ultra.png" alt="ExDia Ultra TID指令盤・ランカーブ・運転士スタフ画面" hidden>
+            <div class="showcase-placeholder">
+              <p class="showcase-placeholder-title">TID構内配線・ランカーブ・運転士スタフ</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. エディション・価格案内 (#editions on #FFFFFF) -->
+    <section class="section-block" id="editions" aria-labelledby="editions-heading">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <h2 class="section-title" id="editions-heading">
+            <span class="motion-mask"><span class="motion-mask-inner">エディション・価格</span></span>
+          </h2>
+          <div class="motion-rule section-rule" data-reveal aria-hidden="true"></div>
+        </div>
+
+        <!-- やりたいことから選ぶワンクリック絞り込みバー -->
+        <div class="intent-filter-wrap" data-reveal>
+          <div class="intent-chips" role="group" aria-label="やりたいことから対応エディションを絞り込む">
+            <button type="button" class="intent-chip" data-intent="all" aria-pressed="true">すべて表示</button>
+            <button type="button" class="intent-chip" data-intent="plus" aria-pressed="false">オフライン保存・駅ポスター</button>
+            <button type="button" class="intent-chip" data-intent="pro-print" aria-pressed="false">同人誌入稿・クレジット消去</button>
+            <button type="button" class="intent-chip" data-intent="pro-fleet" aria-pressed="false">編成マスタ・基地両数収支</button>
+            <button type="button" class="intent-chip" data-intent="ultra-tid" aria-pressed="false">TID指令盤・構内配線</button>
+            <button type="button" class="intent-chip" data-intent="ultra-ops" aria-pressed="false">運転曲線・運転士スタフ</button>
+          </div>
+          <p class="intent-guide" id="intent-guide" aria-live="polite" hidden></p>
+        </div>
+
+        <div class="editions-grid">
+          <!-- Card 1: ExDia Web -->
+          <article class="edition-card edition-card--web" data-edition="web" data-reveal data-reveal-delay="0">
+            <div class="edition-head">
+              <img src="assets/brand/logo-web.svg" alt="ExDia Web" class="edition-logo" height="26">
+            </div>
+            <p class="edition-role">まずは気軽に試したい・基本のダイヤと箱ダイヤを作りたい方向け</p>
+
+            <div class="edition-price-block">
+              <p class="edition-price">
+                <span class="price-free">無料</span>
+                <span class="price-tax">ブラウザ / PWA</span>
+              </p>
+              <p class="edition-price-note">登録不要・マルチOS対応</p>
+            </div>
+
+            <p class="edition-cumul-label">主な搭載機能</p>
+            <ul class="edition-features">
+              <li>ダイヤグラム・時刻表・運用表・箱ダイヤ・番線在線表</li>
+              <li>単線〜複々線・環状線の競合検出</li>
+              <li><code>.oud</code> / <code>.oud2</code> / <code>.exdia</code> 入出力対応</li>
+              <li>日付別ダイヤ・臨時・区間運休プレビュー</li>
+              <li>1階層列車フォルダ整理</li>
+            </ul>
+
+            <div class="edition-cta-wrap">
+              <a href="https://exdia.sekitan.net/" class="btn btn--full btn--web" data-ga-placement="edition_card" target="_blank" rel="noopener noreferrer">無料Web版を開く</a>
+              <p class="edition-microcopy">サンプル路線内蔵</p>
+            </div>
+          </article>
+
+          <!-- Card 2: ExDia Plus -->
+          <article class="edition-card edition-card--plus" data-edition="plus" data-reveal data-reveal-delay="70">
+            <div class="edition-head">
+              <img src="assets/brand/logo-plus.svg" alt="ExDia Plus" class="edition-logo" height="26">
+            </div>
+            <p class="edition-role">オフライン安定環境で、駅掲示時刻表や大規模フォルダ整理を使いたい方向け</p>
+
+            <div class="edition-price-block">
+              <p class="edition-price">
+                <span class="price-yen">¥</span><span class="price-num">1,280</span>
+                <span class="price-tax">買い切り</span>
+              </p>
+              <p class="edition-price-note">Windows 10/11 (64bit)・月額なし</p>
+            </div>
+
+            <p class="edition-cumul-label">Web版の全機能 ＋ 以下を追加</p>
+            <ul class="edition-features">
+              <li>完全オフライン単独動作（外部通信なし）</li>
+              <li>Atomic Write による安全保存 ＆ 未保存終了ガード</li>
+              <li>Windows <code>.exdia</code> ダブルクリック起動・履歴10件</li>
+              <li>多階層列車フォルダ ＆ 一括時刻シフト / 運休</li>
+              <li>駅掲示時刻表（縦型ポスター ＆ 全駅一括SVG）</li>
+            </ul>
+
+            <div class="edition-cta-wrap">
+              <a href="https://sekitan66325.booth.pm/items/9206447" class="btn btn--full btn--plus" data-booth-url="plus" data-ga-placement="edition_card" target="_blank" rel="noopener noreferrer">BOOTHでPlusを見る</a>
+              <p class="edition-microcopy">v27.x 無料アップデート / サンプル .exdia 同梱</p>
+            </div>
+          </article>
+
+          <!-- Card 3: ExDia Pro -->
+          <article class="edition-card edition-card--pro" data-edition="pro" data-reveal data-reveal-delay="140">
+            <div class="edition-head">
+              <img src="assets/brand/logo-pro.svg" alt="ExDia Pro" class="edition-logo" height="26">
+            </div>
+            <p class="edition-role">同人誌・印刷入稿や、車両編成・両数管理まで本格運用したい方向け</p>
+
+            <div class="edition-price-block">
+              <p class="edition-price">
+                <span class="price-yen">¥</span><span class="price-num">2,980</span>
+                <span class="price-tax">買い切り</span>
+              </p>
+              <p class="edition-price-note">Windows 10/11 (64bit)・月額なし</p>
+            </div>
+
+            <p class="edition-cumul-label">Plusの全機能 ＋ 以下を追加</p>
+            <ul class="edition-features">
+              <li>印刷・SVGクレジット非表示 ＆ 任意文字印字</li>
+              <li>全ダイヤ / 全運用の一括SVGフォルダ書き出し</li>
+              <li>車両編成マスタ管理 ＆ 日別運用充当カレンダー</li>
+              <li>運用別編成長設定 ＆ 基地別入出庫両数収支</li>
+              <li>保存時の20世代自動バックアップ（<code>_exdia_backup/</code>）</li>
+              <li>出力カスタマイズパッチ（<code>.exdia-patch.json</code>）読込</li>
+            </ul>
+
+            <div class="edition-cta-wrap">
+              <a href="https://sekitan66325.booth.pm/items/9206447" class="btn btn--full btn--pro" data-booth-url="pro" data-ga-placement="edition_card" target="_blank" rel="noopener noreferrer">BOOTHでProを見る</a>
+              <p class="edition-microcopy">v27.x 無料アップデート / サンプル .exdia 同梱</p>
+            </div>
+          </article>
+
+          <!-- Card 4: ExDia Ultra（アルマイト質感マットブラック） -->
+          <article class="edition-card edition-card--ultra" data-edition="ultra" data-reveal data-reveal-delay="210">
+            <div class="edition-head">
+              <img src="assets/brand/logo-ultra-dark.svg" alt="ExDia Ultra" class="edition-logo" height="26">
+            </div>
+            <p class="edition-role">指令盤TID・構内配線・物理運転曲線・乗務員スタフまで完全再現したい方向け</p>
+
+            <div class="edition-price-block">
+              <p class="edition-price">
+                <span class="price-yen">¥</span><span class="price-num">4,980</span>
+                <span class="price-tax">買い切り</span>
+              </p>
+              <p class="edition-price-note">Windows 10/11 (64bit)・月額なし</p>
+            </div>
+
+            <p class="edition-cumul-label">Proの全機能 ＋ 以下を追加</p>
+            <ul class="edition-features">
+              <li>マルチトラックTID指令盤 ＆ 遅延波及シミュレーション</li>
+              <li>構内配線カスタムエディタ（3状態終端・留置線在線）</li>
+              <li>物理運転曲線（ランカーブ）＆ 基準運転時分反映</li>
+              <li>消費電力量・速度曲線・時間曲線の算出</li>
+              <li>乗務員仕業（行路）作成 ＆ 連続乗務・休憩チェック</li>
+              <li>運転士用「携帯時刻表（スタフ）」SVG / PDF出力</li>
+            </ul>
+
+            <div class="edition-cta-wrap">
+              <a href="https://sekitan66325.booth.pm/items/9206447" class="btn btn--full btn--ultra-gold" data-booth-url="ultra" data-ga-placement="edition_card" target="_blank" rel="noopener noreferrer">BOOTHでUltraを見る</a>
+              <p class="edition-microcopy">v27.x 無料アップデート / サンプル .exdia 同梱</p>
+            </div>
+          </article>
+        </div>
+
+        <!-- 5. 個別カスタマイズ・専用開発 (#custom) -->
+        <div class="custom-section-wrap" id="custom" aria-labelledby="custom-heading" data-reveal>
+          <div class="custom-head">
+            <span class="custom-tag">Pro / Ultra <code>.exdia-patch.json</code> 対応・受注制作</span>
+            <h3 class="custom-heading" id="custom-heading">個別カスタマイズ・専用開発</h3>
+            <p class="custom-lead">
+              「ロゴを入れたい」「罫線や列幅をもう少し調整したい」など、標準設定の範囲を超えるご要望に、Pro / Ultra の <code>.exdia-patch.json</code> 読み込み機能を活用した個別カスタムパッチ制作や専用機能開発でお応えします。個別カスタマイズは事前見積もり・仮払い制の「つなぐ」にて承ります。
+            </p>
+          </div>
+
+          <div class="custom-block">
+            <div class="custom-subhead">
+              <h4 class="custom-sub-title">料金目安</h4>
+              <span class="custom-sub-meta">すべて買い切り・税込</span>
+            </div>
+
+            <div class="custom-price-table-wrap">
+              <table class="custom-price-table">
+                <thead>
+                  <tr>
+                    <th scope="col">相談メニュー</th>
+                    <th scope="col">料金目安</th>
+                    <th scope="col">想定内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row" class="custom-price-menu">
+                      <strong class="custom-menu-name">帳票カスタムパッチ（ライト）</strong>
+                      <span class="custom-menu-sub"><code>.exdia-patch.json</code></span>
+                    </th>
+                    <td class="custom-price-val tabular">¥3,000</td>
+                    <td class="custom-price-desc">特定ヘッダーへのロゴ挿入、標準外の列幅個別調整、特定行・セルへの特殊罫線追加など（軽微な個別調整）</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="custom-price-menu">
+                      <strong class="custom-menu-name">帳票カスタムパッチ（スタンダード）</strong>
+                      <span class="custom-menu-sub"><code>.exdia-patch.json</code></span>
+                    </th>
+                    <td class="custom-price-val tabular">¥5,000</td>
+                    <td class="custom-price-desc">複数箇所のレイアウト変更、独自項目の配置変更、印刷向けデザインの個別最適化など</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="custom-price-menu">
+                      <strong class="custom-menu-name">帳票カスタムパッチ（カスタム）</strong>
+                      <span class="custom-menu-sub"><code>.exdia-patch.json</code></span>
+                    </th>
+                    <td class="custom-price-val tabular">¥8,000〜</td>
+                    <td class="custom-price-desc">大幅なUI構造変更、特定会社風の複雑な様式再現など</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="custom-price-menu">
+                      <strong class="custom-menu-name">個別機能追加・他形式変換</strong>
+                      <span class="custom-menu-sub">個人・サークル向け</span>
+                    </th>
+                    <td class="custom-price-val tabular">¥10,000〜</td>
+                    <td class="custom-price-desc">特殊な出力フォーマット追加、既存データの独自変換スクリプト、専用設定プリセットなど</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="custom-price-menu">
+                      <strong class="custom-menu-name">専用ビルド・団体/法人導入</strong>
+                      <span class="custom-menu-sub">Enterprise 相談</span>
+                    </th>
+                    <td class="custom-price-val tabular">¥30,000〜</td>
+                    <td class="custom-price-desc">専用機能組み込みビルド、独自フォーマット連携、複数台導入・運用サポートなど</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="custom-options">
+              <span class="custom-options-label">追加オプション</span>
+              <ul class="custom-options-list">
+                <li>他ビューへの横展開（時刻表＋箱ダイヤ等）：<strong class="tabular">＋¥1,000 / 1ビュー</strong></li>
+                <li>納品前確認時の追加修正：初回1回無料、2回目以降は <strong class="tabular">＋¥1,000 / 回</strong></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="custom-block">
+            <h4 class="custom-sub-title">ご依頼の流れ</h4>
+            <ol class="custom-steps" aria-label="個別カスタマイズのご依頼から納品までの流れ">
+              <li class="custom-step">
+                <span class="custom-step-num tabular">01</span>
+                <div class="custom-step-body">
+                  <strong class="custom-step-title">ご相談</strong>
+                  <span class="custom-step-desc">つなぐのメッセージにてご希望内容をお知らせください</span>
+                </div>
+              </li>
+              <li class="custom-step">
+                <span class="custom-step-num tabular">02</span>
+                <div class="custom-step-body">
+                  <strong class="custom-step-title">お見積り</strong>
+                  <span class="custom-step-desc">内容と工数を確認し、正式な金額をご提示します（見積り確認後のキャンセル可）</span>
+                </div>
+              </li>
+              <li class="custom-step">
+                <span class="custom-step-num tabular">03</span>
+                <div class="custom-step-body">
+                  <strong class="custom-step-title">仮払い・制作</strong>
+                  <span class="custom-step-desc">合意後、つなぐ上で仮払いいただき制作を開始します</span>
+                </div>
+              </li>
+              <li class="custom-step">
+                <span class="custom-step-num tabular">04</span>
+                <div class="custom-step-body">
+                  <strong class="custom-step-title">ご確認・納品</strong>
+                  <span class="custom-step-desc">仕上がり確認後、パッチファイル（<code>.exdia-patch.json</code> 等）を納品します</span>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <details class="custom-info-details">
+            <summary class="custom-info-summary">
+              <span>ご相談時に添えてほしい情報（初回やり取りをスムーズにするための4点）</span>
+              <svg class="custom-info-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="custom-info-body">
+              <p>ご相談の際にあわせて以下の4点をお送りいただくと、仕様確認とお見積りがスムーズに進みます。</p>
+              <ul class="custom-info-list">
+                <li>対象画面のスクリーンショット</li>
+                <li>変更したい箇所の赤入れ・メモ</li>
+                <li>ご利用中の ExDia エディション・バージョン</li>
+                <li>希望する見た目や動作の詳細</li>
+              </ul>
+            </div>
+          </details>
+
+          <div class="custom-notes">
+            <ul class="custom-notes-list">
+              <li>上記は目安の料金です。内容と工数を確認のうえ、事前に正式なお見積りをご提示します（お見積り確認後のキャンセル可）。</li>
+              <li>パッチの動作保証は<strong>納品時点の本体バージョンのみ</strong>となります。将来の本体アップデートに伴う再調整は別途有償（¥1,000〜）です。</li>
+              <li>既製品（ExDia本体・汎用パッチ）のご購入は <a href="https://sekitan66325.booth.pm/items/9206447" data-booth-url="default" data-ga-placement="custom_note" target="_blank" rel="noopener noreferrer">BOOTH</a> をご利用ください。</li>
+            </ul>
+          </div>
+
+          <div class="custom-cta-row">
+            <a href="https://tsunagu.cloud/products/152803" class="btn btn--dark" data-ga-outbound="tsunagu" data-ga-placement="custom_section" target="_blank" rel="noopener noreferrer">
+              <span>つなぐで個別カスタムを相談する</span>
+              <span class="arrow-glyph" aria-hidden="true">→</span>
+            </a>
+            <a href="https://forms.gle/CaTR8ShCaVNaA6f56" class="btn btn--ghost-border" id="custom-form-trigger" target="_blank" rel="noopener noreferrer">
+              <span>団体・法人導入（Enterprise）のお問い合わせ</span>
+              <span class="arrow-glyph" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 詳細機能比較マトリクス (#compare on #F7F8FA・ブランドロゴヘッダー＋tfoot CTA行) -->
+    <section class="section-block section-block--subtle" id="compare" aria-labelledby="compare-heading">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <h2 class="section-title" id="compare-heading">
+            <span class="motion-mask"><span class="motion-mask-inner">全4エディション 詳細機能比較</span></span>
+          </h2>
+          <div class="motion-rule section-rule" data-reveal aria-hidden="true"></div>
+        </div>
+
+        <div class="compare-toolbar" data-reveal>
+          <div class="compare-toggle-group" id="compare-toggle-group" role="group" aria-label="比較表示の絞り込み">
+            <span class="compare-toggle-indicator" id="compare-toggle-indicator" aria-hidden="true"></span>
+            <button type="button" class="compare-toggle-btn" id="filter-all-btn" aria-pressed="true">すべて表示</button>
+            <button type="button" class="compare-toggle-btn" id="filter-diff-btn" aria-pressed="false">差がある項目だけ表示</button>
+          </div>
+
+          <div class="compare-legend" aria-label="比較表の記号凡例">
+            <span class="compare-legend-item"><strong>○</strong> 対応</span>
+            <span class="compare-legend-item"><strong>△</strong> 一部制限</span>
+            <span class="compare-legend-item"><strong>—</strong> 非対応</span>
+          </div>
+        </div>
+
+        <!-- PC表示：4エディション比較表（ブランドロゴヘッダー ＋ tfoot 直結CTA） -->
+        <div class="compare-table-wrap">
+          <table class="compare-table" id="compare-table">
+            <thead>
+              <tr>
+                <th scope="col">機能・仕様項目</th>
+                <th scope="col">
+                  <img src="assets/brand/logo-web.svg" alt="ExDia Web" class="compare-th-logo" height="22">
+                  <span class="compare-th-price">無料</span>
+                </th>
+                <th scope="col">
+                  <img src="assets/brand/logo-plus.svg" alt="ExDia Plus" class="compare-th-logo" height="22">
+                  <span class="compare-th-price">¥1,280</span>
+                </th>
+                <th scope="col">
+                  <img src="assets/brand/logo-pro.svg" alt="ExDia Pro" class="compare-th-logo" height="22">
+                  <span class="compare-th-price">¥2,980</span>
+                </th>
+                <th scope="col">
+                  <img src="assets/brand/logo-ultra.svg" alt="ExDia Ultra" class="compare-th-logo" height="22">
+                  <span class="compare-th-price">¥4,980</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="compare-group-row" data-group-id="env">
+                <td colspan="5">① 動作環境・ファイル安全</td>
+              </tr>
+              <tr class="compare-row" data-group="env">
+                <td>ブラウザ / PWA 動作（Windows / Mac / タブレット）</td>
+                <td><span class="cell-yes cell-yes--web">○</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+              </tr>
+              <tr class="compare-row" data-group="env">
+                <td>Windows 10/11（64bit）完全オフライン単独動作</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--plus">○</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row" data-group="env">
+                <td>Atomic Write 安全保存・未保存終了ガード・<code>.exdia</code> 関連付け</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--plus">○</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row" data-group="env">
+                <td>保存時の自動世代バックアップ（最大20世代）</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row" data-group="env">
+                <td><code>.exdia</code> / <code>.exdia.json</code> / <code>.oud</code> / <code>.oud2</code> 読込・書出</td>
+                <td><span class="cell-yes cell-yes--web">○</span></td>
+                <td><span class="cell-yes cell-yes--plus">○</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+
+              <tr class="compare-group-row" data-group-id="output">
+                <td colspan="5">② 整理・帳票・印刷入稿</td>
+              </tr>
+              <tr class="compare-row" data-group="output">
+                <td>列車フォルダ整理・一括時刻シフト / 一括運休</td>
+                <td><span class="cell-limit">△（1階層のみ）</span></td>
+                <td><span class="cell-yes cell-yes--plus">○（多階層・一括可）</span></td>
+                <td><span class="cell-yes cell-yes--pro">○（多階層・一括可）</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○（多階層・一括可）</span></td>
+              </tr>
+              <tr class="compare-row" data-group="output">
+                <td>駅掲示時刻表（縦型ポスター）＆ 全駅一括SVG出力</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--plus">○</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row" data-group="output">
+                <td>印刷・SVG クレジット表記制御</td>
+                <td><span class="cell-limit">△（標準固定）</span></td>
+                <td><span class="cell-limit">△（標準固定）</span></td>
+                <td><span class="cell-yes cell-yes--pro">○（非表示・任意文字可）</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○（非表示・任意文字可）</span></td>
+              </tr>
+              <tr class="compare-row" data-group="output">
+                <td>全ダイヤ / 全運用の一括SVGフォルダ書き出し</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row" data-group="output">
+                <td>出力カスタマイズパッチ（<code>.exdia-patch.json</code>）読込</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+
+              <tr class="compare-group-row" data-group-id="fleet">
+                <td colspan="5">③ 車両編成・運用管理</td>
+              </tr>
+              <tr class="compare-row" data-group="fleet">
+                <td>車両編成マスタ管理 ＆ 日別運用充当カレンダー</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row" data-group="fleet">
+                <td>運用ごとの編成長設定 ＆ 基地別入出庫両数収支</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+
+              <tr class="compare-group-row" data-group-id="ultra">
+                <td colspan="5">④ 指令・運転曲線・乗務（Ultra限定）</td>
+              </tr>
+              <tr class="compare-row" data-group="ultra">
+                <td>マルチトラックTID ＆ 構内配線カスタムエディタ（3状態終端・留置線在線）</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row" data-group="ultra">
+                <td>遅延波及リアルタイム運行シミュレーション</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row" data-group="ultra">
+                <td>物理運転曲線（ランカーブ）＆ 基準運転時分反映</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row" data-group="ultra">
+                <td>乗務員仕業（行路）作成 ＆ 運転士スタフ SVG/PDF出力</td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-no">—</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+
+              <tr class="compare-group-row" data-group-id="basic">
+                <td colspan="5">
+                  <button type="button" class="compare-group-toggle-btn" id="basic-group-toggle" aria-expanded="false">
+                    <span>⑤ 基本ダイヤ編集機能（全エディション共通）</span>
+                    <span class="compare-group-state">（クリックで展開）</span>
+                  </button>
+                </td>
+              </tr>
+              <tr class="compare-row is-collapsed-group" data-group="basic">
+                <td>ダイヤグラム・時刻表・車両運用表・箱ダイヤ・番線在線表</td>
+                <td><span class="cell-yes cell-yes--web">○</span></td>
+                <td><span class="cell-yes cell-yes--plus">○</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row is-collapsed-group" data-group="basic">
+                <td>単線・複線・複々線・分岐・環状線 ＆ 競合自動検出</td>
+                <td><span class="cell-yes cell-yes--web">○</span></td>
+                <td><span class="cell-yes cell-yes--plus">○</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row is-collapsed-group" data-group="basic">
+                <td>日付別ダイヤ・臨時列車・区間運休カレンダープレビュー</td>
+                <td><span class="cell-yes cell-yes--web">○</span></td>
+                <td><span class="cell-yes cell-yes--plus">○</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+              <tr class="compare-row is-collapsed-group" data-group="basic">
+                <td>ダイヤグラム・時刻表・箱ダイヤの印刷 / PDF / SVG / PNG出力</td>
+                <td><span class="cell-yes cell-yes--web">○</span></td>
+                <td><span class="cell-yes cell-yes--plus">○</span></td>
+                <td><span class="cell-yes cell-yes--pro">○</span></td>
+                <td><span class="cell-yes cell-yes--ultra">○</span></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="compare-cta-row">
+                <td>エディションを選択</td>
+                <td><a href="https://exdia.sekitan.net/" class="btn btn--sm btn--web compare-foot-btn" data-ga-placement="compare_tfoot" target="_blank" rel="noopener noreferrer">Web版を開く</a></td>
+                <td><a href="https://sekitan66325.booth.pm/items/9206447" class="btn btn--sm btn--plus compare-foot-btn" data-booth-url="plus" data-ga-placement="compare_tfoot" target="_blank" rel="noopener noreferrer">BOOTHでPlus</a></td>
+                <td><a href="https://sekitan66325.booth.pm/items/9206447" class="btn btn--sm btn--pro compare-foot-btn" data-booth-url="pro" data-ga-placement="compare_tfoot" target="_blank" rel="noopener noreferrer">BOOTHでPro</a></td>
+                <td><a href="https://sekitan66325.booth.pm/items/9206447" class="btn btn--sm btn--ultra-gold compare-foot-btn" data-booth-url="ultra" data-ga-placement="compare_tfoot" target="_blank" rel="noopener noreferrer">BOOTHでUltra</a></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- スマホ幅（< 768px）：任意2エディション比較セレクタUI -->
+        <div class="mobile-compare" aria-label="2エディション比較">
+          <div class="mobile-compare-selectors">
+            <div class="mobile-select-box">
+              <label for="mobile-compare-left" class="mobile-select-label">比較対象 A</label>
+              <select id="mobile-compare-left" class="mobile-select">
+                <option value="web">ExDia Web（無料）</option>
+                <option value="plus">ExDia Plus（¥1,280）</option>
+                <option value="pro" selected>ExDia Pro（¥2,980）</option>
+                <option value="ultra">ExDia Ultra（¥4,980）</option>
+              </select>
+            </div>
+            <div class="mobile-select-box">
+              <label for="mobile-compare-right" class="mobile-select-label">比較対象 B</label>
+              <select id="mobile-compare-right" class="mobile-select">
+                <option value="web">ExDia Web（無料）</option>
+                <option value="plus">ExDia Plus（¥1,280）</option>
+                <option value="pro">ExDia Pro（¥2,980）</option>
+                <option value="ultra" selected>ExDia Ultra（¥4,980）</option>
+              </select>
+            </div>
+          </div>
+
+          <table class="mobile-compare-table">
+            <thead>
+              <tr>
+                <th scope="col">機能項目</th>
+                <th scope="col" id="mobile-th-left">Pro（¥2,980）</th>
+                <th scope="col" id="mobile-th-right">Ultra（¥4,980）</th>
+              </tr>
+            </thead>
+            <tbody id="mobile-compare-body"></tbody>
+          </table>
+        </div>
+
+        <div class="compare-footer-note">
+          <span>※ Atomic Write＝一時ファイル書き出しと同期後に置換するクラッシュ耐性保存方式。TID＝列車運行表示盤。</span>
+          <a href="https://sekitan66325.booth.pm/items/9206447" class="text-arrow-link" data-booth-url="default" data-ga-placement="compare_footer" target="_blank" rel="noopener noreferrer">
+            <span>BOOTH販売ページを見る</span>
+            <span class="arrow-glyph" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. 動作環境・確認事項・FAQ (#requirements / #faq on #FFFFFF) -->
+    <section class="section-block" id="requirements" aria-labelledby="requirements-heading">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <h2 class="section-title" id="requirements-heading">
+            <span class="motion-mask"><span class="motion-mask-inner">動作環境・確認事項</span></span>
+          </h2>
+          <div class="motion-rule section-rule" data-reveal aria-hidden="true"></div>
+        </div>
+
+        <div class="spec-grid-layout">
+          <dl class="spec-dl" data-reveal>
+            <div class="spec-row">
+              <dt class="spec-term">バージョン・頒布日程</dt>
+              <dd class="spec-desc tabular">
+                無料 Web 版：<strong>v1.3.0</strong>（公開中）／ Windows デスクトップ版（Plus / Pro / Ultra）：<strong>v27.0.0</strong>（正式版公開中・BOOTH 1ページ内バリエーション出品）
+              </dd>
+            </div>
+            <div class="spec-row">
+              <dt class="spec-term">対応OS・動作環境</dt>
+              <dd class="spec-desc">
+                デスクトップ版は <strong>Windows 10 / 11（64bit）専用</strong> です。macOS・Linux・iPad・スマートフォンでは動作しません。
+                <p class="spec-inline-note">Mac やタブレット環境では <a href="https://exdia.sekitan.net/" data-ga-placement="spec_note" target="_blank" rel="noopener noreferrer">無料 Web 版（ExDia Web / PWA）</a> をご利用いただけます。</p>
+              </dd>
+            </div>
+            <div class="spec-row">
+              <dt class="spec-term">提供形式・初回起動</dt>
+              <dd class="spec-desc">
+                ポータブル <code>.zip</code> 形式で配布します。ダウンロード後に任意のフォルダへ<strong>必ずすべて解凍してから</strong>実行ファイルを起動してください（初回は空プロジェクトで起動します）。
+              </dd>
+            </div>
+            <div class="spec-row">
+              <dt class="spec-term">同梱物</dt>
+              <dd class="spec-desc">
+                ExDia 実行ファイル一式、<code>samples/</code> フォルダ内サンプル <code>.exdia</code> データ 2本（桜川電鉄 本線・緑川鉄道 シャトル）、<code>はじめに必ずお読みください.txt</code>。
+                <p class="spec-inline-note">補足：エディション別の専用オンラインマニュアルを付属しています。</p>
+              </dd>
+            </div>
+            <div class="spec-row">
+              <dt class="spec-term">データ互換性</dt>
+              <dd class="spec-desc">
+                <code>.exdia</code> / <code>.exdia.json</code> 形式は Web / Plus / Pro / Ultra の全エディション間で100%互換です。<code>.oud</code> / <code>.oud2</code> 読込にも対応しています。
+              </dd>
+            </div>
+            <div class="spec-row">
+              <dt class="spec-term">アップデート範囲</dt>
+              <dd class="spec-desc">
+                ご購入いただいたエディションの <strong><code>v27.x</code> 系の不具合修正・改善アップデート</strong>は、BOOTH の購入履歴から無料で再ダウンロードいただけます。
+              </dd>
+            </div>
+            <div class="spec-row">
+              <dt class="spec-term">出力物の利用・再配布</dt>
+              <dd class="spec-desc">
+                ExDia から出力したダイヤグラム・時刻表・駅ポスター・運転士スタフ等の<strong>同人誌・SNS・商用利用はすべて可能</strong>です（クレジット表示仕様は各エディションに準拠）。ソフトウェア本体および同梱サンプルデータの再配布・転売は禁止です。
+              </dd>
+            </div>
+            <div class="spec-row">
+              <dt class="spec-term">キャンセル・アップグレード</dt>
+              <dd class="spec-desc">
+                <strong>デジタル商品の性質上、購入後のキャンセル・返金および下位版から上位版への差額アップグレードには対応しておりません。</strong>
+                <p class="spec-inline-note">ご購入前にまず <a href="https://exdia.sekitan.net/" data-ga-placement="spec_note" target="_blank" rel="noopener noreferrer">無料 Web 版</a> にてお手元の <code>.oud</code> / <code>.oud2</code> ファイル読込と基本操作をお試しいただくことを推奨します。</p>
+              </dd>
+            </div>
+          </dl>
+
+          <div id="faq" data-reveal>
+            <h3 class="faq-subheading">よくある質問（FAQ）</h3>
+            <div class="faq-list">
+              <details class="faq-item" data-faq-id="smartscreen" open>
+                <summary class="faq-summary">
+                  <span>Windows Defender SmartScreen の青い警告画面（「Windows によって PC が保護されました」）が出た場合は？</span>
+                  <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="faq-answer">
+                  <p>
+                    個人開発によるコード署名なしの実行ファイルであるため、配布直後など実績履歴が少ない環境では初回起動時に SmartScreen の青い確認画面が表示されることがあります。
+                  </p>
+                  <p>
+                    公式 BOOTH からダウンロードしたファイルであることを確認のうえ、警告画面内の「<strong>詳細情報</strong>」をクリックし、表示される「<strong>実行</strong>」ボタンを押して起動してください。セキュリティ保護維持のため、Windows Defender や SmartScreen 機能自体の無効化は行わないでください。
+                  </p>
+                </div>
+              </details>
+
+              <details class="faq-item" data-faq-id="smart_app_control">
+                <summary class="faq-summary">
+                  <span>Windows 11 の「Smart App Control（スマートアプリコントロール）」で起動がブロックされた場合は？</span>
+                  <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="faq-answer">
+                  <p>
+                    Windows 11 で「Smart App Control（SAC）」が「オン」になっている環境では、署名のない個人開発アプリケーションの起動がブロックされ、個別の除外許可ができません。
+                  </p>
+                  <p>
+                    <strong>2026年4月以降の Windows 11 アップデート（24H2 / 25H2 / 26H2）</strong>が適用された環境では、OSの再インストールなしで「Windows セキュリティ」→「アプリとブラウザー コントロール」→「スマート アプリ コントロール設定」からオン／オフを切り替えられます。旧ビルドのままの環境では設定画面上の仕様が異なる場合がありますので、事前に Windows Update 状況と SAC 設定をご確認ください。
+                  </p>
+                </div>
+              </details>
+
+              <details class="faq-item" data-faq-id="web_migration">
+                <summary class="faq-summary">
+                  <span>無料 Web 版で作ったデータはデスクトップ版へ引き継げますか？</span>
+                  <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="faq-answer">
+                  <p>
+                    はい、そのまま引き継げます。無料 Web 版の「ファイル」メニューから <code>.exdia</code> または <code>.exdia.json</code> として保存したファイルをデスクトップ版で開くことで、路線・列車・運用データ一式をそのまま編集できます。逆方向（デスクトップ版 → Web 版）の開閉も可能です。
+                  </p>
+                </div>
+              </details>
+
+              <details class="faq-item" data-faq-id="update_settings">
+                <summary class="faq-summary">
+                  <span>アップデートやバージョン更新時、ユーザー設定や最近使ったファイルは引き継がれますか？</span>
+                  <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="faq-answer">
+                  <p>
+                    はい。表示設定や最近使ったファイル履歴は Windows のユーザーデータ領域（アプリ専用データフォルダ）に保存されており、各プロジェクトの <code>.exdia</code> ファイルや Pro/Ultra の自動バックアップ（<code>_exdia_backup/</code>）もプロジェクト保存先フォルダに残ります。新しいバージョンのポータブル <code>.zip</code> を解凍して差し替えても設定はそのまま引き継がれます。
+                  </p>
+                  <p>
+                    なお、Windows の <code>.exdia</code> ファイル関連付けを登録したあとで実行フォルダの置き場所を変更した場合は、新しいフォルダから起動した後にアプリ内の関連付けメニューを再度実行してください。
+                  </p>
+                </div>
+              </details>
+
+              <details class="faq-item" data-faq-id="samples_manual">
+                <summary class="faq-summary">
+                  <span>同梱サンプルやオンラインマニュアルはどのような内容ですか？</span>
+                  <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="faq-answer">
+                  <p>
+                    デスクトップ版は初回起動時に空プロジェクトで開きますが、同梱の <code>samples/</code> フォルダ内に動作確認用の <code>.exdia</code> サンプルデータ 2本（桜川電鉄 本線・緑川鉄道 シャトル）を収録しており、すぐに動作や帳票出力を試せます。
+                  </p>
+                  <p>
+                    補足として、各エディションの機能仕様に対応した専用のオンラインマニュアルを付属しています。
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            <div class="notebook-guide-box" id="ai-manual" data-reveal>
+              <h3 class="notebook-guide-title">公式AIマニュアル（Gemini Notebook）で操作・仕様を調べる</h3>
+              <p class="notebook-guide-desc">
+                各エディションの公式取扱説明書を読み込んだ専用 AI マニュアルです。購入前の機能確認や、導入後の操作・仕様に関するご質問に 24 時間いつでもお答えします（外部サイト・新規タブで開きます）。
+              </p>
+              <div class="notebook-guide-grid">
+                <a href="https://notebook.google.com/notebook/3890a9de-d981-4eac-9604-ad3bdea0c52d" class="notebook-guide-link" target="_blank" rel="noopener noreferrer" data-ga-placement="support_notebook_btn" data-ga-cta="notebook_web">
+                  <span><span class="notebook-guide-edition">Web</span> 無料 Web 版</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a href="https://notebook.google.com/notebook/50d172c7-eda3-49ea-93e5-ca23d5622a8d" class="notebook-guide-link" target="_blank" rel="noopener noreferrer" data-ga-placement="support_notebook_btn" data-ga-cta="notebook_plus">
+                  <span><span class="notebook-guide-edition">Plus</span> ExDia Plus</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a href="https://notebook.google.com/notebook/5d17e789-22ef-4ecc-9308-ff533639d2d3" class="notebook-guide-link" target="_blank" rel="noopener noreferrer" data-ga-placement="support_notebook_btn" data-ga-cta="notebook_pro">
+                  <span><span class="notebook-guide-edition">Pro</span> ExDia Pro</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a href="https://notebook.google.com/notebook/af0a236b-f452-4b83-8c05-4cdf5c3d44f2" class="notebook-guide-link" target="_blank" rel="noopener noreferrer" data-ga-placement="support_notebook_btn" data-ga-cta="notebook_ultra">
+                  <span><span class="notebook-guide-edition">Ultra</span> ExDia Ultra</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. 静かなクロージング (#F7F8FA) -->
+    <section class="closing-section" id="closing" aria-labelledby="closing-heading">
+      <div class="container closing-inner" data-reveal>
+        <h2 class="closing-title" id="closing-heading">
+          <span class="motion-mask"><span class="motion-mask-inner">お手元の路線データを、本格的な制作・運行環境へ。</span></span>
+        </h2>
+        <p class="closing-desc">
+          Windows デスクトップ版（Plus / Pro / Ultra）は買い切り・月額 ¥0 で永続利用いただけます。ご購入前の動作確認や <code>.oud</code> / <code>.oud2</code> ファイルの互換チェックは、公開中の無料 Web 版からお試しいただけます。
+        </p>
+        <div class="closing-actions">
+          <a href="https://sekitan66325.booth.pm/items/9206447" class="btn btn--pill btn--dark" data-booth-url="default" data-ga-placement="closing" target="_blank" rel="noopener noreferrer">BOOTH販売ページへ</a>
+          <a href="https://exdia.sekitan.net/" class="btn btn--pill btn--ghost-border" data-ga-placement="closing" target="_blank" rel="noopener noreferrer">無料Web版で動作確認する</a>
+        </div>
+        <p class="closing-community">
+          不具合報告・ご質問：<a href="https://discord.gg/2MWfFE3Z2" data-ga-outbound="discord" data-ga-placement="closing" target="_blank" rel="noopener noreferrer">公式 Discord</a> ／ <a href="mailto:sekitan.info@gmail.com" data-ga-outbound="mail" data-ga-placement="closing">メールお問い合わせ</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- sekitan.net 共通フッター (#FFFFFF) -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <nav class="footer-nav" aria-label="フッターリンク">
+        <a href="../" data-ga-outbound="portal" data-ga-placement="footer">ポータルトップ</a>
+        <a href="https://exdia.sekitan.net/" data-ga-placement="footer" target="_blank" rel="noopener noreferrer">ExDia 無料Web版</a>
+        <a href="https://discord.gg/2MWfFE3Z2" data-ga-outbound="discord" data-ga-placement="footer" target="_blank" rel="noopener noreferrer">Discord</a>
+        <a href="https://x.com/sekitan66325" data-ga-outbound="x" data-ga-placement="footer" target="_blank" rel="noopener noreferrer">X</a>
+        <a href="https://github.com/sekitan66325" data-ga-outbound="github" data-ga-placement="footer" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://sekitan66325.booth.pm/items/9206447" data-booth-url="default" data-ga-placement="footer" target="_blank" rel="noopener noreferrer">BOOTH</a>
+        <a href="mailto:sekitan.info@gmail.com" data-ga-outbound="mail" data-ga-placement="footer">お問い合わせ</a>
+      </nav>
+      <p class="footer-copy">© 2026 せきたん / sekitan.net</p>
+    </div>
+  </footer>
+
+  <!-- カスタマイズ相談モーダル（EXDIA_CONFIG.customFormUrl 未設定時用） -->
+  <div class="custom-modal" id="custom-modal" role="dialog" aria-modal="true" aria-labelledby="custom-modal-title" hidden>
+    <div class="custom-modal-dialog">
+      <div class="custom-modal-head">
+        <h3 class="custom-modal-title" id="custom-modal-title">個別カスタマイズ相談フォーム</h3>
+        <button type="button" class="custom-modal-close" id="custom-modal-close" aria-label="相談フォームを閉じる">×</button>
+      </div>
+      <p class="custom-modal-lead">ご希望の相談内容をご記入ください。メール下書きを作成するか、内容をコピーして公式 Discord 等からそのままお送りいただけます。</p>
+
+      <form id="custom-consult-form" class="custom-form">
+        <label class="custom-field">
+          <span class="custom-field-label">相談種別</span>
+          <select id="custom-field-type" class="custom-input">
+            <option value="帳票カスタムパッチ制作（.exdia-patch.json）">帳票カスタムパッチ制作（.exdia-patch.json）</option>
+            <option value="機能追加・個別カスタマイズ相談">機能追加・個別カスタマイズ相談</option>
+          </select>
+        </label>
+
+        <label class="custom-field">
+          <span class="custom-field-label">対象・ご利用予定エディション</span>
+          <select id="custom-field-edition" class="custom-input">
+            <option value="ExDia Pro">ExDia Pro</option>
+            <option value="ExDia Ultra">ExDia Ultra</option>
+            <option value="ExDia Plus">ExDia Plus</option>
+            <option value="未定・相談して決めたい">未定・相談して決めたい</option>
+          </select>
+        </label>
+
+        <label class="custom-field">
+          <span class="custom-field-label">ご希望内容・参考様式など</span>
+          <textarea id="custom-field-detail" class="custom-input custom-textarea" rows="4" placeholder="例：〇〇電鉄風の運転士スタフ様式を制作してほしい／独自CSV変換について相談したい"></textarea>
+        </label>
+
+        <div class="custom-modal-actions">
+          <button type="submit" class="btn btn--dark">メール下書きを開く</button>
+          <button type="button" class="btn btn--ghost-border" id="custom-copy-btn">相談内容をコピー</button>
+        </div>
+        <p class="custom-modal-status" id="custom-modal-status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- 実機スクショクリック拡大ライトボックス -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightbox-caption" hidden>
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="拡大表示を閉じる">×</button>
+    <div class="lightbox-content">
+      <img class="lightbox-img" id="lightbox-img" src="" alt="">
+      <p class="lightbox-caption" id="lightbox-caption"></p>
+    </div>
+  </div>
+
+  <script src="exdia.js?v=20261128a" defer></script>
+</body>
+
+</html>

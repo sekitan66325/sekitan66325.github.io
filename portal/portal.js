@@ -110,4 +110,18 @@
   window.addEventListener('resize', syncActiveNav, { passive: true });
   window.addEventListener('load', syncActiveNav);
   syncActiveNav();
+
+  // 4. ExDia CTA click tracking (GA4: G-0GM4B0FTW9)
+  document.querySelectorAll('[data-exdia-cta]').forEach((el) => {
+    el.addEventListener('click', () => {
+      if (typeof window.gtag !== 'function') return;
+      window.gtag('event', 'exdia_cta_click', {
+        source_app: el.getAttribute('data-cta-source') || 'portal',
+        placement: el.getAttribute('data-cta-placement') || 'unknown',
+        destination: el.getAttribute('data-cta-destination') || 'unknown',
+        link_url: el.href || el.getAttribute('href') || '',
+        transport_type: 'beacon'
+      });
+    });
+  });
 })();
